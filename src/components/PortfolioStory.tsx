@@ -1,4 +1,3 @@
-import type { Dispatch, SetStateAction } from "react";
 import {
   archive,
   capabilities,
@@ -10,7 +9,7 @@ import {
 } from "../content/portfolio";
 
 type PortfolioStoryProps = {
-  onSelectCase: Dispatch<SetStateAction<CaseStudy | null>>;
+  onSelectCase: (caseStudy: CaseStudy) => void;
 };
 
 export function PortfolioStory({ onSelectCase }: PortfolioStoryProps) {

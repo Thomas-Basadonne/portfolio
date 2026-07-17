@@ -21,7 +21,6 @@ export function CaseStudyDrawer({ caseStudy, onClose }: CaseStudyDrawerProps) {
 
   useEffect(() => {
     if (!caseStudy) return;
-    const previousFocus = document.activeElement as HTMLElement | null;
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     closeRef.current?.focus();
@@ -52,7 +51,6 @@ export function CaseStudyDrawer({ caseStudy, onClose }: CaseStudyDrawerProps) {
     return () => {
       document.body.style.overflow = previousOverflow;
       window.removeEventListener("keydown", onKeyDown);
-      window.requestAnimationFrame(() => previousFocus?.focus());
     };
   }, [caseStudy, onClose]);
 
@@ -73,7 +71,7 @@ export function CaseStudyDrawer({ caseStudy, onClose }: CaseStudyDrawerProps) {
             <span className="mono-label">{caseStudy.code} / inspection report</span>
             <h2 id="case-drawer-title">{caseStudy.title}</h2>
           </div>
-          <button ref={closeRef} type="button" onClick={onClose} data-cursor="engage">
+          <button ref={closeRef} type="button" onClick={onClose} data-cursor="engage" autoFocus>
             Close <span aria-hidden="true">×</span>
           </button>
         </header>

@@ -35,9 +35,22 @@ export default function App() {
   const [mountCanvas, setMountCanvas] = useState(false);
   const [selectedCase, setSelectedCase] = useState<CaseStudy | null>(null);
   const siteRef = useRef<HTMLDivElement>(null);
+  const caseTriggerRef = useRef<HTMLElement | null>(null);
   const entered = phase !== "entry";
   const { activeChapter, progressPercent, reducedMotion } = useExperienceController(entered);
-  const closeCase = useCallback(() => setSelectedCase(null), []);
+  const selectCase = useCallback((caseStudy: CaseStudy) => {
+    caseTriggerRef.current =
+      document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    setSelectedCase(caseStudy);
+  }, []);
+  const closeCase = useCallback(() => {
+    const trigger = caseTriggerRef.current;
+    setSelectedCase(null);
+    window.requestAnimationFrame(() => {
+      trigger?.focus();
+      caseTriggerRef.current = null;
+    });
+  }, []);
   const visualFailed = useCallback(() => dispatch({ type: "CANVAS_FAILED" }), []);
   const visualReady = useCallback(() => dispatch({ type: "CANVAS_READY" }), []);
 
@@ -120,7 +133,7 @@ export default function App() {
         )}
         <div className="paper-grain" aria-hidden="true" />
         <Hud activeChapter={activeChapter} progressPercent={progressPercent} />
-        <PortfolioStory onSelectCase={setSelectedCase} />
+        <PortfolioStory onSelectCase={selectCase} />
       </div>
 
       {entered && phase === "loading" && (

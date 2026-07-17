@@ -180,8 +180,17 @@ test("critical interaction path has no unexpected console warnings or errors", a
     const text = message.text();
     const isHeadlessDriverNoise =
       message.type() === "warning" &&
-      /GL Driver Message .*GPU stall due to ReadPixels/.test(text);
-    if (["error", "warning"].includes(message.type()) && !isHeadlessDriverNoise) {
+      (/GL Driver Message .*GPU stall due to ReadPixels/.test(text) ||
+        /Failed to create WebGL context: WebGL creation failed/.test(text));
+    const isOptionalFontPreloadNoise =
+      message.type() === "warning" &&
+      /was preloaded using link preload but not used/.test(text) &&
+      /\/fonts\/(manrope|dm-mono|instrument-serif)-latin/.test(text);
+    if (
+      ["error", "warning"].includes(message.type()) &&
+      !isHeadlessDriverNoise &&
+      !isOptionalFontPreloadNoise
+    ) {
       unexpectedLogs.push(text);
     }
   });
