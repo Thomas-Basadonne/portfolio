@@ -174,19 +174,25 @@ test("WebGL context loss switches to the deterministic fallback", async ({ page,
   await expect(page.getByRole("heading", { level: 1, name: /thomas basadonne/i })).toBeVisible();
 });
 
-test("critical interaction path has no unexpected console or page errors", async ({ page }) => {
-  const errors: string[] = [];
+test("critical interaction path has no unexpected console warnings or errors", async ({ page }) => {
+  const unexpectedLogs: string[] = [];
   page.on("console", (message) => {
-    if (message.type() === "error") errors.push(message.text());
+    const text = message.text();
+    const isHeadlessDriverNoise =
+      message.type() === "warning" &&
+      /GL Driver Message .*GPU stall due to ReadPixels/.test(text);
+    if (["error", "warning"].includes(message.type()) && !isHeadlessDriverNoise) {
+      unexpectedLogs.push(text);
+    }
   });
-  page.on("pageerror", (error) => errors.push(error.message));
+  page.on("pageerror", (error) => unexpectedLogs.push(error.message));
   await bypassEntry(page);
   await page.goto("/");
   await page.getByRole("link", { name: /03 case files/i }).click();
   await page.getByRole("button", { name: /tolerance \/ 0.01/i }).click();
   await page.getByRole("button", { name: /close/i }).click();
   await page.getByRole("link", { name: /05 transmit/i }).click();
-  expect(errors).toEqual([]);
+  expect(unexpectedLogs).toEqual([]);
 });
 
 test("automated accessibility scan is clean", async ({ page }) => {
