@@ -22,6 +22,10 @@ test("entry isolates the portfolio and delays the visual bundle", async ({ page 
   await expect(page.getByRole("dialog", { name: /measure what survives complexity/i })).toBeVisible();
   await expect(page.locator(".site-shell")).toHaveAttribute("inert", "");
   expect(visualRequests).toHaveLength(0);
+  const webglSupported = await page.evaluate(() => {
+    const canvas = document.createElement("canvas");
+    return Boolean(canvas.getContext("webgl2") || canvas.getContext("webgl"));
+  });
 
   const skipLink = page.getByRole("link", { name: "Skip to content" });
   await skipLink.focus();
@@ -33,7 +37,12 @@ test("entry isolates the portfolio and delays the visual bundle", async ({ page 
 
   await expect(page.locator(".entry-sequence")).toHaveAttribute("aria-hidden", "true");
   await expect(page.locator(".site-shell")).not.toHaveAttribute("inert", "");
-  await expect.poll(() => visualRequests.length).toBeGreaterThan(0);
+  if (webglSupported) {
+    await expect.poll(() => visualRequests.length).toBeGreaterThan(0);
+  } else {
+    await expect(page.getByText(/visual layer unavailable/i)).toBeVisible();
+    expect(visualRequests).toHaveLength(0);
+  }
   await expect(page.getByRole("heading", { level: 1, name: /thomas basadonne/i })).toBeVisible();
 });
 
@@ -59,7 +68,7 @@ test("chapter navigation, history and refresh preserve context", async ({ page }
   await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight * 0.55));
   await page.reload();
   await expect(page.locator(".entry-sequence")).toHaveAttribute("aria-hidden", "true");
-  expect(await page.evaluate(() => window.scrollY)).toBeGreaterThan(0);
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(0);
 });
 
 test("case drawer traps focus and restores it", async ({ page }) => {
