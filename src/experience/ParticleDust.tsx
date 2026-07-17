@@ -14,6 +14,7 @@ function seeded(index: number, offset: number) {
 
 export function ParticleDust({ count }: ParticleDustProps) {
   const points = useRef<THREE.Points>(null);
+  const motionTime = useRef(0);
   const positions = useMemo(() => {
     const values = new Float32Array(count * 3);
     for (let index = 0; index < count; index += 1) {
@@ -27,10 +28,12 @@ export function ParticleDust({ count }: ParticleDustProps) {
     return values;
   }, [count]);
 
-  useFrame(({ clock }, delta) => {
-    if (!points.current || experienceStore.reducedMotion) return;
-    points.current.rotation.y += delta * 0.012;
-    points.current.rotation.z = Math.sin(clock.elapsedTime * 0.08) * 0.025;
+  useFrame((_, delta) => {
+    if (!points.current || experienceStore.reducedMotion || experienceStore.paused) return;
+    const safeDelta = Math.min(delta, 0.05);
+    motionTime.current += safeDelta;
+    points.current.rotation.y += safeDelta * 0.012;
+    points.current.rotation.z = Math.sin(motionTime.current * 0.08) * 0.025;
   });
 
   return (

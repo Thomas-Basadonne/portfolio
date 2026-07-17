@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse">
+      <path d="M60 0H0V60" fill="none" stroke="#e9e5da" stroke-opacity=".08"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="630" fill="#0b0b0a"/>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+  <circle cx="910" cy="315" r="188" fill="none" stroke="#ff4d00" stroke-width="3"/>
+  <circle cx="910" cy="315" r="106" fill="none" stroke="#a8b6ac" stroke-width="2" stroke-dasharray="8 14"/>
+  <path d="M690 315h440M910 95v440" stroke="#e9e5da" stroke-opacity=".45"/>
+  <circle cx="910" cy="315" r="34" fill="#ff4d00"/>
+  <g fill="#e9e5da" font-family="Arial, sans-serif">
+    <text x="72" y="88" font-size="18" letter-spacing="4">TB / PERSONAL INSTRUMENT</text>
+    <text x="72" y="248" font-size="78" font-weight="700">THOMAS</text>
+    <text x="72" y="324" font-size="78" font-weight="700">BASADONNE</text>
+    <text x="72" y="402" font-size="28">Built to hold. Wired to wonder.</text>
+    <text x="72" y="542" font-size="16" letter-spacing="3" fill="#a8b6ac">FRONTEND / CREATIVE DEVELOPER</text>
+  </g>
+</svg>

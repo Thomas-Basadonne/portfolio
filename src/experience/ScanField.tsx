@@ -40,10 +40,12 @@ const fragmentShader = /* glsl */ `
 
 export function ScanField() {
   const material = useRef<THREE.ShaderMaterial>(null);
+  const motionTime = useRef(0);
 
-  useFrame(({ clock }) => {
-    if (!material.current) return;
-    material.current.uniforms.uTime.value = clock.elapsedTime;
+  useFrame((_, delta) => {
+    if (!material.current || experienceStore.paused) return;
+    if (!experienceStore.reducedMotion) motionTime.current += Math.min(delta, 0.05);
+    material.current.uniforms.uTime.value = motionTime.current;
     material.current.uniforms.uProgress.value = experienceStore.progress;
   });
 

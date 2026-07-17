@@ -1,0 +1,11 @@
+:root { color-scheme: dark; font-family: system-ui, sans-serif; color: #e9e5da; background: #0b0b0a; }
+* { box-sizing: border-box; }
+body { margin: 0; }
+.static-portfolio { max-width: 70rem; margin: 0 auto; padding: 4rem clamp(1rem, 5vw, 5rem); }
+.static-portfolio section { padding: 3rem 0; border-top: 1px solid #5d5b55; }
+.static-portfolio h1 { max-width: 10ch; margin: 0; font-size: clamp(3.5rem, 12vw, 9rem); line-height: .82; }
+.static-portfolio h2 { max-width: 18ch; font-size: clamp(2rem, 6vw, 4rem); line-height: .95; }
+.static-portfolio p, .static-portfolio li { max-width: 62ch; line-height: 1.65; }
+.static-portfolio a { color: #ff6a2b; }
+.static-portfolio nav ul { display: flex; flex-wrap: wrap; gap: 1rem; padding: 0; list-style: none; }
+.prerender-shell { display: none; }

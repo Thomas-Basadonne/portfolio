@@ -83,8 +83,8 @@ export function PortfolioStory({ onSelectCase }: PortfolioStoryProps) {
           <div className="section-heading-row">
             <h2>Work, opened to the decisions inside.</h2>
             <p>
-              These three report slots are ready for verified case-study material. Their empty state is
-              visible by design—nothing here pretends to be client work.
+              A fully inspectable build, followed by a concise trace of public experiments. No client
+              name, private metric or unverified outcome is presented as evidence.
             </p>
           </div>
 
@@ -103,7 +103,7 @@ export function PortfolioStory({ onSelectCase }: PortfolioStoryProps) {
                   <strong>{caseStudy.title}</strong>
                   <em>{caseStudy.summary}</em>
                 </span>
-                <span className="case-index__status mono-label">Data requested</span>
+                <span className="case-index__status mono-label">Published</span>
                 <span className="case-index__arrow" aria-hidden="true">↗</span>
               </button>
             ))}
@@ -128,7 +128,7 @@ export function PortfolioStory({ onSelectCase }: PortfolioStoryProps) {
           <h2>Systems leave traces. Keep the useful ones.</h2>
           <ol className="trace-list">
             {trace.map((item) => (
-              <li key={`${item.time}-${item.title}`} className={item.incomplete ? "is-incomplete" : undefined}>
+              <li key={`${item.time}-${item.title}`}>
                 <span className="mono-label">{item.time}</span>
                 <div>
                   <h3>{item.title}</h3>
@@ -153,21 +153,20 @@ export function PortfolioStory({ onSelectCase }: PortfolioStoryProps) {
           </p>
 
           <div className="contact-links">
-            {socials.map((social) =>
-              social.placeholder ? (
-                <span key={social.label} className="contact-link is-placeholder" aria-disabled="true">
-                  <small className="mono-label">Add verified URL</small>
-                  <strong>{social.label}</strong>
-                  <span aria-hidden="true">—</span>
-                </span>
-              ) : (
-                <a key={social.label} className="contact-link" href={social.href} target="_blank" rel="noreferrer">
-                  <small className="mono-label">Open channel</small>
-                  <strong>{social.label}</strong>
-                  <span aria-hidden="true">↗</span>
-                </a>
-              ),
-            )}
+            {socials.map((social) => (
+              <a
+                key={social.label}
+                className="contact-link"
+                href={social.href}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <small className="mono-label">Open channel</small>
+                <strong>{social.label}</strong>
+                <span aria-hidden="true">↗</span>
+                <span className="visually-hidden"> (opens in a new tab)</span>
+              </a>
+            ))}
           </div>
 
           <footer className="site-footer mono-label">

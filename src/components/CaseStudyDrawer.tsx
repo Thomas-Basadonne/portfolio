@@ -7,11 +7,10 @@ type CaseStudyDrawerProps = {
 };
 
 function DataField({ label, value }: { label: string; value: string }) {
-  const missing = value.startsWith("CONTENT NEEDED");
   return (
     <div className="case-field">
       <dt className="mono-label">{label}</dt>
-      <dd className={missing ? "is-placeholder" : undefined}>{value}</dd>
+      <dd>{value}</dd>
     </div>
   );
 }
@@ -53,7 +52,7 @@ export function CaseStudyDrawer({ caseStudy, onClose }: CaseStudyDrawerProps) {
     return () => {
       document.body.style.overflow = previousOverflow;
       window.removeEventListener("keydown", onKeyDown);
-      previousFocus?.focus();
+      window.requestAnimationFrame(() => previousFocus?.focus());
     };
   }, [caseStudy, onClose]);
 
@@ -81,7 +80,7 @@ export function CaseStudyDrawer({ caseStudy, onClose }: CaseStudyDrawerProps) {
 
         <div className="case-drawer__status mono-label">
           <span>Status</span>
-          <strong>{caseStudy.status === "content-needed" ? "Awaiting verified data" : "Published"}</strong>
+          <strong>Published</strong>
         </div>
 
         <dl className="case-drawer__fields">
@@ -109,7 +108,7 @@ export function CaseStudyDrawer({ caseStudy, onClose }: CaseStudyDrawerProps) {
         </dl>
 
         <p className="case-drawer__footnote mono-label">
-          This slot is deliberately honest: no client, metric or outcome is shown until it can be verified.
+          Evidence boundary: this report describes the portfolio itself and makes no private client claim.
         </p>
       </article>
     </div>

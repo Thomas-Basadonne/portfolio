@@ -8,7 +8,9 @@ export const experienceStore = {
   reducedMotion: false,
   isMobile: false,
   entered: false,
+  paused: true,
   quality: "high" as RenderQuality,
+  requestRender: null as null | (() => void),
 };
 
 export const clamp01 = (value: number) => Math.min(1, Math.max(0, value));

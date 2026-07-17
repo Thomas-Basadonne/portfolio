@@ -8,7 +8,11 @@ type HudProps = {
 export function Hud({ activeChapter, progressPercent }: HudProps) {
   return (
     <header className="hud">
-      <a className="hud__identity" href="#identity" aria-label="Thomas Basadonne, back to start">
+      <a
+        className="hud__identity"
+        href="#identity"
+        aria-label="Thomas Basadonne, Frontend / Creative developer — back to start"
+      >
         <span className="hud__monogram">TB</span>
         <span>
           Thomas Basadonne
@@ -39,9 +43,12 @@ export function Hud({ activeChapter, progressPercent }: HudProps) {
         </ol>
       </nav>
 
-      <div className="hud__progress" aria-hidden="true">
-        <span style={{ transform: `scaleX(${progressPercent / 100})` }} />
-      </div>
+      <progress
+        className="hud__progress"
+        max="100"
+        value={progressPercent}
+        aria-label={`Inspection depth: ${progressPercent}%`}
+      />
     </header>
   );
 }

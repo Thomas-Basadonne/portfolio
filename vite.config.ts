@@ -6,8 +6,8 @@ export default defineConfig({
   build: {
     target: "es2022",
     cssCodeSplit: true,
-    sourcemap: true,
-    // The lazy realtime chunk intentionally contains Three.js; its gzip size stays below 240 kB.
-    chunkSizeWarningLimit: 1000,
+    sourcemap: false,
+    // The isolated Three.js layer is governed by scripts/check-bundle.mjs at 250 kB gzip.
+    chunkSizeWarningLimit: 900,
   },
 });

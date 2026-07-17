@@ -1,7 +1,6 @@
 export type SocialLink = {
   label: string;
   href: string;
-  placeholder?: boolean;
 };
 
 export type Capability = {
@@ -22,10 +21,8 @@ export type CaseStudy = {
   decisions: string[];
   technologies: string[];
   impact: string;
-  status: "content-needed" | "published";
+  status: "published";
 };
-
-export const CONTENT_NEEDED = "CONTENT NEEDED — replace this value in src/content/portfolio.ts";
 
 export const profile = {
   name: "Thomas Basadonne",
@@ -38,8 +35,6 @@ export const profile = {
     "I design frontend systems that stay clear under pressure — then use code, AI and physical experiments to discover what the interface could become.",
   extended:
     "My center of gravity is frontend architecture: React, TypeScript and complex commerce. Around it I build full-stack tools, AI workflows and hands-on experiments that move between browser, backend and workbench.",
-  availability: CONTENT_NEEDED,
-  email: CONTENT_NEEDED,
 } as const;
 
 export const socials: SocialLink[] = [
@@ -49,13 +44,7 @@ export const socials: SocialLink[] = [
   },
   {
     label: "GitHub",
-    href: "#content-needed",
-    placeholder: true,
-  },
-  {
-    label: "CV / Résumé",
-    href: "#content-needed",
-    placeholder: true,
+    href: "https://github.com/Thomas-Basadonne",
   },
 ];
 
@@ -92,51 +81,25 @@ export const capabilities: Capability[] = [
   },
 ];
 
-const missingDecisions = [
-  "Add the verified architectural constraint and the alternatives considered.",
-  "Add the decision Thomas owned and why it mattered.",
-  "Add one implementation detail that a developer would want to inspect.",
-];
-
 export const caseStudies: CaseStudy[] = [
   {
-    id: "commerce",
+    id: "tolerance-machine",
     code: "CF–01",
-    title: "Enterprise commerce case file",
-    kind: "Reserved specimen / commerce",
-    summary: "A reserved case-study slot for the strongest verified Adobe Commerce or B2B project.",
-    problem: CONTENT_NEEDED,
-    role: CONTENT_NEEDED,
-    decisions: missingDecisions,
-    technologies: ["Add verified project stack"],
-    impact: CONTENT_NEEDED,
-    status: "content-needed",
-  },
-  {
-    id: "ai",
-    code: "CF–02",
-    title: "Intelligent product case file",
-    kind: "Reserved specimen / AI",
-    summary: "A reserved case-study slot for an LLM, RAG, local AI or intelligent-workflow product.",
-    problem: CONTENT_NEEDED,
-    role: CONTENT_NEEDED,
-    decisions: missingDecisions,
-    technologies: ["Add verified project stack"],
-    impact: CONTENT_NEEDED,
-    status: "content-needed",
-  },
-  {
-    id: "experiment",
-    code: "CF–03",
-    title: "Experimental build case file",
-    kind: "Reserved specimen / workshop",
-    summary: "A reserved case-study slot for hardware, 3D printing or a creative-code experiment.",
-    problem: CONTENT_NEEDED,
-    role: CONTENT_NEEDED,
-    decisions: missingDecisions,
-    technologies: ["Add verified project stack"],
-    impact: CONTENT_NEEDED,
-    status: "content-needed",
+    title: "Tolerance / 0.01",
+    kind: "Portfolio / realtime system",
+    summary: "A procedural portfolio where a metrology instrument turns scrolling into inspection depth.",
+    problem:
+      "Create a memorable portfolio without allowing WebGL to compromise content, accessibility or the first interaction.",
+    role: "Concept, art direction, interaction design and implementation by Thomas Basadonne.",
+    decisions: [
+      "Keep the complete narrative in semantic HTML and treat the canvas as a progressive visual layer.",
+      "Build one procedural artifact with no downloaded models, textures or post-processing stack.",
+      "Load realtime code only after entry, render on demand and adapt geometry and DPR to the device.",
+    ],
+    technologies: ["React", "TypeScript", "React Three Fiber", "Three.js", "Vite", "Playwright"],
+    impact:
+      "A single-page experience whose navigation and complete story remain usable when motion is reduced or WebGL is unavailable.",
+    status: "published",
   },
 ];
 
@@ -156,21 +119,18 @@ export const archive = [
 export const trace = [
   {
     time: "NOW",
-    title: "Frontend development · CØDESTORM",
-    note: "Current company verified from the public profile. Exact role title and dates still need confirmation.",
-    incomplete: true,
+    title: "CØDESTORM",
+    note: "Current company listed on Thomas’s public profile; private client details are intentionally omitted.",
+  },
+  {
+    time: "2024",
+    title: "Public learning experiments",
+    note: "GSAP4NOOBS and Task Manager explored responsive Vue interfaces, motion and local-first state.",
   },
   {
     time: "2023",
     title: "Java & Spring · Experis Academy",
     note: "Six-week intensive academy covering Java, Spring and databases.",
-    incomplete: false,
-  },
-  {
-    time: "EARLIER",
-    title: "Trace data requested",
-    note: "Add verified roles, education and dates in this file to complete the professional path.",
-    incomplete: true,
   },
 ];
 

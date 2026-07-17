@@ -18,7 +18,14 @@ export function EntrySequence({ entered, reducedMotion, onEnter }: EntrySequence
   }, [entered]);
 
   return (
-    <div className={`entry-sequence${entered ? " is-complete" : ""}`} aria-hidden={entered}>
+    <section
+      className={`entry-sequence${entered ? " is-complete" : ""}`}
+      role="dialog"
+      aria-modal={!entered || undefined}
+      aria-hidden={entered}
+      aria-labelledby="entry-title"
+      inert={entered || undefined}
+    >
       <div className="entry-sequence__meta mono-label">
         <span>TB / PERSONAL INSTRUMENT</span>
         <span>RESOLUTION 00.01</span>
@@ -34,13 +41,18 @@ export function EntrySequence({ entered, reducedMotion, onEnter }: EntrySequence
 
       <div className="entry-sequence__statement">
         <p className="mono-label">A machine for useful deviations</p>
-        <h2>
+        <h2 id="entry-title">
           Measure what
           <em> survives complexity.</em>
         </h2>
       </div>
 
-      <button className="calibrate-button" type="button" onClick={onEnter} data-cursor="engage">
+      <button
+        className="calibrate-button"
+        type="button"
+        onClick={onEnter}
+        data-cursor="engage"
+      >
         <span>Calibrate / enter</span>
         <span aria-hidden="true">↗</span>
       </button>
@@ -48,6 +60,6 @@ export function EntrySequence({ entered, reducedMotion, onEnter }: EntrySequence
       <p className="entry-sequence__note mono-label">
         {reducedMotion ? "Reduced-motion protocol active" : "Scroll controls inspection depth"}
       </p>
-    </div>
+    </section>
   );
 }

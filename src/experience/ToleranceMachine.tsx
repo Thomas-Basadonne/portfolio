@@ -64,49 +64,54 @@ export function ToleranceMachine({ quality }: ToleranceMachineProps) {
   const coreMaterial = useRef<THREE.ShaderMaterial>(null);
   const rings = useRef<Array<THREE.Mesh | null>>([]);
   const antennae = useRef<THREE.Group>(null);
+  const motionTime = useRef(0);
   const signalColor = useMemo(() => new THREE.Color("#ff4d00"), []);
   const segments = quality === "high" ? 96 : 48;
   const particles = quality === "high" ? 520 : 180;
 
-  useFrame(({ camera, clock }, delta) => {
+  useFrame(({ camera }, delta) => {
     const group = machine.current;
     const coreMesh = core.current;
     if (!group || !coreMesh || !coreMaterial.current) return;
 
+    if (experienceStore.paused) return;
+    const safeDelta = Math.min(delta, 0.05);
+    if (!experienceStore.reducedMotion) motionTime.current += safeDelta;
+    const elapsedTime = motionTime.current;
     const progress = experienceStore.progress;
     const motion = experienceStore.reducedMotion ? 0 : 1;
     const chapter = Math.min(5, Math.round(progress * 5));
     const desktopOffsets = [-0.55, -1.2, 1.15, -1.05, 1.12, 0];
     const targetX = experienceStore.isMobile ? 0 : desktopOffsets[chapter];
-    const idle = Math.sin(clock.elapsedTime * 0.55) * 0.055 * motion;
+    const idle = Math.sin(elapsedTime * 0.55) * 0.055 * motion;
     const caseExplode = smoothRange(progress, 0.42, 0.62) * (1 - smoothRange(progress, 0.68, 0.8));
     const transmission = smoothRange(progress, 0.79, 0.98);
 
-    group.position.x = damp(group.position.x, targetX, 2.8, delta);
+    group.position.x = damp(group.position.x, targetX, 2.8, safeDelta);
     group.position.y = damp(
       group.position.y,
       experienceStore.isMobile ? -0.7 : idle,
       3.1,
-      delta,
+      safeDelta,
     );
     group.rotation.y = damp(
       group.rotation.y,
       progress * Math.PI * 1.48 + experienceStore.pointerX * 0.11 * motion,
       3.2,
-      delta,
+      safeDelta,
     );
     group.rotation.x = damp(
       group.rotation.x,
       -0.16 + Math.sin(progress * Math.PI * 2) * 0.18 + experienceStore.pointerY * 0.06 * motion,
       3.2,
-      delta,
+      safeDelta,
     );
-    group.rotation.z = damp(group.rotation.z, transmission * Math.PI * 0.5, 3, delta);
+    group.rotation.z = damp(group.rotation.z, transmission * Math.PI * 0.5, 3, safeDelta);
 
     const coreScale = 1 - caseExplode * 0.26 + transmission * 0.12;
-    coreMesh.scale.setScalar(damp(coreMesh.scale.x, coreScale, 3.4, delta));
-    coreMesh.rotation.y += delta * 0.12 * motion;
-    coreMesh.rotation.z -= delta * 0.07 * motion;
+    coreMesh.scale.setScalar(damp(coreMesh.scale.x, coreScale, 3.4, safeDelta));
+    coreMesh.rotation.y += safeDelta * 0.12 * motion;
+    coreMesh.rotation.z -= safeDelta * 0.07 * motion;
 
     rings.current.forEach((ring, index) => {
       if (!ring) return;
@@ -115,22 +120,22 @@ export function ToleranceMachine({ quality }: ToleranceMachineProps) {
       const targetRingX = Math.cos(angle) * radial;
       const targetRingY = Math.sin(angle) * radial;
       const targetRingZ = (index - 2.5) * 0.34 * caseExplode;
-      ring.position.x = damp(ring.position.x, targetRingX, 3.1, delta);
-      ring.position.y = damp(ring.position.y, targetRingY, 3.1, delta);
-      ring.position.z = damp(ring.position.z, targetRingZ, 3.1, delta);
+      ring.position.x = damp(ring.position.x, targetRingX, 3.1, safeDelta);
+      ring.position.y = damp(ring.position.y, targetRingY, 3.1, safeDelta);
+      ring.position.z = damp(ring.position.z, targetRingZ, 3.1, safeDelta);
       ring.rotation.x = damp(
         ring.rotation.x,
         angle * 0.22 + progress * (0.35 + index * 0.035),
         3,
-        delta,
+        safeDelta,
       );
       ring.rotation.y = damp(
         ring.rotation.y,
         angle * 0.16 - progress * (0.22 + index * 0.025),
         3,
-        delta,
+        safeDelta,
       );
-      ring.rotation.z += delta * (index % 2 === 0 ? 0.055 : -0.045) * motion;
+      ring.rotation.z += safeDelta * (index % 2 === 0 ? 0.055 : -0.045) * motion;
     });
 
     if (antennae.current) {
@@ -138,16 +143,16 @@ export function ToleranceMachine({ quality }: ToleranceMachineProps) {
       antennae.current.rotation.z = -transmission * Math.PI * 0.5;
     }
 
-    coreMaterial.current.uniforms.uTime.value = clock.elapsedTime;
+    coreMaterial.current.uniforms.uTime.value = elapsedTime;
     coreMaterial.current.uniforms.uProgress.value = progress;
     coreMaterial.current.uniforms.uMotion.value = motion;
 
     const cameraX = experienceStore.pointerX * 0.18 * motion;
     const cameraY = 0.1 + experienceStore.pointerY * 0.12 * motion;
     const cameraZ = experienceStore.isMobile ? 8.7 : 7.1 - Math.sin(progress * Math.PI) * 0.35;
-    camera.position.x = damp(camera.position.x, cameraX, 2.4, delta);
-    camera.position.y = damp(camera.position.y, cameraY, 2.4, delta);
-    camera.position.z = damp(camera.position.z, cameraZ, 2.4, delta);
+    camera.position.x = damp(camera.position.x, cameraX, 2.4, safeDelta);
+    camera.position.y = damp(camera.position.y, cameraY, 2.4, safeDelta);
+    camera.position.z = damp(camera.position.z, cameraZ, 2.4, safeDelta);
     camera.lookAt(0, experienceStore.isMobile ? -0.58 : 0, 0);
   });
 

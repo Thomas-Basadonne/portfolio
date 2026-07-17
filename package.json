@@ -9,26 +9,38 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build && node scripts/prerender.mjs",
     "preview": "vite preview",
-    "typecheck": "tsc -b --pretty false"
+    "typecheck": "tsc -b --pretty false",
+    "lint": "oxlint --deny-warnings src tests scripts netlify vite.config.ts vitest.config.ts playwright.config.ts",
+    "test:unit": "vitest run --config vitest.config.ts",
+    "test:e2e": "pnpm build && playwright test",
+    "test:soak": "node scripts/soak.mjs",
+    "test:lighthouse": "lhci autorun --config=lighthouserc.mobile.json && lhci autorun --config=lighthouserc.json",
+    "check:bundle": "node scripts/check-bundle.mjs",
+    "check:links": "node scripts/check-links.mjs",
+    "check": "pnpm typecheck && pnpm lint && pnpm test:unit && pnpm build && pnpm check:bundle && pnpm check:links"
   },
   "dependencies": {
     "@fontsource-variable/manrope": "^5.2.8",
     "@fontsource/dm-mono": "^5.2.7",
     "@fontsource/instrument-serif": "^5.2.8",
-    "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.6.1",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
-    "three": "^0.182.0"
+    "three": "^0.185.1"
   },
   "devDependencies": {
+    "@axe-core/playwright": "4.12.1",
+    "@lhci/cli": "0.15.1",
+    "@playwright/test": "1.61.1",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
-    "@types/three": "^0.182.0",
+    "@types/three": "^0.185.1",
     "@vitejs/plugin-react": "^6.0.3",
+    "oxlint": "1.74.0",
     "typescript": "^7.0.2",
-    "vite": "^8.1.5"
+    "vite": "^8.1.5",
+    "vitest": "4.1.10"
   }
 }

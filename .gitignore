@@ -2,6 +2,9 @@ node_modules/
 .pnpm-store/
 dist/
 coverage/
+.lighthouseci/
+playwright-report/
+test-results/
 *.tsbuildinfo
 .DS_Store
 .env
