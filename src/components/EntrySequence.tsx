@@ -1,12 +1,26 @@
 import { useEffect } from "react";
+import type { Locale, PortfolioContent } from "../content/portfolio";
+import { LanguageSwitch } from "./LanguageSwitch";
 
 type EntrySequenceProps = {
   entered: boolean;
   reducedMotion: boolean;
   onEnter: () => void;
+  content: PortfolioContent;
+  locale: Locale;
+  onLocaleChange: (locale: Locale) => void;
 };
 
-export function EntrySequence({ entered, reducedMotion, onEnter }: EntrySequenceProps) {
+export function EntrySequence({
+  entered,
+  reducedMotion,
+  onEnter,
+  content,
+  locale,
+  onLocaleChange,
+}: EntrySequenceProps) {
+  const { ui } = content;
+
   useEffect(() => {
     if (!entered) {
       document.body.classList.add("is-calibrating");
@@ -27,8 +41,9 @@ export function EntrySequence({ entered, reducedMotion, onEnter }: EntrySequence
       inert={entered || undefined}
     >
       <div className="entry-sequence__meta mono-label">
-        <span>TB / PERSONAL INSTRUMENT</span>
-        <span>RESOLUTION 00.01</span>
+        <span>{ui.entryMeta}</span>
+        <LanguageSwitch locale={locale} ui={ui} onChange={onLocaleChange} />
+        <span>{ui.entryResolution}</span>
       </div>
 
       <div className="calibration-mark" aria-hidden="true">
@@ -40,25 +55,20 @@ export function EntrySequence({ entered, reducedMotion, onEnter }: EntrySequence
       </div>
 
       <div className="entry-sequence__statement">
-        <p className="mono-label">A machine for useful deviations</p>
+        <p className="mono-label">{ui.entryKicker}</p>
         <h2 id="entry-title">
-          Measure what
-          <em> survives complexity.</em>
+          {ui.entryTitle.lead}
+          <em>{ui.entryTitle.emphasis}</em>
         </h2>
       </div>
 
-      <button
-        className="calibrate-button"
-        type="button"
-        onClick={onEnter}
-        data-cursor="engage"
-      >
-        <span>Calibrate / enter</span>
+      <button className="calibrate-button" type="button" onClick={onEnter} data-cursor="engage">
+        <span>{ui.entryButton}</span>
         <span aria-hidden="true">↗</span>
       </button>
 
       <p className="entry-sequence__note mono-label">
-        {reducedMotion ? "Reduced-motion protocol active" : "Scroll controls inspection depth"}
+        {reducedMotion ? ui.entryNoteReduced : ui.entryNoteMotion}
       </p>
     </section>
   );

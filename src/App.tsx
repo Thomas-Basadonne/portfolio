@@ -7,7 +7,7 @@ import {
   useRef,
   useState,
 } from "react";
-import type { CaseStudy } from "./content/portfolio";
+import { getContent, legacySectionIds, type CaseStudy } from "./content/portfolio";
 import { CaseStudyDrawer } from "./components/CaseStudyDrawer";
 import { CustomCursor } from "./components/CustomCursor";
 import { EntrySequence } from "./components/EntrySequence";
@@ -21,6 +21,7 @@ import {
   getInitialExperiencePhase,
   supportsWebGL,
 } from "./lib/experienceState";
+import { useLocale } from "./lib/locale";
 
 const ExperienceCanvas = lazy(() =>
   import("./experience/ExperienceCanvas").then((module) => ({ default: module.ExperienceCanvas })),
@@ -32,8 +33,11 @@ export default function App() {
     undefined,
     getInitialExperiencePhase,
   );
+  const { locale, setLocale } = useLocale();
+  const content = getContent(locale);
   const [mountCanvas, setMountCanvas] = useState(false);
-  const [selectedCase, setSelectedCase] = useState<CaseStudy | null>(null);
+  const [selectedCaseId, setSelectedCaseId] = useState<string | null>(null);
+  const selectedCase = content.caseStudies.find((entry) => entry.id === selectedCaseId) ?? null;
   const siteRef = useRef<HTMLDivElement>(null);
   const caseTriggerRef = useRef<HTMLElement | null>(null);
   const entered = phase !== "entry";
@@ -41,11 +45,11 @@ export default function App() {
   const selectCase = useCallback((caseStudy: CaseStudy) => {
     caseTriggerRef.current =
       document.activeElement instanceof HTMLElement ? document.activeElement : null;
-    setSelectedCase(caseStudy);
+    setSelectedCaseId(caseStudy.id);
   }, []);
   const closeCase = useCallback(() => {
     const trigger = caseTriggerRef.current;
-    setSelectedCase(null);
+    setSelectedCaseId(null);
     window.requestAnimationFrame(() => {
       trigger?.focus();
       caseTriggerRef.current = null;
@@ -75,7 +79,13 @@ export default function App() {
 
   useEffect(() => {
     if (!entered || window.location.hash.length < 2) return;
-    const targetId = decodeURIComponent(window.location.hash.slice(1));
+    const requestedId = decodeURIComponent(window.location.hash.slice(1));
+    const targetId = legacySectionIds[requestedId] ?? requestedId;
+    if (targetId !== requestedId) {
+      const url = new URL(window.location.href);
+      url.hash = targetId;
+      window.history.replaceState(window.history.state, "", url);
+    }
     window.requestAnimationFrame(() => {
       document.getElementById(targetId)?.scrollIntoView({ behavior: "auto" });
     });
@@ -102,16 +112,20 @@ export default function App() {
   }, [entered, mountCanvas, phase, visualFailed]);
 
   const backgroundBlocked = !entered || selectedCase !== null;
+  const { ui } = content;
 
   return (
     <>
       <a className="skip-link" href="#main-content" onClick={focusMain}>
-        Skip to content
+        {ui.skipLink}
       </a>
       <EntrySequence
         entered={entered}
         reducedMotion={reducedMotion}
         onEnter={enter}
+        content={content}
+        locale={locale}
+        onLocaleChange={setLocale}
       />
       <div
         ref={siteRef}
@@ -132,24 +146,30 @@ export default function App() {
           <div className="webgl-fallback" aria-hidden="true" />
         )}
         <div className="paper-grain" aria-hidden="true" />
-        <Hud activeChapter={activeChapter} progressPercent={progressPercent} />
-        <PortfolioStory onSelectCase={selectCase} />
+        <Hud
+          activeChapter={activeChapter}
+          progressPercent={progressPercent}
+          content={content}
+          locale={locale}
+          onLocaleChange={setLocale}
+        />
+        <PortfolioStory content={content} onSelectCase={selectCase} />
       </div>
 
       {entered && phase === "loading" && (
         <p className="visual-status visually-hidden mono-label" role="status">
-          Calibrating optional visual layer…
+          {ui.visualLoading}
         </p>
       )}
       {phase === "failed" && (
         <div className="visual-status visual-status--failed" role="status">
-          <span className="mono-label">Visual layer unavailable. Content remains complete.</span>
+          <span className="mono-label">{ui.visualFailed}</span>
           <button type="button" onClick={() => window.location.reload()}>
-            Retry visual layer
+            {ui.visualRetry}
           </button>
         </div>
       )}
-      <CaseStudyDrawer caseStudy={selectedCase} onClose={closeCase} />
+      <CaseStudyDrawer caseStudy={selectedCase} ui={ui} onClose={closeCase} />
       <CustomCursor reducedMotion={reducedMotion} />
     </>
   );
