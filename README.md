@@ -23,9 +23,16 @@ by scripts in `scripts/`.
 
 ## Content editing
 
-All published facts, links and case-study records live in `src/content/portfolio.ts`. The current
-case file documents this portfolio itself so every technical statement remains inspectable; private
-client names, metrics and unverified employment details are deliberately omitted.
+All published facts, links and case-study records live in `src/content/portfolio.ts`, with one
+complete English (default) and Italian dictionary. Visitors switch language from the HUD or the entry
+screen; the choice is kept in `?lang=it` and `localStorage`. The prerendered and no-script markup in
+`index.html` is English and must be updated by hand when the English copy changes.
+
+Copy rules: every claim must be traceable to a repository, a public profile or an explicit approval;
+co-developed work names its collaborators; client metrics are never published.
+
+`pnpm check:links` also verifies that every inline script in `dist/index.html` has its SHA-256 hash in
+the Content-Security-Policy of `netlify.toml`: edit the JSON-LD and the check tells you the new hash.
 
 ## Architecture
 
