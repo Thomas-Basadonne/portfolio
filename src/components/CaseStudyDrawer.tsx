@@ -1,8 +1,9 @@
 import { useEffect, useRef } from "react";
-import type { CaseStudy } from "../content/portfolio";
+import type { CaseStudy, PortfolioContent } from "../content/portfolio";
 
 type CaseStudyDrawerProps = {
   caseStudy: CaseStudy | null;
+  ui: PortfolioContent["ui"];
   onClose: () => void;
 };
 
@@ -15,12 +16,13 @@ function DataField({ label, value }: { label: string; value: string }) {
   );
 }
 
-export function CaseStudyDrawer({ caseStudy, onClose }: CaseStudyDrawerProps) {
+export function CaseStudyDrawer({ caseStudy, ui, onClose }: CaseStudyDrawerProps) {
   const closeRef = useRef<HTMLButtonElement>(null);
   const drawerRef = useRef<HTMLElement>(null);
+  const isOpen = caseStudy !== null;
 
   useEffect(() => {
-    if (!caseStudy) return;
+    if (!isOpen) return;
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     closeRef.current?.focus();
@@ -52,7 +54,7 @@ export function CaseStudyDrawer({ caseStudy, onClose }: CaseStudyDrawerProps) {
       document.body.style.overflow = previousOverflow;
       window.removeEventListener("keydown", onKeyDown);
     };
-  }, [caseStudy, onClose]);
+  }, [isOpen, onClose]);
 
   if (!caseStudy) return null;
 
@@ -68,24 +70,30 @@ export function CaseStudyDrawer({ caseStudy, onClose }: CaseStudyDrawerProps) {
       >
         <header className="case-drawer__header">
           <div>
-            <span className="mono-label">{caseStudy.code} / inspection report</span>
+            <span className="mono-label">
+              {caseStudy.code} / {ui.drawerReport}
+            </span>
             <h2 id="case-drawer-title">{caseStudy.title}</h2>
           </div>
           <button ref={closeRef} type="button" onClick={onClose} data-cursor="engage" autoFocus>
-            Close <span aria-hidden="true">×</span>
+            {ui.drawerClose} <span aria-hidden="true">×</span>
           </button>
         </header>
 
         <div className="case-drawer__status mono-label">
-          <span>Status</span>
-          <strong>Published</strong>
+          <span>{caseStudy.kind}</span>
+          <strong>
+            {caseStudy.status} · {caseStudy.period}
+          </strong>
         </div>
 
+        <p className="case-drawer__summary">{caseStudy.summary}</p>
+
         <dl className="case-drawer__fields">
-          <DataField label="Problem" value={caseStudy.problem} />
-          <DataField label="Role" value={caseStudy.role} />
+          <DataField label={ui.drawerContext} value={caseStudy.context} />
+          <DataField label={ui.drawerRole} value={caseStudy.role} />
           <div className="case-field">
-            <dt className="mono-label">Technical decisions</dt>
+            <dt className="mono-label">{caseStudy.decisionsLabel ?? ui.drawerDecisions}</dt>
             <dd>
               <ol>
                 {caseStudy.decisions.map((decision) => (
@@ -95,19 +103,37 @@ export function CaseStudyDrawer({ caseStudy, onClose }: CaseStudyDrawerProps) {
             </dd>
           </div>
           <div className="case-field">
-            <dt className="mono-label">Technologies</dt>
+            <dt className="mono-label">{ui.drawerTechnologies}</dt>
             <dd className="case-drawer__tags">
               {caseStudy.technologies.map((technology) => (
                 <span key={technology}>{technology}</span>
               ))}
             </dd>
           </div>
-          <DataField label="Impact" value={caseStudy.impact} />
+          <DataField label={ui.drawerOutcome} value={caseStudy.outcome} />
+          {caseStudy.links.length > 0 && (
+            <div className="case-field">
+              <dt className="mono-label">{ui.drawerLinks}</dt>
+              <dd>
+                {caseStudy.links.map((link) => (
+                  <a
+                    key={link.href}
+                    className="item-link mono-label"
+                    href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {link.label}
+                    <span aria-hidden="true"> ↗</span>
+                    <span className="visually-hidden"> {ui.opensNewTab}</span>
+                  </a>
+                ))}
+              </dd>
+            </div>
+          )}
         </dl>
 
-        <p className="case-drawer__footnote mono-label">
-          Evidence boundary: this report describes the portfolio itself and makes no private client claim.
-        </p>
+        <p className="case-drawer__footnote mono-label">{caseStudy.evidence}</p>
       </article>
     </div>
   );

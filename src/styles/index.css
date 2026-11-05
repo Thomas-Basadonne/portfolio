@@ -319,6 +319,7 @@ a {
   right: var(--gutter);
   left: var(--gutter);
   display: flex;
+  align-items: center;
   justify-content: space-between;
   padding-bottom: 0.75rem;
   border-bottom: 1px solid var(--line-dark);
@@ -701,7 +702,7 @@ main {
 
 .hero-thesis {
   position: absolute;
-  right: 0;
+  right: clamp(4.5rem, 7vw, 7rem);
   bottom: 6vh;
   width: min(36rem, 42vw);
 }
@@ -816,23 +817,18 @@ main {
 
 .principle-equation {
   display: grid;
-  margin-top: clamp(2rem, 4vw, 3.5rem);
-  grid-template-columns: 1fr auto 1fr auto 1fr;
+  margin: clamp(2rem, 4vw, 3.5rem) 0 0;
+  grid-template-columns: repeat(3, 1fr);
   align-items: center;
   gap: 0.6rem;
-  padding-top: 1rem;
+  padding: 1rem 0 0;
+  list-style: none;
   border-top: 1px solid var(--line-dark);
   font-family: "DM Mono", monospace;
   font-size: 0.55rem;
   letter-spacing: 0.045em;
   text-align: center;
   text-transform: uppercase;
-}
-
-.principle-equation b {
-  color: var(--signal-ink);
-  font-size: 1rem;
-  font-weight: 400;
 }
 
 .fields-section {
@@ -1032,6 +1028,10 @@ main {
   gap: 0.5rem;
 }
 
+.archive-strip > div:nth-of-type(2n + 1) {
+  grid-column: 2;
+}
+
 .archive-strip strong {
   font-size: 0.9rem;
 }
@@ -1131,6 +1131,7 @@ a.contact-link:focus-visible {
 }
 
 .contact-link strong {
+  overflow-wrap: anywhere;
   font-size: clamp(1.6rem, 3vw, 3.5rem);
   font-weight: 560;
   letter-spacing: -0.06em;
@@ -1146,6 +1147,145 @@ a.contact-link:focus-visible {
   margin-top: clamp(4rem, 8vw, 9rem);
   padding-top: 1rem;
   border-top: 1px solid rgba(11, 11, 10, 0.35);
+}
+
+/* Language switch, hero actions and inline links */
+
+.hud__tools {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.lang-switch {
+  display: flex;
+  pointer-events: auto;
+  background: rgba(11, 11, 10, 0.9);
+  border: 1px solid var(--line-light);
+}
+
+.lang-switch button {
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  padding: 0 0.5rem;
+  color: var(--muted);
+  background: transparent;
+  font: inherit;
+  letter-spacing: inherit;
+  cursor: pointer;
+}
+
+.lang-switch button:hover {
+  color: var(--bone);
+}
+
+.lang-switch button[aria-pressed="true"] {
+  color: var(--graphite);
+  background: var(--bone);
+}
+
+.entry-sequence .lang-switch {
+  background: transparent;
+  border-color: var(--line-dark);
+}
+
+.entry-sequence .lang-switch button {
+  color: #5d5b55;
+}
+
+.entry-sequence .lang-switch button[aria-pressed="true"] {
+  color: var(--bone);
+  background: var(--graphite);
+}
+
+.nowrap {
+  white-space: nowrap;
+}
+
+@media (min-width: 761px) and (max-height: 820px) {
+  .hero-thesis {
+    position: static;
+    margin: clamp(1.5rem, 5vh, 3rem) 0 0 auto;
+  }
+}
+
+.hero-thesis > .hero-lede {
+  max-width: 36ch;
+  margin: 1.25rem 0 0;
+  color: var(--bone-dim);
+  font-family: inherit;
+  font-size: clamp(0.92rem, 1.1vw, 1.08rem);
+  letter-spacing: 0;
+  line-height: 1.5;
+  text-transform: none;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1.25rem;
+}
+
+.hero-actions a {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  padding: 0 1rem;
+  border: 1px solid var(--line-light);
+  font-family: "DM Mono", monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.hero-actions a:first-child {
+  color: var(--graphite);
+  background: var(--signal);
+  border-color: var(--signal);
+}
+
+.hero-actions a:hover,
+.hero-actions a:focus-visible {
+  border-color: var(--bone);
+}
+
+.item-link {
+  display: inline-block;
+  margin-top: 0.5rem;
+  color: var(--signal-ink);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.archive-strip .item-link {
+  grid-column: 2;
+}
+
+.item-link + .item-link {
+  margin-left: 1rem;
+}
+
+.timeline-heading {
+  margin: clamp(2.5rem, 5vw, 4rem) 0 0;
+  opacity: 0.62;
+}
+
+.timeline-heading + .trace-list {
+  margin-top: 1rem;
+}
+
+.case-drawer__summary + .case-drawer__fields {
+  margin-top: 2.5rem;
+}
+
+.case-drawer__summary {
+  max-width: 60ch;
+  margin: 2rem 0 0;
+  font-size: clamp(1.05rem, 1.4vw, 1.3rem);
+  font-weight: 560;
+  letter-spacing: -0.02em;
+  line-height: 1.4;
 }
 
 /* Case-study inspection drawer */
@@ -1566,10 +1706,6 @@ a.contact-link:focus-visible {
     text-align: left;
   }
 
-  .principle-equation b {
-    padding-left: 1rem;
-  }
-
   .fields-section,
   .cases-section,
   .trace-section,
@@ -1605,6 +1741,10 @@ a.contact-link:focus-visible {
 
   .archive-strip > div {
     grid-template-columns: 2.7rem 1fr;
+  }
+
+  .archive-strip > div:nth-of-type(2n + 1) {
+    grid-column: auto;
   }
 
   .contact-section {
