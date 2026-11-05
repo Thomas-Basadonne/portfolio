@@ -219,6 +219,7 @@ test("semantic portfolio remains available without JavaScript", async ({ browser
   await page.goto("http://127.0.0.1:4173/");
   await expect(page.getByRole("heading", { level: 1, name: "Thomas Basadonne" })).toBeVisible();
   await expect(page.getByRole("link", { name: "GitHub" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "thomasbasadonne@gmail.com" })).toBeVisible();
   await context.close();
 });
 

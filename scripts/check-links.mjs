@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { access, readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 
@@ -23,4 +24,13 @@ for (const required of ["canonical", "og:image", "twitter:card", "application/ld
   if (!html.includes(required)) throw new Error(`Required metadata is missing: ${required}`);
 }
 
-console.log(`Verified ${localPaths.length} local resources and required metadata.`);
+const csp = (await readFile(resolve("netlify.toml"), "utf8")).match(/Content-Security-Policy = "([^"]+)"/)?.[1] ?? "";
+const inlineScripts = [...html.matchAll(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g)].map((match) => match[1]);
+for (const script of inlineScripts) {
+  const hash = `sha256-${createHash("sha256").update(script).digest("base64")}`;
+  if (!csp.includes(`'${hash}'`)) throw new Error(`Inline script hash ${hash} is missing from the CSP in netlify.toml.`);
+}
+
+console.log(
+  `Verified ${localPaths.length} local resources, required metadata and ${inlineScripts.length} CSP inline-script hash(es).`,
+);
