@@ -56,14 +56,14 @@ test("skip link moves focus to main content", async ({ page }) => {
 
 test("chapter navigation, history and refresh preserve context", async ({ page }) => {
   await bypassEntry(page);
-  await page.goto("/#fields");
-  await expect(page.locator("#fields")).toBeInViewport();
+  await page.goto("/#capabilities");
+  await expect(page.locator("#capabilities")).toBeInViewport();
 
-  await page.getByRole("link", { name: /03 case files/i }).click();
-  await expect(page).toHaveURL(/#cases$/);
-  await expect(page.locator("#cases")).toBeInViewport();
+  await page.getByRole("link", { name: /03 work/i }).click();
+  await expect(page).toHaveURL(/#work$/);
+  await expect(page.locator("#work")).toBeInViewport();
   await page.goBack();
-  await expect(page).toHaveURL(/#fields$/);
+  await expect(page).toHaveURL(/#capabilities$/);
 
   await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight * 0.55));
   await page.reload();
@@ -73,11 +73,11 @@ test("chapter navigation, history and refresh preserve context", async ({ page }
 
 test("case drawer traps focus and restores it", async ({ page }) => {
   await bypassEntry(page);
-  await page.goto("/#cases");
-  const trigger = page.getByRole("button", { name: /tolerance \/ 0.01/i });
+  await page.goto("/#work");
+  const trigger = page.getByRole("button", { name: /project twin/i });
   await trigger.focus();
   await page.keyboard.press("Enter");
-  const dialog = page.getByRole("dialog", { name: "Tolerance / 0.01" });
+  const dialog = page.getByRole("dialog", { name: "Project Twin" });
   await expect(dialog).toBeVisible();
   await expect(dialog.getByRole("button", { name: /close/i })).toBeFocused();
   await expect(page.locator(".site-shell")).toHaveAttribute("inert", "");
@@ -153,7 +153,7 @@ test("visual chunk failure leaves the complete portfolio usable", async ({ page 
   await page.getByRole("button", { name: /calibrate/i }).click();
   await expect(page.getByText(/visual layer unavailable/i)).toBeVisible();
   await expect(page.getByRole("heading", { level: 1, name: /thomas basadonne/i })).toBeVisible();
-  await expect(page.getByRole("navigation", { name: "Inspection chapters" })).toBeVisible();
+  await expect(page.getByRole("navigation", { name: "Portfolio sections" })).toBeVisible();
 });
 
 test("WebGL context loss switches to the deterministic fallback", async ({ page, browserName }) => {
@@ -197,10 +197,11 @@ test("critical interaction path has no unexpected console warnings or errors", a
   page.on("pageerror", (error) => unexpectedLogs.push(error.message));
   await bypassEntry(page);
   await page.goto("/");
-  await page.getByRole("link", { name: /03 case files/i }).click();
-  await page.getByRole("button", { name: /tolerance \/ 0.01/i }).click();
+  await page.getByRole("link", { name: /03 work/i }).click();
+  await page.getByRole("button", { name: /promptify/i }).click();
   await page.getByRole("button", { name: /close/i }).click();
-  await page.getByRole("link", { name: /05 transmit/i }).click();
+  await page.getByRole("button", { name: "Italiano" }).click();
+  await page.getByRole("link", { name: /05 contatti/i }).click();
   expect(unexpectedLogs).toEqual([]);
 });
 
@@ -218,5 +219,36 @@ test("semantic portfolio remains available without JavaScript", async ({ browser
   await page.goto("http://127.0.0.1:4173/");
   await expect(page.getByRole("heading", { level: 1, name: "Thomas Basadonne" })).toBeVisible();
   await expect(page.getByRole("link", { name: "GitHub" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "thomasbasadonne@gmail.com" })).toBeVisible();
   await context.close();
+});
+
+test("language switch translates the page, persists and keeps a shareable URL", async ({ page }) => {
+  await bypassEntry(page);
+  await page.goto("/#work");
+  await expect(page.locator("html")).toHaveAttribute("lang", "en");
+  await page.getByRole("button", { name: "Italiano" }).click();
+
+  await expect(page.locator("html")).toHaveAttribute("lang", "it");
+  await expect(page.getByRole("button", { name: "Italiano" })).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByRole("heading", { level: 2, name: /progetti, aperti fino alle decisioni/i })).toBeVisible();
+  await expect(page).toHaveURL(/\?lang=it#work$/);
+  await expect(page).toHaveTitle(/Thomas Basadonne/);
+
+  await page.getByRole("button", { name: /la fetuseria/i }).click();
+  await expect(page.getByRole("dialog", { name: "La Fetuseria" }).getByText("Contesto")).toBeVisible();
+  await page.getByRole("button", { name: /chiudi/i }).click();
+
+  await page.goto("/");
+  await expect(page.locator("html")).toHaveAttribute("lang", "it");
+  await page.getByRole("button", { name: "English" }).click();
+  await expect(page.locator("html")).toHaveAttribute("lang", "en");
+  await expect(page).not.toHaveURL(/lang=/);
+});
+
+test("legacy section links land on the renamed chapter", async ({ page }) => {
+  await bypassEntry(page);
+  await page.goto("/#cases");
+  await expect(page).toHaveURL(/#work$/);
+  await expect(page.locator("#work")).toBeInViewport();
 });

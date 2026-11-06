@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { chapters } from "../content/portfolio";
+import { chapterCount } from "../content/portfolio";
 import { clamp01, experienceStore } from "../lib/experienceStore";
 
 type ExperienceController = {
@@ -81,7 +81,7 @@ export function useExperienceController(entered: boolean): ExperienceController 
         : experienceStore.progress + difference * (1 - Math.exp(-5.2 * delta));
 
       const percent = Math.round(experienceStore.progress * 100);
-      const chapter = Math.min(chapters.length - 1, readActiveChapter());
+      const chapter = Math.min(chapterCount - 1, readActiveChapter());
 
       if (percent !== lastPercent) {
         lastPercent = percent;
