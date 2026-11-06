@@ -1,0 +1,839 @@
+{
+  "source": "TB-001 spike SPEC v0.4 (#18), approved 2026-11-05",
+  "poses": [
+    {
+      "cycle": 0,
+      "explode": 0,
+      "time": 0.5,
+      "expected": {
+        "cycle": 0,
+        "explode": 0,
+        "teardown": 0,
+        "jointsExt": 0,
+        "state": {
+          "id": "01",
+          "name": "STANDBY",
+          "note": "Chiuso / compatto",
+          "from": 0,
+          "to": 0.2
+        },
+        "oblo": {
+          "rotZ": 0,
+          "z": 0,
+          "hinge": 0
+        },
+        "petals": [
+          {
+            "band": 0,
+            "q": 0,
+            "i": 0,
+            "d": 0,
+            "twist": 0
+          },
+          {
+            "band": 0,
+            "q": 1,
+            "i": 1,
+            "d": 0,
+            "twist": 0
+          },
+          {
+            "band": 0,
+            "q": 2,
+            "i": 2,
+            "d": 0,
+            "twist": 0
+          },
+          {
+            "band": 0,
+            "q": 3,
+            "i": 3,
+            "d": 0,
+            "twist": 0
+          },
+          {
+            "band": 1,
+            "q": 0,
+            "i": 4,
+            "d": 0,
+            "twist": 0
+          },
+          {
+            "band": 1,
+            "q": 1,
+            "i": 5,
+            "d": 0,
+            "twist": 0
+          },
+          {
+            "band": 1,
+            "q": 2,
+            "i": 6,
+            "d": 0,
+            "twist": 0
+          },
+          {
+            "band": 1,
+            "q": 3,
+            "i": 7,
+            "d": 0,
+            "twist": 0
+          }
+        ],
+        "inner": [
+          {
+            "q": 0,
+            "d": 0,
+            "dx": 0
+          },
+          {
+            "q": 1,
+            "d": 0,
+            "dx": 0
+          },
+          {
+            "q": 2,
+            "d": 0,
+            "dx": 0
+          },
+          {
+            "q": 3,
+            "d": 0,
+            "dx": 0
+          }
+        ],
+        "rings": {
+          "a1": 0,
+          "a2": 0,
+          "a3": 0
+        },
+        "light": {
+          "seams": 0.9111669412906089,
+          "slits": 0,
+          "core": 0
+        },
+        "core": {
+          "rot": 0.2,
+          "innerRot": -0.45
+        },
+        "orbits": {
+          "alpha": 0,
+          "phase": 0.125
+        },
+        "offsets": {
+          "shellFront": 0,
+          "ringOuter": 0,
+          "ringMid": 0,
+          "ringInner": 0,
+          "process": 0,
+          "core": 0,
+          "joints": 0,
+          "inner": 0,
+          "shellRear": 0
+        },
+        "readout": {
+          "state": "01 STANDBY",
+          "note": "Chiuso / compatto",
+          "cycle": 0,
+          "explode": 0,
+          "active": "Involucro esterno"
+        }
+      }
+    },
+    {
+      "cycle": 0.35,
+      "explode": 0,
+      "time": 4.5,
+      "expected": {
+        "cycle": 0.35,
+        "explode": 0,
+        "teardown": 0,
+        "jointsExt": 0,
+        "state": {
+          "id": "02",
+          "name": "ATTIVAZIONE",
+          "note": "Apertura involucro",
+          "from": 0.2,
+          "to": 0.45
+        },
+        "oblo": {
+          "rotZ": -0.6981317007977318,
+          "z": 0.12,
+          "hinge": 0
+        },
+        "petals": [
+          {
+            "band": 0,
+            "q": 0,
+            "i": 0,
+            "d": 0.08999999999999991,
+            "twist": 0
+          },
+          {
+            "band": 0,
+            "q": 1,
+            "i": 1,
+            "d": 0.012506396144463592,
+            "twist": 0
+          },
+          {
+            "band": 0,
+            "q": 2,
+            "i": 2,
+            "d": 0,
+            "twist": 0
+          },
+          {
+            "band": 0,
+            "q": 3,
+            "i": 3,
+            "d": 0,
+            "twist": 0
+          },
+          {
+            "band": 1,
+            "q": 0,
+            "i": 4,
+            "d": 0.0041875409055750394,
+            "twist": 0
+          },
+          {
+            "band": 1,
+            "q": 1,
+            "i": 5,
+            "d": 0,
+            "twist": 0
+          },
+          {
+            "band": 1,
+            "q": 2,
+            "i": 6,
+            "d": 0,
+            "twist": 0
+          },
+          {
+            "band": 1,
+            "q": 3,
+            "i": 7,
+            "d": 0,
+            "twist": 0
+          }
+        ],
+        "inner": [
+          {
+            "q": 0,
+            "d": 0,
+            "dx": 0
+          },
+          {
+            "q": 1,
+            "d": 0,
+            "dx": 0
+          },
+          {
+            "q": 2,
+            "d": 0,
+            "dx": 0
+          },
+          {
+            "q": 3,
+            "d": 0,
+            "dx": 0
+          }
+        ],
+        "rings": {
+          "a1": 0,
+          "a2": 0,
+          "a3": 0
+        },
+        "light": {
+          "seams": 0.16766318575993136,
+          "slits": 0,
+          "core": 0
+        },
+        "core": {
+          "rot": 1.8,
+          "innerRot": -4.05
+        },
+        "orbits": {
+          "alpha": 0,
+          "phase": 1.125
+        },
+        "offsets": {
+          "shellFront": 0,
+          "ringOuter": 0,
+          "ringMid": 0,
+          "ringInner": 0,
+          "process": 0,
+          "core": 0,
+          "joints": 0,
+          "inner": 0,
+          "shellRear": 0
+        },
+        "readout": {
+          "state": "02 ATTIVAZIONE",
+          "note": "Apertura involucro",
+          "cycle": 35,
+          "explode": 0,
+          "active": "Sistema di giunti"
+        }
+      }
+    },
+    {
+      "cycle": 0.68,
+      "explode": 0,
+      "time": 8.6,
+      "expected": {
+        "cycle": 0.68,
+        "explode": 0,
+        "teardown": 0,
+        "jointsExt": 0,
+        "state": {
+          "id": "03",
+          "name": "ESPANSIONE",
+          "note": "Esposizione del core",
+          "from": 0.45,
+          "to": 0.75
+        },
+        "oblo": {
+          "rotZ": -0.6981317007977318,
+          "z": 0.12,
+          "hinge": 1.6580627893946132
+        },
+        "petals": [
+          {
+            "band": 0,
+            "q": 0,
+            "i": 0,
+            "d": 0.48,
+            "twist": 0.5667647644054082
+          },
+          {
+            "band": 0,
+            "q": 1,
+            "i": 1,
+            "d": 0.47743199999999975,
+            "twist": -0.5590415257843983
+          },
+          {
+            "band": 0,
+            "q": 2,
+            "i": 2,
+            "d": 0.4626240000000002,
+            "twist": 0.5480686765473592
+          },
+          {
+            "band": 0,
+            "q": 3,
+            "i": 3,
+            "d": 0.431076,
+            "twist": -0.5319845372387407
+          },
+          {
+            "band": 1,
+            "q": 0,
+            "i": 4,
+            "d": 0.41614746093750016,
+            "twist": 0.4256807348673809
+          },
+          {
+            "band": 1,
+            "q": 1,
+            "i": 5,
+            "d": 0.4010585296874999,
+            "twist": -0.4164765674837081
+          },
+          {
+            "band": 1,
+            "q": 2,
+            "i": 6,
+            "d": 0.3725550984375,
+            "twist": 0.4028693189971445
+          },
+          {
+            "band": 1,
+            "q": 3,
+            "i": 7,
+            "d": 0.33324716718750014,
+            "twist": -0.38199005259362373
+          }
+        ],
+        "inner": [
+          {
+            "q": 0,
+            "d": 0.08896204846822128,
+            "dx": 0
+          },
+          {
+            "q": 1,
+            "d": 0.08855529785156256,
+            "dx": 0
+          },
+          {
+            "q": 2,
+            "d": 0.0879062295472125,
+            "dx": 0
+          },
+          {
+            "q": 3,
+            "d": 0.08680555555555562,
+            "dx": 0
+          }
+        ],
+        "rings": {
+          "a1": 0.4693981210930064,
+          "a2": -0.6258641614573419,
+          "a3": 0.2190524565100697
+        },
+        "light": {
+          "seams": 0,
+          "slits": 0.9914399999999998,
+          "core": 1
+        },
+        "core": {
+          "rot": 3.44,
+          "innerRot": -7.74
+        },
+        "orbits": {
+          "alpha": 0,
+          "phase": 2.15
+        },
+        "offsets": {
+          "shellFront": 0,
+          "ringOuter": 0,
+          "ringMid": 0,
+          "ringInner": 0,
+          "process": 0,
+          "core": 0,
+          "joints": 0,
+          "inner": 0,
+          "shellRear": 0
+        },
+        "readout": {
+          "state": "03 ESPANSIONE",
+          "note": "Esposizione del core",
+          "cycle": 68,
+          "explode": 0,
+          "active": "Anelli di stabilizzazione"
+        }
+      }
+    },
+    {
+      "cycle": 1,
+      "explode": 0,
+      "time": 12.6,
+      "expected": {
+        "cycle": 1,
+        "explode": 0,
+        "teardown": 0,
+        "jointsExt": 0,
+        "state": {
+          "id": "04",
+          "name": "OPERATIVO",
+          "note": "Sistema attivo",
+          "from": 0.75,
+          "to": 1.0001
+        },
+        "oblo": {
+          "rotZ": -0.6981317007977318,
+          "z": 0.12,
+          "hinge": 1.6580627893946132
+        },
+        "petals": [
+          {
+            "band": 0,
+            "q": 0,
+            "i": 0,
+            "d": 0.48,
+            "twist": 0.5934119456780721
+          },
+          {
+            "band": 0,
+            "q": 1,
+            "i": 1,
+            "d": 0.48,
+            "twist": -0.5934119456780721
+          },
+          {
+            "band": 0,
+            "q": 2,
+            "i": 2,
+            "d": 0.48,
+            "twist": 0.5934119456780721
+          },
+          {
+            "band": 0,
+            "q": 3,
+            "i": 3,
+            "d": 0.48,
+            "twist": -0.5934119456780721
+          },
+          {
+            "band": 1,
+            "q": 0,
+            "i": 4,
+            "d": 0.42,
+            "twist": 0.4537856055185257
+          },
+          {
+            "band": 1,
+            "q": 1,
+            "i": 5,
+            "d": 0.42,
+            "twist": -0.4537856055185257
+          },
+          {
+            "band": 1,
+            "q": 2,
+            "i": 6,
+            "d": 0.42,
+            "twist": 0.4537856055185257
+          },
+          {
+            "band": 1,
+            "q": 3,
+            "i": 7,
+            "d": 0.42,
+            "twist": -0.4537856055185257
+          }
+        ],
+        "inner": [
+          {
+            "q": 0,
+            "d": 0.09,
+            "dx": 0
+          },
+          {
+            "q": 1,
+            "d": 0.09,
+            "dx": 0
+          },
+          {
+            "q": 2,
+            "d": 0.09,
+            "dx": 0
+          },
+          {
+            "q": 3,
+            "d": 0.09,
+            "dx": 0
+          }
+        ],
+        "rings": {
+          "a1": 0.5235987755982988,
+          "a2": -0.6981317007977318,
+          "a3": 0.3435819271919647
+        },
+        "light": {
+          "seams": 0,
+          "slits": 1,
+          "core": 1
+        },
+        "core": {
+          "rot": 5.04,
+          "innerRot": -11.34
+        },
+        "orbits": {
+          "alpha": 1,
+          "phase": 3.15
+        },
+        "offsets": {
+          "shellFront": 0,
+          "ringOuter": 0,
+          "ringMid": 0,
+          "ringInner": 0,
+          "process": 0,
+          "core": 0,
+          "joints": 0,
+          "inner": 0,
+          "shellRear": 0
+        },
+        "readout": {
+          "state": "04 OPERATIVO",
+          "note": "Sistema attivo",
+          "cycle": 100,
+          "explode": 0,
+          "active": "Core computazionale"
+        }
+      }
+    },
+    {
+      "cycle": 0.8,
+      "explode": 0.6,
+      "time": 15,
+      "expected": {
+        "cycle": 0.8,
+        "explode": 0.36788242993990605,
+        "teardown": 0.6,
+        "jointsExt": 0,
+        "state": {
+          "id": "04",
+          "name": "OPERATIVO",
+          "note": "Sistema attivo",
+          "from": 0.75,
+          "to": 1.0001
+        },
+        "oblo": {
+          "rotZ": 0,
+          "z": 0,
+          "hinge": 0
+        },
+        "petals": [
+          {
+            "band": 0,
+            "q": 0,
+            "i": 0,
+            "d": 0,
+            "twist": 0
+          },
+          {
+            "band": 0,
+            "q": 1,
+            "i": 1,
+            "d": 0,
+            "twist": 0
+          },
+          {
+            "band": 0,
+            "q": 2,
+            "i": 2,
+            "d": 0,
+            "twist": 0
+          },
+          {
+            "band": 0,
+            "q": 3,
+            "i": 3,
+            "d": 0,
+            "twist": 0
+          },
+          {
+            "band": 1,
+            "q": 0,
+            "i": 4,
+            "d": 0,
+            "twist": 0
+          },
+          {
+            "band": 1,
+            "q": 1,
+            "i": 5,
+            "d": 0,
+            "twist": 0
+          },
+          {
+            "band": 1,
+            "q": 2,
+            "i": 6,
+            "d": 0,
+            "twist": 0
+          },
+          {
+            "band": 1,
+            "q": 3,
+            "i": 7,
+            "d": 0,
+            "twist": 0
+          }
+        ],
+        "inner": [
+          {
+            "q": 0,
+            "d": 0.26894531249999987,
+            "dx": 0.26894531249999987
+          },
+          {
+            "q": 1,
+            "d": 0.26894531249999987,
+            "dx": 0.26894531249999987
+          },
+          {
+            "q": 2,
+            "d": 0.26894531249999987,
+            "dx": 0.26894531249999987
+          },
+          {
+            "q": 3,
+            "d": 0.26894531249999987,
+            "dx": 0.26894531249999987
+          }
+        ],
+        "rings": {
+          "a1": 0,
+          "a2": 0,
+          "a3": 0
+        },
+        "light": {
+          "seams": 0,
+          "slits": 1,
+          "core": 0.8528470280240376
+        },
+        "core": {
+          "rot": 5.679942285952282,
+          "innerRot": -13.5
+        },
+        "orbits": {
+          "alpha": 0,
+          "phase": 3.75
+        },
+        "offsets": {
+          "shellFront": 2.9,
+          "ringOuter": 0,
+          "ringMid": 0,
+          "ringInner": 0,
+          "process": 0,
+          "core": 0,
+          "joints": 0,
+          "inner": 0,
+          "shellRear": -3
+        },
+        "readout": {
+          "state": "04 OPERATIVO",
+          "note": "Sistema attivo",
+          "cycle": 80,
+          "explode": 60,
+          "active": "Tutte (esploso)"
+        }
+      }
+    },
+    {
+      "cycle": 1,
+      "explode": 1,
+      "time": 17.5,
+      "expected": {
+        "cycle": 1,
+        "explode": 1,
+        "teardown": 1,
+        "jointsExt": 0.32,
+        "state": {
+          "id": "04",
+          "name": "OPERATIVO",
+          "note": "Sistema attivo",
+          "from": 0.75,
+          "to": 1.0001
+        },
+        "oblo": {
+          "rotZ": 0,
+          "z": 0,
+          "hinge": 0
+        },
+        "petals": [
+          {
+            "band": 0,
+            "q": 0,
+            "i": 0,
+            "d": 0,
+            "twist": 0
+          },
+          {
+            "band": 0,
+            "q": 1,
+            "i": 1,
+            "d": 0,
+            "twist": 0
+          },
+          {
+            "band": 0,
+            "q": 2,
+            "i": 2,
+            "d": 0,
+            "twist": 0
+          },
+          {
+            "band": 0,
+            "q": 3,
+            "i": 3,
+            "d": 0,
+            "twist": 0
+          },
+          {
+            "band": 1,
+            "q": 0,
+            "i": 4,
+            "d": 0,
+            "twist": 0
+          },
+          {
+            "band": 1,
+            "q": 1,
+            "i": 5,
+            "d": 0,
+            "twist": 0
+          },
+          {
+            "band": 1,
+            "q": 2,
+            "i": 6,
+            "d": 0,
+            "twist": 0
+          },
+          {
+            "band": 1,
+            "q": 3,
+            "i": 7,
+            "d": 0,
+            "twist": 0
+          }
+        ],
+        "inner": [
+          {
+            "q": 0,
+            "d": 0.3,
+            "dx": 0.3
+          },
+          {
+            "q": 1,
+            "d": 0.3,
+            "dx": 0.3
+          },
+          {
+            "q": 2,
+            "d": 0.3,
+            "dx": 0.3
+          },
+          {
+            "q": 3,
+            "d": 0.3,
+            "dx": 0.3
+          }
+        ],
+        "rings": {
+          "a1": 0,
+          "a2": 0,
+          "a3": 0
+        },
+        "light": {
+          "seams": 0,
+          "slits": 1,
+          "core": 0.6
+        },
+        "core": {
+          "rot": 5.13,
+          "innerRot": -15.75
+        },
+        "orbits": {
+          "alpha": 0,
+          "phase": 4.375
+        },
+        "offsets": {
+          "shellFront": 2.9,
+          "ringOuter": 2.1,
+          "ringMid": 1.75,
+          "ringInner": 1.4,
+          "process": 0.85,
+          "core": -0.3,
+          "joints": -1.45,
+          "inner": -1.45,
+          "shellRear": -3
+        },
+        "readout": {
+          "state": "04 OPERATIVO",
+          "note": "Sistema attivo",
+          "cycle": 100,
+          "explode": 100,
+          "active": "Tutte (esploso)"
+        }
+      }
+    }
+  ]
+}

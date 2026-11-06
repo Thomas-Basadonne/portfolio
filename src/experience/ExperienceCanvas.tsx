@@ -2,7 +2,8 @@ import { Suspense, useEffect, useRef, useState } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { experienceStore } from "../lib/experienceStore";
 import { reportClientError } from "../lib/reportClientError";
-import { ToleranceMachine } from "./ToleranceMachine";
+import { NeutralToneMapping } from "three";
+import { CompilerMachine } from "./CompilerMachine";
 
 type ExperienceCanvasProps = {
   onReady: () => void;
@@ -86,6 +87,7 @@ export function ExperienceCanvas({ onReady, onFailure }: ExperienceCanvasProps) 
         frameloop="demand"
         gl={{
           alpha: true,
+          toneMapping: NeutralToneMapping,
           antialias: quality === "high",
           powerPreference: quality === "high" ? "high-performance" : "default",
         }}
@@ -109,7 +111,7 @@ export function ExperienceCanvas({ onReady, onFailure }: ExperienceCanvasProps) 
           onReady={onReady}
         />
         <Suspense fallback={null}>
-          <ToleranceMachine quality={quality} />
+          <CompilerMachine quality={quality} />
         </Suspense>
       </Canvas>
     </div>
