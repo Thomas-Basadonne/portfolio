@@ -148,7 +148,7 @@ a {
 
 .visual-status button {
   min-height: 2.75rem;
-  flex: none;
+  flex: 0 1 auto;
   padding: 0.6rem 0.75rem;
   color: var(--graphite);
   background: var(--bone);
@@ -1788,6 +1788,7 @@ a.contact-link:focus-visible {
   }
 
   .story-section__content--contact h2 {
+    overflow-wrap: anywhere;
     font-size: clamp(3.2rem, 16vw, 6rem);
   }
 

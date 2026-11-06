@@ -346,6 +346,7 @@ for (const locale of ["en", "it"]) {
   test(`HUD fallback and drawer retain readable isolated chrome (${locale})`, async ({ page }, info) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.route(/ExperienceCanvas-.*\.js/, (route) => route.abort());
+    await page.route("**/fonts/**", (route) => route.abort());
     await bypassEntry(page);
     await page.goto(`/?lang=${locale}#contact`);
     await expect(page.locator(".visual-status--failed")).toBeVisible();

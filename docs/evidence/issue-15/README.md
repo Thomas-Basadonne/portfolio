@@ -108,8 +108,10 @@ base URL too. Omitting `PORTFOLIO_TEST_PORT` retains the default port 4173.
 
 The installed macOS Firefox headless runtime cannot launch even an empty page:
 `RenderCompositorSWGL failed mapping default framebuffer` and a sandbox-extension
-error precede the launch timeout. No Firefox application assertion ran locally.
-The repository's Linux CI still runs all three engines; its result must be read
+error precede the launch timeout. No application assertion ran in that native
+macOS Firefox runtime. A targeted Firefox Linux probe was subsequently executed
+in a disposable Debian container (see below). The repository's Linux CI still
+runs all three engines; its result must be read
 from the PR, separately from these local Chromium/WebKit results. Physical iOS
 hardware and arbitrary OS high-contrast palettes are not certified by emulation.
 
@@ -126,6 +128,23 @@ viewport even though no element box overflowed. The new font-failure test failed
 on the previous CSS and passes with the smaller heading; no copy is removed.
 Browser test setup also settles fragment hydration and font metrics before the
 intentional bottom scroll, avoiding a WebKit navigation/reflow race.
+
+### Firefox Linux fallback-font probe
+
+A disposable Debian 12 ARM64 container reproduced the remaining Linux Firefox
+font-failure edge: at 320px, the contact heading still painted to x=322.07 even
+after reducing its minimum size. Narrow contact headings now allow emergency
+word wrapping, so a long fallback-font word wraps rather than losing characters.
+The retry button also shrinks/wraps within its notice instead of relying on macOS
+font metrics. Its containment is asserted in the shared geometry helper.
+The fallback tests explicitly block both fonts and the optional visual chunk.
+
+The same isolated Firefox 151 probe now measures scrollWidth/clientWidth **320/320**
+and confirms that the retry control stays inside its own panel. This is a targeted
+Linux fallback-layout check, not a claim that the full Firefox suite ran on macOS.
+See [linux-firefox.json](linux-firefox.json).
+
+![Firefox Linux at 320px with fonts blocked](linux-firefox-fonts.jpg)
 
 ## Scope and risk
 

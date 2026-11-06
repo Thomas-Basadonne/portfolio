@@ -90,6 +90,14 @@ export async function expectHudGeometry(page: Page) {
     const { x, y, right, bottom, width, height } = element.getBoundingClientRect();
     return { name: element.className, x, y, right, bottom, width, height };
   }));
+  const fallbackControls = await page.locator(".visual-status--failed").evaluateAll((notices) => notices.map((notice) => {
+    const outer = notice.getBoundingClientRect();
+    const button = notice.querySelector("button")!.getBoundingClientRect();
+    return { left: button.left - outer.left, right: outer.right - button.right, top: button.top - outer.top, bottom: outer.bottom - button.bottom };
+  }));
+  for (const control of fallbackControls) {
+    for (const clearance of Object.values(control)) expect.soft(clearance, "Retry button stays within its notice").toBeGreaterThanOrEqual(0);
+  }
   const viewport = page.viewportSize()!;
   for (const box of boxes) {
     expect.soft(box.x, box.name).toBeGreaterThanOrEqual(0);
