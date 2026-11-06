@@ -5,6 +5,7 @@ coverage/
 .lighthouseci/
 playwright-report/
 test-results/
+/visual-review/
 *.tsbuildinfo
 .DS_Store
 .env

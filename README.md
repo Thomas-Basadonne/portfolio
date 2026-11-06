@@ -21,6 +21,13 @@ The full release gate is `pnpm check`, followed by `pnpm test:e2e` and
 `pnpm test:lighthouse`. Production source maps are disabled; bundle and metadata budgets are enforced
 by scripts in `scripts/`.
 
+## Visual review
+
+`pnpm test:visual --label before` builds locally and captures desktop/mobile chapter frames,
+contact sheets and labeled WebGL probe windows. See [docs/VISUAL_REVIEW.md](docs/VISUAL_REVIEW.md)
+for before/after comparison, identity manifests, review checklist and emulation limits.
+Evidence stays in the Git-ignored `visual-review/` directory; no images are uploaded.
+
 ## Content editing
 
 All published facts, links and case-study records live in `src/content/portfolio.ts`, with one
