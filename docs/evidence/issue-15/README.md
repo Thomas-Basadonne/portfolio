@@ -79,15 +79,16 @@ The automated suite also retains the equivalent 720 × 450 reflow regression cas
 ## Executed verification
 
 - `pnpm check`: passed (typecheck, lint, 14 unit tests, build, bundle and link/CSP checks).
-- Same final HUD battery against the baseline: **22 failures** on Chromium/WebKit,
+- Same final HUD battery against the baseline: **24 failures** on Chromium/WebKit,
   with contrast assertions reproducing the bug (not browser-launch failures).
-- Same final HUD battery against the fix: **22 passed** on Chromium/WebKit.
-- Full Chromium/WebKit suite: **55 passed, 1 expected skip** (WebGL context-loss
+- Same final HUD battery against the fix: **24 passed** on Chromium/WebKit.
+- Full Chromium/WebKit suite: **57 passed, 1 expected skip** (WebGL context-loss
   injection is Chromium-only).
 - Browser zoom 200%: passed in EN/IT, including screenshot review.
 - The tests cover graphite, bone, contact start/boundary/middle/end and reverse
   scroll, DOM value agreement with progress, hover/focus, forced colors, six
-  desktop/mobile/reflow viewports, WebGL failure and keyboard drawer open/close.
+  desktop/mobile/reflow viewports, optional font failure at 320px, WebGL failure
+  (including short desktop windows) and keyboard drawer open/close.
 - `git diff --check`: passed.
 
 ### Re-run
@@ -112,9 +113,24 @@ The repository's Linux CI still runs all three engines; its result must be read
 from the PR, separately from these local Chromium/WebKit results. Physical iOS
 hardware and arbitrary OS high-contrast palettes are not certified by emulation.
 
+## CI follow-up
+
+The initial Linux CI exposed two platform/layout differences and a fallback-font
+case not visible in the first local run. WebKit Linux's `HighlightText` / `Highlight`
+pair measured only **3.772361:1**. Selected HUD controls now use inverse `Canvas` /
+`CanvasText` surfaces, retaining the OS palette without relying on that pair.
+A short desktop fallback notice is horizontally offset from the navigation rail.
+The Italian contact heading's minimum mobile size is reduced from 3.8rem to 3.2rem:
+with blocked optional fonts, “Costruiamo” otherwise painted 3px beyond a 320px
+viewport even though no element box overflowed. The new font-failure test failed
+on the previous CSS and passes with the smaller heading; no copy is removed.
+Browser test setup also settles fragment hydration and font metrics before the
+intentional bottom scroll, avoiding a WebKit navigation/reflow race.
+
 ## Scope and risk
 
 Production changes are CSS-only and scoped to chrome surfaces, focus treatment,
-and fallback/landscape clearance. `Hud.tsx`, `PortfolioStory.tsx`, professional
+and fallback/landscape clearance, plus the narrow contact-heading minimum.
+`Hud.tsx`, `PortfolioStory.tsx`, professional
 copy, DEPTH semantics and the controller remain unchanged. Rollback is a revert
 of the CSS change; there is no data migration or persistence change.

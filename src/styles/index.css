@@ -1523,6 +1523,14 @@ a.contact-link:focus-visible {
   }
 }
 
+/* Keep the fallback notice outside the desktop nav rail on short windows. */
+@media (min-width: 761px) and (max-height: 600px) {
+  .visual-status {
+    right: max(calc(var(--gutter) + 11rem), calc(env(safe-area-inset-right) + 11rem));
+    max-width: min(22rem, calc(100vw - 15rem));
+  }
+}
+
 /* Mobile reinterpretation */
 
 @media (max-width: 760px) {
@@ -1780,7 +1788,7 @@ a.contact-link:focus-visible {
   }
 
   .story-section__content--contact h2 {
-    font-size: clamp(3.8rem, 16vw, 6rem);
+    font-size: clamp(3.2rem, 16vw, 6rem);
   }
 
   .contact-link {
@@ -2010,13 +2018,13 @@ a.contact-link:focus-visible {
 
   .hud .lang-switch button[aria-pressed="true"],
   .hud .chapter-nav a.is-active {
-    color: HighlightText;
-    background: Highlight;
+    color: Canvas;
+    background: CanvasText;
   }
 
   .hud .lang-switch button[aria-pressed="true"]:focus-visible,
   .hud .chapter-nav a.is-active:focus-visible {
-    outline-color: HighlightText;
+    outline-color: Canvas;
   }
 
   a,

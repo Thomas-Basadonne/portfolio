@@ -85,6 +85,7 @@ export async function expectHudContrast(page: Page, info: TestInfo, label: strin
 }
 
 export async function expectHudGeometry(page: Page) {
+  await page.evaluate(() => new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))));
   const boxes = await page.locator(".hud__identity, .hud__readout, .hud .lang-switch, .chapter-nav, .visual-status--failed").evaluateAll((elements) => elements.map((element) => {
     const { x, y, right, bottom, width, height } = element.getBoundingClientRect();
     return { name: element.className, x, y, right, bottom, width, height };

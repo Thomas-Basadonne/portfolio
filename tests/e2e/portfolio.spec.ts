@@ -6,6 +6,17 @@ async function bypassEntry(page: Page) {
   await page.addInitScript(() => window.sessionStorage.setItem("tb:entry-seen", "1"));
 }
 
+async function scrollToEnd(page: Page) {
+  await expect(page.locator(".hud__readout")).toBeVisible();
+  await page.evaluate(async () => {
+    // Let hydration's fragment navigation and optional font metrics settle first.
+    // Otherwise WebKit can replay #contact after our intentional bottom scroll.
+    await document.fonts.ready;
+    await new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
+    window.scrollTo({ top: document.body.scrollHeight, behavior: "instant" });
+  });
+}
+
 async function expectNoHorizontalOverflow(page: Page) {
   const overflow = await page.evaluate(
     () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
@@ -283,7 +294,7 @@ for (const locale of ["en", "it"]) {
       await expectHudGeometry(page);
       await expectHudContrast(page, info, label);
     }
-    await page.evaluate(() => window.scrollTo({ top: document.body.scrollHeight, behavior: "instant" }));
+    await scrollToEnd(page);
     await expect(page.locator(".hud__readout strong")).toHaveText("100");
     for (const selector of [".chapter-nav a[href='#contact']", ".hud .lang-switch button[aria-pressed='false']", ".hud__identity"]) {
       const control = page.locator(selector);
@@ -310,13 +321,26 @@ for (const viewport of [
     await page.emulateMedia({ reducedMotion: "reduce" });
     await bypassEntry(page);
     await page.goto("/?lang=it#contact");
-    await page.evaluate(() => window.scrollTo({ top: document.body.scrollHeight, behavior: "instant" }));
+    await scrollToEnd(page);
     await expect(page.locator(".hud__readout strong")).toHaveText("100");
     await expectNoHorizontalOverflow(page);
     await expectHudGeometry(page);
     await expectHudContrast(page, info, `contact-${viewport.width}`);
   });
 }
+
+test("HUD contact fits at 320px when optional fonts fail", async ({ page }, info) => {
+  await page.setViewportSize({ width: 320, height: 568 });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.route("**/fonts/**", (route) => route.abort());
+  await bypassEntry(page);
+  await page.goto("/?lang=it#contact");
+  await scrollToEnd(page);
+  await expect(page.locator(".hud__readout strong")).toHaveText("100");
+  await expectNoHorizontalOverflow(page);
+  await expectHudGeometry(page);
+  await expectHudContrast(page, info, "fallback-fonts-320");
+});
 
 for (const locale of ["en", "it"]) {
   test(`HUD fallback and drawer retain readable isolated chrome (${locale})`, async ({ page }, info) => {
@@ -325,11 +349,11 @@ for (const locale of ["en", "it"]) {
     await bypassEntry(page);
     await page.goto(`/?lang=${locale}#contact`);
     await expect(page.locator(".visual-status--failed")).toBeVisible();
-    await page.evaluate(() => window.scrollTo({ top: document.body.scrollHeight, behavior: "instant" }));
+    await scrollToEnd(page);
     await expect(page.locator(".hud__readout strong")).toHaveText("100");
-    for (const viewport of [{ width: 1280, height: 720 }, { width: 320, height: 568 }, { width: 667, height: 375 }]) {
+    for (const viewport of [{ width: 1280, height: 720 }, { width: 1024, height: 500 }, { width: 320, height: 568 }, { width: 667, height: 375 }]) {
       await page.setViewportSize(viewport);
-      await page.evaluate(() => window.scrollTo({ top: document.body.scrollHeight, behavior: "instant" }));
+      await scrollToEnd(page);
       await expect(page.locator(".hud__readout strong")).toHaveText("100");
       await expectHudGeometry(page);
       await expectHudContrast(page, info, `fallback-contact-${viewport.width}`);
@@ -350,9 +374,20 @@ test("HUD contact forced colors preserve text and keyboard focus", async ({ page
   await page.emulateMedia({ reducedMotion: "reduce", forcedColors: "active" });
   await bypassEntry(page);
   await page.goto("/?lang=it#contact");
-  await page.evaluate(() => window.scrollTo({ top: document.body.scrollHeight, behavior: "instant" }));
+  await scrollToEnd(page);
   await expect(page.locator(".hud__readout strong")).toHaveText("100");
   await expectHudGeometry(page);
+  const selectedColors = await page.locator(".hud .lang-switch button[aria-pressed='true']").evaluate((button) => {
+    const probe = document.createElement("span");
+    probe.style.cssText = "color: Canvas; background: CanvasText";
+    document.body.append(probe);
+    const expected = getComputedStyle(probe);
+    const actual = getComputedStyle(button);
+    const colors = { actual: [actual.color, actual.backgroundColor], expected: [expected.color, expected.backgroundColor] };
+    probe.remove();
+    return colors;
+  });
+  expect.soft(selectedColors.actual, "Use inverse Canvas colors: OS Highlight pairs can be below 4.5:1").toEqual(selectedColors.expected);
   await expectHudContrast(page, info, "forced-colors");
   const nav = page.locator(".chapter-nav a[href='#contact']");
   await page.keyboard.press("Tab");
