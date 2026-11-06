@@ -1,0 +1,29 @@
+{
+  "engine": "Firefox 151.0 / Playwright 1.61.1",
+  "platform": "Debian 12 ARM64 disposable container",
+  "viewport": {
+    "width": 320,
+    "height": 568
+  },
+  "fontRequests": "aborted",
+  "before": {
+    "scrollWidth": 322,
+    "clientWidth": 320,
+    "contactHeadingTextRuns": [
+      {
+        "text": "Costruiamo qualcosa",
+        "parent": "",
+        "tag": "H2",
+        "right": 322.066650390625,
+        "left": 32,
+        "font": "520 51.2px / 45.05px Manrope Variable, Helvetica Neue, sans-serif",
+        "fontFamily": "Manrope Variable, Helvetica Neue, sans-serif"
+      }
+    ]
+  },
+  "after": {
+    "scrollWidth": 320,
+    "clientWidth": 320,
+    "retryContained": true
+  }
+}

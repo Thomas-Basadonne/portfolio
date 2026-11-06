@@ -1,8 +1,20 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
+import { expectHudContrast, expectHudGeometry } from "./hud-contrast";
 
 async function bypassEntry(page: Page) {
   await page.addInitScript(() => window.sessionStorage.setItem("tb:entry-seen", "1"));
+}
+
+async function scrollToEnd(page: Page) {
+  await expect(page.locator(".hud__readout")).toBeVisible();
+  await page.evaluate(async () => {
+    // Let hydration's fragment navigation and optional font metrics settle first.
+    // Otherwise WebKit can replay #contact after our intentional bottom scroll.
+    await document.fonts.ready;
+    await new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
+    window.scrollTo({ top: document.body.scrollHeight, behavior: "instant" });
+  });
 }
 
 async function expectNoHorizontalOverflow(page: Page) {
@@ -213,10 +225,10 @@ test("automated accessibility scan is clean", async ({ page }) => {
   expect(results.violations).toEqual([]);
 });
 
-test("semantic portfolio remains available without JavaScript", async ({ browser }) => {
-  const context = await browser.newContext({ javaScriptEnabled: false });
+test("semantic portfolio remains available without JavaScript", async ({ browser, baseURL }) => {
+  const context = await browser.newContext({ javaScriptEnabled: false, baseURL });
   const page = await context.newPage();
-  await page.goto("http://127.0.0.1:4173/");
+  await page.goto("/");
   await expect(page.getByRole("heading", { level: 1, name: "Thomas Basadonne" })).toBeVisible();
   await expect(page.getByRole("link", { name: "GitHub" })).toBeVisible();
   await expect(page.getByRole("link", { name: "thomasbasadonne@gmail.com" })).toBeVisible();
@@ -251,4 +263,137 @@ test("legacy section links land on the renamed chapter", async ({ page }) => {
   await page.goto("/#cases");
   await expect(page).toHaveURL(/#work$/);
   await expect(page.locator("#work")).toBeInViewport();
+});
+
+for (const locale of ["en", "it"]) {
+  test(`HUD composited contrast through contact and reverse scroll (${locale})`, async ({ page }, info) => {
+    test.setTimeout(60_000);
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await bypassEntry(page);
+    await page.goto(`/?lang=${locale}`);
+    await expect(page.locator("html")).toHaveAttribute("lang", locale);
+    await expect(page.locator(".hud__readout strong")).toHaveText("000");
+    await expectHudContrast(page, info, "graphite");
+    const positions = await page.locator(".story-section__content--contact").evaluate((panel) => {
+      const top = panel.getBoundingClientRect().top + window.scrollY;
+      const end = document.documentElement.scrollHeight - window.innerHeight;
+      return [top - window.innerHeight * 0.8, top - 50, (top + end) / 2, end];
+    });
+    // Include a bone panel under the fixed tools, then both edges of signal.
+    const boneTop = await page.locator(".story-section__content--cases").evaluate((panel) => panel.getBoundingClientRect().top + window.scrollY);
+    for (const [label, y] of [
+      ["bone", boneTop], ["contact-start", positions[0]], ["contact-boundary", positions[1]],
+      ["contact-middle", positions[2]], ["contact-end", positions[3]],
+      ["reverse-middle", positions[2]], ["reverse-boundary", positions[1]], ["reverse-start", positions[0]],
+    ] as const) {
+      await page.evaluate((top) => window.scrollTo({ top, behavior: "instant" }), y);
+      const expected = await page.evaluate(() => Math.round(window.scrollY / (document.documentElement.scrollHeight - window.innerHeight) * 100));
+      await expect(page.locator(".hud__readout strong")).toHaveText(String(expected).padStart(3, "0"));
+      await expect(page.locator(".hud__progress")).toHaveAttribute("value", String(expected));
+      await expectHudGeometry(page);
+      await expectHudContrast(page, info, label);
+    }
+    await scrollToEnd(page);
+    await expect(page.locator(".hud__readout strong")).toHaveText("100");
+    for (const selector of [".chapter-nav a[href='#contact']", ".hud .lang-switch button[aria-pressed='false']", ".hud__identity"]) {
+      const control = page.locator(selector);
+      await control.hover();
+      await expectHudContrast(page, info, `hover-${selector}`);
+      await page.keyboard.press("Tab");
+      await control.focus();
+      await expect(control).toBeFocused();
+      const outline = await control.evaluate((element) => getComputedStyle(element).outlineStyle);
+      expect(outline).not.toBe("none");
+      await expectHudContrast(page, info, `focus-${selector}`);
+    }
+  });
+}
+
+for (const viewport of [
+  { width: 320, height: 568 }, { width: 667, height: 375 }, { width: 768, height: 1024 },
+  { width: 1024, height: 500 }, { width: 2560, height: 1080 },
+  // 1440x900 at browser zoom 200% has this CSS viewport, not a CSS transform.
+  { width: 720, height: 450 },
+]) {
+  test(`HUD contact geometry and contrast ${viewport.width}x${viewport.height}`, async ({ page }, info) => {
+    await page.setViewportSize(viewport);
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await bypassEntry(page);
+    await page.goto("/?lang=it#contact");
+    await scrollToEnd(page);
+    await expect(page.locator(".hud__readout strong")).toHaveText("100");
+    await expectNoHorizontalOverflow(page);
+    await expectHudGeometry(page);
+    await expectHudContrast(page, info, `contact-${viewport.width}`);
+  });
+}
+
+test("HUD contact fits at 320px when optional fonts fail", async ({ page }, info) => {
+  await page.setViewportSize({ width: 320, height: 568 });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.route("**/fonts/**", (route) => route.abort());
+  await bypassEntry(page);
+  await page.goto("/?lang=it#contact");
+  await scrollToEnd(page);
+  await expect(page.locator(".hud__readout strong")).toHaveText("100");
+  await expectNoHorizontalOverflow(page);
+  await expectHudGeometry(page);
+  await expectHudContrast(page, info, "fallback-fonts-320");
+});
+
+for (const locale of ["en", "it"]) {
+  test(`HUD fallback and drawer retain readable isolated chrome (${locale})`, async ({ page }, info) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.route(/ExperienceCanvas-.*\.js/, (route) => route.abort());
+    await page.route("**/fonts/**", (route) => route.abort());
+    await bypassEntry(page);
+    await page.goto(`/?lang=${locale}#contact`);
+    await expect(page.locator(".visual-status--failed")).toBeVisible();
+    await scrollToEnd(page);
+    await expect(page.locator(".hud__readout strong")).toHaveText("100");
+    for (const viewport of [{ width: 1280, height: 720 }, { width: 1024, height: 500 }, { width: 320, height: 568 }, { width: 667, height: 375 }]) {
+      await page.setViewportSize(viewport);
+      await scrollToEnd(page);
+      await expect(page.locator(".hud__readout strong")).toHaveText("100");
+      await expectHudGeometry(page);
+      await expectHudContrast(page, info, `fallback-contact-${viewport.width}`);
+    }
+    await page.locator(".chapter-nav a[href='#work']").click();
+    await page.getByRole("button", { name: /project twin/i }).focus();
+    await page.keyboard.press("Enter");
+    await expect(page.getByRole("dialog", { name: "Project Twin" })).toBeVisible();
+    await expect(page.locator(".site-shell")).toHaveAttribute("inert", "");
+    await page.keyboard.press("Escape");
+    await expect(page.getByRole("dialog")).toBeHidden();
+    await expect(page.getByRole("button", { name: /project twin/i })).toBeFocused();
+    await expectHudGeometry(page);
+  });
+}
+
+test("HUD contact forced colors preserve text and keyboard focus", async ({ page }, info) => {
+  await page.emulateMedia({ reducedMotion: "reduce", forcedColors: "active" });
+  await bypassEntry(page);
+  await page.goto("/?lang=it#contact");
+  await scrollToEnd(page);
+  await expect(page.locator(".hud__readout strong")).toHaveText("100");
+  await expectHudGeometry(page);
+  const selectedColors = await page.locator(".hud .lang-switch button[aria-pressed='true']").evaluate((button) => {
+    const probe = document.createElement("span");
+    probe.style.cssText = "color: Canvas; background: CanvasText";
+    document.body.append(probe);
+    const expected = getComputedStyle(probe);
+    const actual = getComputedStyle(button);
+    const colors = { actual: [actual.color, actual.backgroundColor], expected: [expected.color, expected.backgroundColor] };
+    probe.remove();
+    return colors;
+  });
+  expect.soft(selectedColors.actual, "Use inverse Canvas colors: OS Highlight pairs can be below 4.5:1").toEqual(selectedColors.expected);
+  await expectHudContrast(page, info, "forced-colors");
+  const nav = page.locator(".chapter-nav a[href='#contact']");
+  await page.keyboard.press("Tab");
+  await nav.focus();
+  await expect(nav).toBeFocused();
+  expect(await nav.evaluate((element) => getComputedStyle(element).outlineStyle)).not.toBe("none");
+  await expectHudContrast(page, info, "forced-colors-focus");
 });

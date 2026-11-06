@@ -1,0 +1,81 @@
+{
+  "success": true,
+  "record": [
+    {
+      "locale": "en",
+      "zoom": 2,
+      "width": 720,
+      "height": 450,
+      "overflow": 0,
+      "depth": "100",
+      "boxes": [
+        {
+          "name": "hud__identity",
+          "x": 12,
+          "y": 12,
+          "right": 58.796875,
+          "bottom": 58.796875
+        },
+        {
+          "name": "hud__readout mono-label",
+          "x": 497.9375,
+          "y": 31.6015625,
+          "right": 591.40625,
+          "bottom": 53.1953125
+        },
+        {
+          "name": "lang-switch mono-label",
+          "x": 607.40625,
+          "y": 19.3984375,
+          "right": 697.40625,
+          "bottom": 65.3984375
+        },
+        {
+          "name": "chapter-nav",
+          "x": 650.8125,
+          "y": 84,
+          "right": 708,
+          "bottom": 361.1875
+        }
+      ]
+    },
+    {
+      "locale": "it",
+      "zoom": 2,
+      "width": 720,
+      "height": 450,
+      "overflow": 0,
+      "depth": "100",
+      "boxes": [
+        {
+          "name": "hud__identity",
+          "x": 12,
+          "y": 12,
+          "right": 58.796875,
+          "bottom": 58.796875
+        },
+        {
+          "name": "hud__readout mono-label",
+          "x": 497.9375,
+          "y": 31.6015625,
+          "right": 591.40625,
+          "bottom": 53.1953125
+        },
+        {
+          "name": "lang-switch mono-label",
+          "x": 607.40625,
+          "y": 19.3984375,
+          "right": 697.40625,
+          "bottom": 65.3984375
+        },
+        {
+          "name": "chapter-nav",
+          "x": 650.8125,
+          "y": 84,
+          "right": 708,
+          "bottom": 361.1875
+        }
+      ]
+    }
+  ]
+}

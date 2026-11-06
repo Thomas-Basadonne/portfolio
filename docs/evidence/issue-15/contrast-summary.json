@@ -1,0 +1,3350 @@
+[
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-composited-c-528d6-tact-and-reverse-scroll-it--chromium",
+    "frame": "graphite-contrast",
+    "minimumContrast": 4.556492843077012,
+    "depth": [
+      {
+        "text": "000",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-composited-c-528d6-tact-and-reverse-scroll-it--chromium",
+    "frame": "bone-contrast",
+    "minimumContrast": 1,
+    "depth": [
+      {
+        "text": "050",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 2.642703549643294,
+        "background": [
+          233,
+          229,
+          218
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-composited-c-528d6-tact-and-reverse-scroll-it--chromium",
+    "frame": "contact-start-contrast",
+    "minimumContrast": 1,
+    "depth": [
+      {
+        "text": "088",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-composited-c-528d6-tact-and-reverse-scroll-it--chromium",
+    "frame": "contact-boundary-contrast",
+    "minimumContrast": 1,
+    "depth": [
+      {
+        "text": "096",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 1,
+        "background": [
+          255,
+          77,
+          0
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-composited-c-528d6-tact-and-reverse-scroll-it--chromium",
+    "frame": "contact-middle-contrast",
+    "minimumContrast": 1,
+    "depth": [
+      {
+        "text": "098",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 1,
+        "background": [
+          255,
+          77,
+          0
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-composited-c-528d6-tact-and-reverse-scroll-it--chromium",
+    "frame": "contact-end-contrast",
+    "minimumContrast": 1,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 1,
+        "background": [
+          255,
+          77,
+          0
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-composited-c-528d6-tact-and-reverse-scroll-it--chromium",
+    "frame": "reverse-middle-contrast",
+    "minimumContrast": 1,
+    "depth": [
+      {
+        "text": "098",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 1,
+        "background": [
+          255,
+          77,
+          0
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-composited-c-528d6-tact-and-reverse-scroll-it--chromium",
+    "frame": "reverse-boundary-contrast",
+    "minimumContrast": 1,
+    "depth": [
+      {
+        "text": "096",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 1,
+        "background": [
+          255,
+          77,
+          0
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-composited-c-528d6-tact-and-reverse-scroll-it--chromium",
+    "frame": "reverse-start-contrast",
+    "minimumContrast": 1,
+    "depth": [
+      {
+        "text": "088",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-composited-c-528d6-tact-and-reverse-scroll-it--chromium",
+    "frame": "hover-.chapter-nav a[href='#contact']-contrast",
+    "minimumContrast": 1,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 1,
+        "background": [
+          255,
+          77,
+          0
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-composited-c-528d6-tact-and-reverse-scroll-it--chromium",
+    "frame": "focus-.chapter-nav a[href='#contact']-contrast",
+    "minimumContrast": 1,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 1,
+        "background": [
+          255,
+          77,
+          0
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-composited-c-528d6-tact-and-reverse-scroll-it--chromium",
+    "frame": "hover-.hud .lang-switch button[aria-pressed='false']-contrast",
+    "minimumContrast": 1,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 1,
+        "background": [
+          255,
+          77,
+          0
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-composited-c-528d6-tact-and-reverse-scroll-it--chromium",
+    "frame": "focus-.hud .lang-switch button[aria-pressed='false']-contrast",
+    "minimumContrast": 1.7424297214896614,
+    "depth": [
+      {
+        "text": "005",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-composited-c-528d6-tact-and-reverse-scroll-it--chromium",
+    "frame": "hover-.hud__identity-contrast",
+    "minimumContrast": 1.7424297214896614,
+    "depth": [
+      {
+        "text": "005",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-composited-c-528d6-tact-and-reverse-scroll-it--chromium",
+    "frame": "focus-.hud__identity-contrast",
+    "minimumContrast": 1.7424297214896614,
+    "depth": [
+      {
+        "text": "005",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-contact-geometry-and-contrast-667x375-chromium",
+    "frame": "contact-667-contrast",
+    "minimumContrast": 1,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 1,
+        "background": [
+          255,
+          77,
+          0
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-composited-c-528d6-tact-and-reverse-scroll-it--webkit",
+    "frame": "graphite-contrast",
+    "minimumContrast": 1,
+    "depth": [
+      {
+        "text": "000",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-composited-c-528d6-tact-and-reverse-scroll-it--webkit",
+    "frame": "bone-contrast",
+    "minimumContrast": 1,
+    "depth": [
+      {
+        "text": "050",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 2.642703549643294,
+        "background": [
+          233,
+          229,
+          218
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-composited-c-528d6-tact-and-reverse-scroll-it--webkit",
+    "frame": "contact-start-contrast",
+    "minimumContrast": 1,
+    "depth": [
+      {
+        "text": "088",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-composited-c-528d6-tact-and-reverse-scroll-it--webkit",
+    "frame": "contact-boundary-contrast",
+    "minimumContrast": 1,
+    "depth": [
+      {
+        "text": "096",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 1,
+        "background": [
+          255,
+          77,
+          0
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-composited-c-528d6-tact-and-reverse-scroll-it--webkit",
+    "frame": "contact-middle-contrast",
+    "minimumContrast": 1,
+    "depth": [
+      {
+        "text": "098",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 1,
+        "background": [
+          255,
+          77,
+          0
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-composited-c-528d6-tact-and-reverse-scroll-it--webkit",
+    "frame": "contact-end-contrast",
+    "minimumContrast": 1,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 1,
+        "background": [
+          255,
+          77,
+          0
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-composited-c-528d6-tact-and-reverse-scroll-it--webkit",
+    "frame": "reverse-middle-contrast",
+    "minimumContrast": 1,
+    "depth": [
+      {
+        "text": "098",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 1,
+        "background": [
+          255,
+          77,
+          0
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-composited-c-528d6-tact-and-reverse-scroll-it--webkit",
+    "frame": "reverse-boundary-contrast",
+    "minimumContrast": 1,
+    "depth": [
+      {
+        "text": "096",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 1,
+        "background": [
+          255,
+          77,
+          0
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-composited-c-528d6-tact-and-reverse-scroll-it--webkit",
+    "frame": "reverse-start-contrast",
+    "minimumContrast": 1,
+    "depth": [
+      {
+        "text": "088",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-composited-c-528d6-tact-and-reverse-scroll-it--webkit",
+    "frame": "hover-.chapter-nav a[href='#contact']-contrast",
+    "minimumContrast": 1,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 1,
+        "background": [
+          255,
+          77,
+          0
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-composited-c-528d6-tact-and-reverse-scroll-it--webkit",
+    "frame": "focus-.chapter-nav a[href='#contact']-contrast",
+    "minimumContrast": 1,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 1,
+        "background": [
+          255,
+          77,
+          0
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-composited-c-528d6-tact-and-reverse-scroll-it--webkit",
+    "frame": "hover-.hud .lang-switch button[aria-pressed='false']-contrast",
+    "minimumContrast": 1,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 1,
+        "background": [
+          255,
+          77,
+          0
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-composited-c-528d6-tact-and-reverse-scroll-it--webkit",
+    "frame": "focus-.hud .lang-switch button[aria-pressed='false']-contrast",
+    "minimumContrast": 1,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 1,
+        "background": [
+          255,
+          77,
+          0
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-composited-c-528d6-tact-and-reverse-scroll-it--webkit",
+    "frame": "hover-.hud__identity-contrast",
+    "minimumContrast": 1,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 1,
+        "background": [
+          255,
+          77,
+          0
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-composited-c-528d6-tact-and-reverse-scroll-it--webkit",
+    "frame": "focus-.hud__identity-contrast",
+    "minimumContrast": 1,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 1,
+        "background": [
+          255,
+          77,
+          0
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-contact-geometry-and-contrast-720x450-chromium",
+    "frame": "contact-720-contrast",
+    "minimumContrast": 1,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 1,
+        "background": [
+          255,
+          77,
+          0
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-fallback-and-c55ab-eadable-isolated-chrome-it--chromium",
+    "frame": "fallback-contact-1280-contrast",
+    "minimumContrast": 1,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 1,
+        "background": [
+          255,
+          77,
+          0
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-fallback-and-c55ab-eadable-isolated-chrome-it--chromium",
+    "frame": "fallback-contact-1024-contrast",
+    "minimumContrast": 1,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 1,
+        "background": [
+          255,
+          77,
+          0
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-fallback-and-c55ab-eadable-isolated-chrome-it--chromium",
+    "frame": "fallback-contact-320-contrast",
+    "minimumContrast": 1,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 1,
+        "background": [
+          255,
+          77,
+          0
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-fallback-and-c55ab-eadable-isolated-chrome-it--chromium",
+    "frame": "fallback-contact-667-contrast",
+    "minimumContrast": 1,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 1,
+        "background": [
+          255,
+          77,
+          0
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-composited-c-59fa1-tact-and-reverse-scroll-en--chromium",
+    "frame": "graphite-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "000",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-composited-c-59fa1-tact-and-reverse-scroll-en--chromium",
+    "frame": "bone-contrast",
+    "minimumContrast": 1,
+    "depth": [
+      {
+        "text": "049",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 2.642703549643294,
+        "background": [
+          233,
+          229,
+          218
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-composited-c-59fa1-tact-and-reverse-scroll-en--chromium",
+    "frame": "contact-start-contrast",
+    "minimumContrast": 1,
+    "depth": [
+      {
+        "text": "087",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-composited-c-59fa1-tact-and-reverse-scroll-en--chromium",
+    "frame": "contact-boundary-contrast",
+    "minimumContrast": 1,
+    "depth": [
+      {
+        "text": "096",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 1,
+        "background": [
+          255,
+          77,
+          0
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-composited-c-59fa1-tact-and-reverse-scroll-en--chromium",
+    "frame": "contact-middle-contrast",
+    "minimumContrast": 1,
+    "depth": [
+      {
+        "text": "098",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 1,
+        "background": [
+          255,
+          77,
+          0
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-composited-c-59fa1-tact-and-reverse-scroll-en--chromium",
+    "frame": "contact-end-contrast",
+    "minimumContrast": 1,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 1,
+        "background": [
+          255,
+          77,
+          0
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-composited-c-59fa1-tact-and-reverse-scroll-en--chromium",
+    "frame": "reverse-middle-contrast",
+    "minimumContrast": 1,
+    "depth": [
+      {
+        "text": "098",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 1,
+        "background": [
+          255,
+          77,
+          0
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-composited-c-59fa1-tact-and-reverse-scroll-en--chromium",
+    "frame": "reverse-boundary-contrast",
+    "minimumContrast": 1,
+    "depth": [
+      {
+        "text": "096",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 1,
+        "background": [
+          255,
+          77,
+          0
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-composited-c-59fa1-tact-and-reverse-scroll-en--chromium",
+    "frame": "reverse-start-contrast",
+    "minimumContrast": 1,
+    "depth": [
+      {
+        "text": "087",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-composited-c-59fa1-tact-and-reverse-scroll-en--chromium",
+    "frame": "hover-.chapter-nav a[href='#contact']-contrast",
+    "minimumContrast": 1,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 1,
+        "background": [
+          255,
+          77,
+          0
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-composited-c-59fa1-tact-and-reverse-scroll-en--chromium",
+    "frame": "focus-.chapter-nav a[href='#contact']-contrast",
+    "minimumContrast": 1,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 1,
+        "background": [
+          255,
+          77,
+          0
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-composited-c-59fa1-tact-and-reverse-scroll-en--chromium",
+    "frame": "hover-.hud .lang-switch button[aria-pressed='false']-contrast",
+    "minimumContrast": 1,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 1,
+        "background": [
+          255,
+          77,
+          0
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-composited-c-59fa1-tact-and-reverse-scroll-en--chromium",
+    "frame": "focus-.hud .lang-switch button[aria-pressed='false']-contrast",
+    "minimumContrast": 1.7424297214896614,
+    "depth": [
+      {
+        "text": "005",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-composited-c-59fa1-tact-and-reverse-scroll-en--chromium",
+    "frame": "hover-.hud__identity-contrast",
+    "minimumContrast": 1.7424297214896614,
+    "depth": [
+      {
+        "text": "005",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-composited-c-59fa1-tact-and-reverse-scroll-en--chromium",
+    "frame": "focus-.hud__identity-contrast",
+    "minimumContrast": 1.7424297214896614,
+    "depth": [
+      {
+        "text": "005",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-fallback-and-0abb1-eadable-isolated-chrome-en--webkit",
+    "frame": "fallback-contact-1280-contrast",
+    "minimumContrast": 1,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 1,
+        "background": [
+          255,
+          77,
+          0
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-fallback-and-0abb1-eadable-isolated-chrome-en--webkit",
+    "frame": "fallback-contact-1024-contrast",
+    "minimumContrast": 1,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 1,
+        "background": [
+          255,
+          77,
+          0
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-fallback-and-0abb1-eadable-isolated-chrome-en--webkit",
+    "frame": "fallback-contact-320-contrast",
+    "minimumContrast": 1,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 1,
+        "background": [
+          255,
+          77,
+          0
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-fallback-and-0abb1-eadable-isolated-chrome-en--webkit",
+    "frame": "fallback-contact-667-contrast",
+    "minimumContrast": 1,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 1,
+        "background": [
+          255,
+          77,
+          0
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-contact-geometry-and-contrast-320x568-webkit",
+    "frame": "contact-320-contrast",
+    "minimumContrast": 1,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 1,
+        "background": [
+          255,
+          77,
+          0
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-contact-geometry-and-contrast-1024x500-webkit",
+    "frame": "contact-1024-contrast",
+    "minimumContrast": 1,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 1,
+        "background": [
+          255,
+          77,
+          0
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-contact-geometry-and-contrast-320x568-chromium",
+    "frame": "contact-320-contrast",
+    "minimumContrast": 1,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 1,
+        "background": [
+          255,
+          77,
+          0
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-fallback-and-0abb1-eadable-isolated-chrome-en--chromium",
+    "frame": "fallback-contact-1280-contrast",
+    "minimumContrast": 1,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 1,
+        "background": [
+          255,
+          77,
+          0
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-fallback-and-0abb1-eadable-isolated-chrome-en--chromium",
+    "frame": "fallback-contact-1024-contrast",
+    "minimumContrast": 1,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 1,
+        "background": [
+          255,
+          77,
+          0
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-fallback-and-0abb1-eadable-isolated-chrome-en--chromium",
+    "frame": "fallback-contact-320-contrast",
+    "minimumContrast": 1,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 1,
+        "background": [
+          255,
+          77,
+          0
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-fallback-and-0abb1-eadable-isolated-chrome-en--chromium",
+    "frame": "fallback-contact-667-contrast",
+    "minimumContrast": 1,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 1,
+        "background": [
+          255,
+          77,
+          0
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-contact-geometry-and-contrast-768x1024-chromium",
+    "frame": "contact-768-contrast",
+    "minimumContrast": 1.0796980117586423,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-fallback-and-c55ab-eadable-isolated-chrome-it--webkit",
+    "frame": "fallback-contact-1280-contrast",
+    "minimumContrast": 1,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 1,
+        "background": [
+          255,
+          77,
+          0
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-fallback-and-c55ab-eadable-isolated-chrome-it--webkit",
+    "frame": "fallback-contact-1024-contrast",
+    "minimumContrast": 1,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 1,
+        "background": [
+          255,
+          77,
+          0
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-fallback-and-c55ab-eadable-isolated-chrome-it--webkit",
+    "frame": "fallback-contact-320-contrast",
+    "minimumContrast": 1,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 1,
+        "background": [
+          255,
+          77,
+          0
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-fallback-and-c55ab-eadable-isolated-chrome-it--webkit",
+    "frame": "fallback-contact-667-contrast",
+    "minimumContrast": 1,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 1,
+        "background": [
+          255,
+          77,
+          0
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-contact-forc-285f6-rve-text-and-keyboard-focus-chromium",
+    "frame": "forced-colors-contrast",
+    "minimumContrast": 1.3509301671204677,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgba(55, 0, 110, 0.8)",
+        "minimumContrast": 1.5481643802036864,
+        "background": [
+          95,
+          51,
+          139
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-contact-forc-285f6-rve-text-and-keyboard-focus-chromium",
+    "frame": "forced-colors-focus-contrast",
+    "minimumContrast": 1.3509301671204677,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgba(55, 0, 110, 0.8)",
+        "minimumContrast": 1.5481643802036864,
+        "background": [
+          95,
+          51,
+          139
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-contact-geometry-and-contrast-2560x1080-chromium",
+    "frame": "contact-2560-contrast",
+    "minimumContrast": 1,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 1,
+        "background": [
+          255,
+          77,
+          0
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-contact-geometry-and-contrast-768x1024-webkit",
+    "frame": "contact-768-contrast",
+    "minimumContrast": 1.0796980117586423,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-contact-geometry-and-contrast-2560x1080-webkit",
+    "frame": "contact-2560-contrast",
+    "minimumContrast": 1,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 1,
+        "background": [
+          255,
+          77,
+          0
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-contact-geometry-and-contrast-1024x500-chromium",
+    "frame": "contact-1024-contrast",
+    "minimumContrast": 1,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 1,
+        "background": [
+          255,
+          77,
+          0
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-composited-c-59fa1-tact-and-reverse-scroll-en--webkit",
+    "frame": "graphite-contrast",
+    "minimumContrast": 1,
+    "depth": [
+      {
+        "text": "000",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-composited-c-59fa1-tact-and-reverse-scroll-en--webkit",
+    "frame": "bone-contrast",
+    "minimumContrast": 1,
+    "depth": [
+      {
+        "text": "049",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 2.642703549643294,
+        "background": [
+          233,
+          229,
+          218
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-composited-c-59fa1-tact-and-reverse-scroll-en--webkit",
+    "frame": "contact-start-contrast",
+    "minimumContrast": 1,
+    "depth": [
+      {
+        "text": "087",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-composited-c-59fa1-tact-and-reverse-scroll-en--webkit",
+    "frame": "contact-boundary-contrast",
+    "minimumContrast": 1,
+    "depth": [
+      {
+        "text": "096",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 1,
+        "background": [
+          255,
+          77,
+          0
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-composited-c-59fa1-tact-and-reverse-scroll-en--webkit",
+    "frame": "contact-middle-contrast",
+    "minimumContrast": 1,
+    "depth": [
+      {
+        "text": "098",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 1,
+        "background": [
+          255,
+          77,
+          0
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-composited-c-59fa1-tact-and-reverse-scroll-en--webkit",
+    "frame": "contact-end-contrast",
+    "minimumContrast": 1,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 1,
+        "background": [
+          255,
+          77,
+          0
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-composited-c-59fa1-tact-and-reverse-scroll-en--webkit",
+    "frame": "reverse-middle-contrast",
+    "minimumContrast": 1,
+    "depth": [
+      {
+        "text": "098",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 1,
+        "background": [
+          255,
+          77,
+          0
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-composited-c-59fa1-tact-and-reverse-scroll-en--webkit",
+    "frame": "reverse-boundary-contrast",
+    "minimumContrast": 1,
+    "depth": [
+      {
+        "text": "096",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 1,
+        "background": [
+          255,
+          77,
+          0
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-composited-c-59fa1-tact-and-reverse-scroll-en--webkit",
+    "frame": "reverse-start-contrast",
+    "minimumContrast": 1,
+    "depth": [
+      {
+        "text": "087",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-composited-c-59fa1-tact-and-reverse-scroll-en--webkit",
+    "frame": "hover-.chapter-nav a[href='#contact']-contrast",
+    "minimumContrast": 1,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 1,
+        "background": [
+          255,
+          77,
+          0
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-composited-c-59fa1-tact-and-reverse-scroll-en--webkit",
+    "frame": "focus-.chapter-nav a[href='#contact']-contrast",
+    "minimumContrast": 1,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 1,
+        "background": [
+          255,
+          77,
+          0
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-composited-c-59fa1-tact-and-reverse-scroll-en--webkit",
+    "frame": "hover-.hud .lang-switch button[aria-pressed='false']-contrast",
+    "minimumContrast": 1,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 1,
+        "background": [
+          255,
+          77,
+          0
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-composited-c-59fa1-tact-and-reverse-scroll-en--webkit",
+    "frame": "focus-.hud .lang-switch button[aria-pressed='false']-contrast",
+    "minimumContrast": 1,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 1,
+        "background": [
+          255,
+          77,
+          0
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-composited-c-59fa1-tact-and-reverse-scroll-en--webkit",
+    "frame": "hover-.hud__identity-contrast",
+    "minimumContrast": 1,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 1,
+        "background": [
+          255,
+          77,
+          0
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-composited-c-59fa1-tact-and-reverse-scroll-en--webkit",
+    "frame": "focus-.hud__identity-contrast",
+    "minimumContrast": 1,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 1,
+        "background": [
+          255,
+          77,
+          0
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-contact-geometry-and-contrast-720x450-webkit",
+    "frame": "contact-720-contrast",
+    "minimumContrast": 1,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 1,
+        "background": [
+          255,
+          77,
+          0
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-contact-forc-285f6-rve-text-and-keyboard-focus-webkit",
+    "frame": "forced-colors-contrast",
+    "minimumContrast": 1.185687108926294,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgba(63, 99, 139, 0.8)",
+        "minimumContrast": 1.185687108926294,
+        "background": [
+          56,
+          85,
+          117
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-contact-forc-285f6-rve-text-and-keyboard-focus-webkit",
+    "frame": "forced-colors-focus-contrast",
+    "minimumContrast": 1.185687108926294,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgba(63, 99, 139, 0.8)",
+        "minimumContrast": 1.185687108926294,
+        "background": [
+          56,
+          85,
+          117
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "before",
+    "test": "portfolio-HUD-contact-geometry-and-contrast-667x375-webkit",
+    "frame": "contact-667-contrast",
+    "minimumContrast": 1,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 1,
+        "background": [
+          255,
+          77,
+          0
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-composited-c-528d6-tact-and-reverse-scroll-it--chromium",
+    "frame": "graphite-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "000",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-composited-c-528d6-tact-and-reverse-scroll-it--chromium",
+    "frame": "bone-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "050",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-composited-c-528d6-tact-and-reverse-scroll-it--chromium",
+    "frame": "contact-start-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "088",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-composited-c-528d6-tact-and-reverse-scroll-it--chromium",
+    "frame": "contact-boundary-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "096",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-composited-c-528d6-tact-and-reverse-scroll-it--chromium",
+    "frame": "contact-middle-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "098",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-composited-c-528d6-tact-and-reverse-scroll-it--chromium",
+    "frame": "contact-end-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-composited-c-528d6-tact-and-reverse-scroll-it--chromium",
+    "frame": "reverse-middle-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "098",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-composited-c-528d6-tact-and-reverse-scroll-it--chromium",
+    "frame": "reverse-boundary-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "096",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-composited-c-528d6-tact-and-reverse-scroll-it--chromium",
+    "frame": "reverse-start-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "088",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-composited-c-528d6-tact-and-reverse-scroll-it--chromium",
+    "frame": "hover-.chapter-nav a[href='#contact']-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-composited-c-528d6-tact-and-reverse-scroll-it--chromium",
+    "frame": "focus-.chapter-nav a[href='#contact']-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-composited-c-528d6-tact-and-reverse-scroll-it--chromium",
+    "frame": "hover-.hud .lang-switch button[aria-pressed='false']-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-composited-c-528d6-tact-and-reverse-scroll-it--chromium",
+    "frame": "focus-.hud .lang-switch button[aria-pressed='false']-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "005",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-composited-c-528d6-tact-and-reverse-scroll-it--chromium",
+    "frame": "hover-.hud__identity-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "005",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-composited-c-528d6-tact-and-reverse-scroll-it--chromium",
+    "frame": "focus-.hud__identity-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "005",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-contact-geometry-and-contrast-667x375-chromium",
+    "frame": "contact-667-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-composited-c-528d6-tact-and-reverse-scroll-it--webkit",
+    "frame": "graphite-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "000",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-composited-c-528d6-tact-and-reverse-scroll-it--webkit",
+    "frame": "bone-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "050",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-composited-c-528d6-tact-and-reverse-scroll-it--webkit",
+    "frame": "contact-start-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "088",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-composited-c-528d6-tact-and-reverse-scroll-it--webkit",
+    "frame": "contact-boundary-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "096",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-composited-c-528d6-tact-and-reverse-scroll-it--webkit",
+    "frame": "contact-middle-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "098",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-composited-c-528d6-tact-and-reverse-scroll-it--webkit",
+    "frame": "contact-end-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-composited-c-528d6-tact-and-reverse-scroll-it--webkit",
+    "frame": "reverse-middle-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "098",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-composited-c-528d6-tact-and-reverse-scroll-it--webkit",
+    "frame": "reverse-boundary-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "096",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-composited-c-528d6-tact-and-reverse-scroll-it--webkit",
+    "frame": "reverse-start-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "088",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-composited-c-528d6-tact-and-reverse-scroll-it--webkit",
+    "frame": "hover-.chapter-nav a[href='#contact']-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-composited-c-528d6-tact-and-reverse-scroll-it--webkit",
+    "frame": "focus-.chapter-nav a[href='#contact']-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-composited-c-528d6-tact-and-reverse-scroll-it--webkit",
+    "frame": "hover-.hud .lang-switch button[aria-pressed='false']-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-composited-c-528d6-tact-and-reverse-scroll-it--webkit",
+    "frame": "focus-.hud .lang-switch button[aria-pressed='false']-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-composited-c-528d6-tact-and-reverse-scroll-it--webkit",
+    "frame": "hover-.hud__identity-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-composited-c-528d6-tact-and-reverse-scroll-it--webkit",
+    "frame": "focus-.hud__identity-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-contact-geometry-and-contrast-720x450-chromium",
+    "frame": "contact-720-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-fallback-and-c55ab-eadable-isolated-chrome-it--chromium",
+    "frame": "fallback-contact-1280-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-fallback-and-c55ab-eadable-isolated-chrome-it--chromium",
+    "frame": "fallback-contact-1024-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-fallback-and-c55ab-eadable-isolated-chrome-it--chromium",
+    "frame": "fallback-contact-320-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-fallback-and-c55ab-eadable-isolated-chrome-it--chromium",
+    "frame": "fallback-contact-667-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-composited-c-59fa1-tact-and-reverse-scroll-en--chromium",
+    "frame": "graphite-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "000",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-composited-c-59fa1-tact-and-reverse-scroll-en--chromium",
+    "frame": "bone-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "049",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-composited-c-59fa1-tact-and-reverse-scroll-en--chromium",
+    "frame": "contact-start-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "087",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-composited-c-59fa1-tact-and-reverse-scroll-en--chromium",
+    "frame": "contact-boundary-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "096",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-composited-c-59fa1-tact-and-reverse-scroll-en--chromium",
+    "frame": "contact-middle-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "098",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-composited-c-59fa1-tact-and-reverse-scroll-en--chromium",
+    "frame": "contact-end-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-composited-c-59fa1-tact-and-reverse-scroll-en--chromium",
+    "frame": "reverse-middle-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "098",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-composited-c-59fa1-tact-and-reverse-scroll-en--chromium",
+    "frame": "reverse-boundary-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "096",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-composited-c-59fa1-tact-and-reverse-scroll-en--chromium",
+    "frame": "reverse-start-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "087",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-composited-c-59fa1-tact-and-reverse-scroll-en--chromium",
+    "frame": "hover-.chapter-nav a[href='#contact']-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-composited-c-59fa1-tact-and-reverse-scroll-en--chromium",
+    "frame": "focus-.chapter-nav a[href='#contact']-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-composited-c-59fa1-tact-and-reverse-scroll-en--chromium",
+    "frame": "hover-.hud .lang-switch button[aria-pressed='false']-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-composited-c-59fa1-tact-and-reverse-scroll-en--chromium",
+    "frame": "focus-.hud .lang-switch button[aria-pressed='false']-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "005",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-composited-c-59fa1-tact-and-reverse-scroll-en--chromium",
+    "frame": "hover-.hud__identity-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "005",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-composited-c-59fa1-tact-and-reverse-scroll-en--chromium",
+    "frame": "focus-.hud__identity-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "005",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-fallback-and-0abb1-eadable-isolated-chrome-en--webkit",
+    "frame": "fallback-contact-1280-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-fallback-and-0abb1-eadable-isolated-chrome-en--webkit",
+    "frame": "fallback-contact-1024-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-fallback-and-0abb1-eadable-isolated-chrome-en--webkit",
+    "frame": "fallback-contact-320-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-fallback-and-0abb1-eadable-isolated-chrome-en--webkit",
+    "frame": "fallback-contact-667-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-contact-geometry-and-contrast-320x568-webkit",
+    "frame": "contact-320-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-contact-fits-at-320px-when-optional-fonts-fail-webkit",
+    "frame": "fallback-fonts-320-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-contact-geometry-and-contrast-1024x500-webkit",
+    "frame": "contact-1024-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-contact-geometry-and-contrast-320x568-chromium",
+    "frame": "contact-320-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-fallback-and-0abb1-eadable-isolated-chrome-en--chromium",
+    "frame": "fallback-contact-1280-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-fallback-and-0abb1-eadable-isolated-chrome-en--chromium",
+    "frame": "fallback-contact-1024-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-fallback-and-0abb1-eadable-isolated-chrome-en--chromium",
+    "frame": "fallback-contact-320-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-fallback-and-0abb1-eadable-isolated-chrome-en--chromium",
+    "frame": "fallback-contact-667-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-contact-fits-at-320px-when-optional-fonts-fail-chromium",
+    "frame": "fallback-fonts-320-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-contact-geometry-and-contrast-768x1024-chromium",
+    "frame": "contact-768-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-fallback-and-c55ab-eadable-isolated-chrome-it--webkit",
+    "frame": "fallback-contact-1280-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-fallback-and-c55ab-eadable-isolated-chrome-it--webkit",
+    "frame": "fallback-contact-1024-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-fallback-and-c55ab-eadable-isolated-chrome-it--webkit",
+    "frame": "fallback-contact-320-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-fallback-and-c55ab-eadable-isolated-chrome-it--webkit",
+    "frame": "fallback-contact-667-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-contact-forc-285f6-rve-text-and-keyboard-focus-chromium",
+    "frame": "forced-colors-contrast",
+    "minimumContrast": 13.994023083921398,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(0, 0, 0)",
+        "minimumContrast": 21,
+        "background": [
+          255,
+          255,
+          255
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-contact-forc-285f6-rve-text-and-keyboard-focus-chromium",
+    "frame": "forced-colors-focus-contrast",
+    "minimumContrast": 13.994023083921398,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(0, 0, 0)",
+        "minimumContrast": 21,
+        "background": [
+          255,
+          255,
+          255
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-contact-geometry-and-contrast-2560x1080-chromium",
+    "frame": "contact-2560-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-contact-geometry-and-contrast-768x1024-webkit",
+    "frame": "contact-768-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-contact-geometry-and-contrast-2560x1080-webkit",
+    "frame": "contact-2560-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-contact-geometry-and-contrast-1024x500-chromium",
+    "frame": "contact-1024-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-composited-c-59fa1-tact-and-reverse-scroll-en--webkit",
+    "frame": "graphite-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "000",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-composited-c-59fa1-tact-and-reverse-scroll-en--webkit",
+    "frame": "bone-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "049",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-composited-c-59fa1-tact-and-reverse-scroll-en--webkit",
+    "frame": "contact-start-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "087",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-composited-c-59fa1-tact-and-reverse-scroll-en--webkit",
+    "frame": "contact-boundary-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "096",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-composited-c-59fa1-tact-and-reverse-scroll-en--webkit",
+    "frame": "contact-middle-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "098",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-composited-c-59fa1-tact-and-reverse-scroll-en--webkit",
+    "frame": "contact-end-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-composited-c-59fa1-tact-and-reverse-scroll-en--webkit",
+    "frame": "reverse-middle-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "098",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-composited-c-59fa1-tact-and-reverse-scroll-en--webkit",
+    "frame": "reverse-boundary-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "096",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-composited-c-59fa1-tact-and-reverse-scroll-en--webkit",
+    "frame": "reverse-start-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "087",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-composited-c-59fa1-tact-and-reverse-scroll-en--webkit",
+    "frame": "hover-.chapter-nav a[href='#contact']-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-composited-c-59fa1-tact-and-reverse-scroll-en--webkit",
+    "frame": "focus-.chapter-nav a[href='#contact']-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-composited-c-59fa1-tact-and-reverse-scroll-en--webkit",
+    "frame": "hover-.hud .lang-switch button[aria-pressed='false']-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-composited-c-59fa1-tact-and-reverse-scroll-en--webkit",
+    "frame": "focus-.hud .lang-switch button[aria-pressed='false']-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-composited-c-59fa1-tact-and-reverse-scroll-en--webkit",
+    "frame": "hover-.hud__identity-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-composited-c-59fa1-tact-and-reverse-scroll-en--webkit",
+    "frame": "focus-.hud__identity-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-contact-geometry-and-contrast-720x450-webkit",
+    "frame": "contact-720-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-contact-forc-285f6-rve-text-and-keyboard-focus-webkit",
+    "frame": "forced-colors-contrast",
+    "minimumContrast": 6.976929929999852,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 255, 255)",
+        "minimumContrast": 16.67115667431794,
+        "background": [
+          30,
+          30,
+          30
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-contact-forc-285f6-rve-text-and-keyboard-focus-webkit",
+    "frame": "forced-colors-focus-contrast",
+    "minimumContrast": 6.976929929999852,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 255, 255)",
+        "minimumContrast": 16.67115667431794,
+        "background": [
+          30,
+          30,
+          30
+        ]
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "test": "portfolio-HUD-contact-geometry-and-contrast-667x375-webkit",
+    "frame": "contact-667-contrast",
+    "minimumContrast": 5.482998914664429,
+    "depth": [
+      {
+        "text": "100",
+        "foreground": "rgb(255, 77, 0)",
+        "minimumContrast": 5.919983026637977,
+        "background": [
+          11,
+          11,
+          10
+        ]
+      }
+    ]
+  }
+]
