@@ -23,21 +23,21 @@
     "check": "pnpm typecheck && pnpm lint && pnpm test:unit && pnpm build && pnpm check:bundle && pnpm check:links"
   },
   "dependencies": {
-    "@fontsource-variable/manrope": "^5.2.8",
-    "@fontsource/dm-mono": "^5.2.7",
-    "@fontsource/instrument-serif": "^5.2.8",
-    "@react-three/fiber": "^9.6.1",
-    "react": "^19.2.7",
-    "react-dom": "^19.2.7",
-    "three": "0.182.0"
+    "@fontsource-variable/manrope": "^5.3.0",
+    "@fontsource/dm-mono": "^5.3.0",
+    "@fontsource/instrument-serif": "^5.3.0",
+    "@react-three/fiber": "^9.8.2",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "three": "0.187.0"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.12.1",
     "@lhci/cli": "0.15.1",
     "@playwright/test": "1.61.1",
-    "@types/react": "^19.2.17",
-    "@types/react-dom": "^19.2.3",
-    "@types/three": "^0.185.1",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@types/three": "^0.187.0",
     "@vitejs/plugin-react": "^6.0.3",
     "oxlint": "1.74.0",
     "typescript": "^7.0.2",
