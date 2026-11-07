@@ -34,6 +34,9 @@
   --line-dark: rgba(11, 11, 10, 0.18);
   --line-light: rgba(233, 229, 218, 0.2);
   --gutter: clamp(1.1rem, 3.2vw, 3.6rem);
+  --nav-lane: 11.5rem;
+  --nav-clearance: 0rem;
+  --reading-top: calc(var(--gutter) + 5.5rem);
   --layer-scene: 0;
   --layer-texture: 1;
   --layer-story: 2;
@@ -60,6 +63,8 @@
 
 html {
   scroll-behavior: smooth;
+  scroll-padding-top: var(--reading-top);
+  scroll-padding-bottom: var(--nav-clearance);
   scrollbar-width: thin;
   scrollbar-color: var(--signal) var(--graphite);
 }
@@ -107,10 +112,10 @@ a {
 
 .mono-label {
   font-family: "DM Mono", monospace;
-  font-size: 0.66rem;
+  font-size: 0.75rem;
   font-weight: 400;
-  letter-spacing: 0.105em;
-  line-height: 1.35;
+  letter-spacing: 0.06em;
+  line-height: 1.5;
   text-transform: uppercase;
 }
 
@@ -315,9 +320,9 @@ a {
 .entry-sequence__meta {
   position: absolute;
   z-index: 2;
-  top: var(--gutter);
-  right: var(--gutter);
-  left: var(--gutter);
+  top: max(var(--gutter), env(safe-area-inset-top));
+  right: max(var(--gutter), env(safe-area-inset-right));
+  left: max(var(--gutter), env(safe-area-inset-left));
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -516,6 +521,14 @@ a {
   outline-offset: -3px;
 }
 
+.reading-panel :focus-visible,
+.story-section__content--cases :focus-visible,
+.story-section__content--contact :focus-visible,
+.case-drawer :focus-visible,
+.entry-sequence :focus-visible {
+  outline-color: var(--focus-on-light, var(--graphite));
+}
+
 .hud .lang-switch button[aria-pressed="true"]:focus-visible {
   outline-color: var(--graphite);
 }
@@ -523,6 +536,8 @@ a {
 .hud__identity {
   display: flex;
   width: max-content;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
   padding: 0.4rem;
   align-items: center;
   gap: 0.75rem;
@@ -538,7 +553,7 @@ a {
   margin-top: 0.25rem;
   color: var(--muted);
   font-family: "DM Mono", monospace;
-  font-size: 0.52rem;
+  font-size: 0.75rem;
   font-weight: 400;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -552,7 +567,7 @@ a {
   color: var(--graphite);
   background: var(--bone);
   font-family: "DM Mono", monospace;
-  font-size: 0.64rem;
+  font-size: 0.75rem;
 }
 
 .hud__readout {
@@ -571,11 +586,13 @@ a {
 
 .chapter-nav {
   position: fixed;
-  top: 50%;
-  right: var(--gutter);
+  top: max(calc(var(--gutter) + 5.5rem), calc(50svh - 10rem));
+  right: max(var(--gutter), env(safe-area-inset-right));
+  max-width: var(--nav-lane);
+  max-height: calc(100svh - var(--gutter) - 10rem);
+  overflow-y: auto;
   padding: 0.55rem 0.6rem;
   pointer-events: auto;
-  transform: translateY(-50%);
 }
 
 .chapter-nav ol {
@@ -590,14 +607,15 @@ a {
 
 .chapter-nav a {
   display: flex;
-  min-height: 1.8rem;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
   padding: 0.2rem 0.5rem;
   align-items: center;
   justify-content: flex-end;
   gap: 0.65rem;
   color: var(--muted);
   font-family: "DM Mono", monospace;
-  font-size: 0.56rem;
+  font-size: 0.75rem;
   letter-spacing: 0.07em;
   text-transform: uppercase;
   transition: color 0.25s ease;
@@ -660,6 +678,23 @@ a {
 
 /* Story */
 
+.scene-staged main {
+  padding-bottom: var(--nav-clearance);
+}
+
+@media (min-width: 761px) {
+  .scene-staged main {
+    padding-right: calc(var(--nav-lane) + env(safe-area-inset-right));
+  }
+}
+
+/* Progressive enhancement; without :has() the notice keeps the base reading inset. */
+@supports selector(:has(*)) {
+  html:has(.visual-status--failed) {
+    --reading-top: max(calc(var(--gutter) + 11rem), calc(env(safe-area-inset-top) + 12rem));
+  }
+}
+
 main {
   position: relative;
   z-index: var(--layer-story);
@@ -671,7 +706,7 @@ main {
   min-height: 118svh;
   align-items: center;
   padding: calc(var(--gutter) * 2.5) var(--gutter);
-  scroll-margin-top: 3rem;
+  scroll-margin-top: 0;
 }
 
 .story-section[data-align="end"] {
@@ -685,6 +720,9 @@ main {
 .story-section__content {
   position: relative;
   width: min(43rem, 47vw);
+  max-width: 100%;
+  min-width: 0;
+  overflow-wrap: anywhere;
   pointer-events: auto;
 }
 
@@ -733,7 +771,7 @@ main {
 .hero-thesis > p {
   margin: 0 0 1rem;
   font-family: "DM Mono", monospace;
-  font-size: 0.66rem;
+  font-size: 0.75rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }
@@ -848,7 +886,7 @@ main {
   list-style: none;
   border-top: 1px solid var(--line-dark);
   font-family: "DM Mono", monospace;
-  font-size: 0.55rem;
+  font-size: 0.75rem;
   letter-spacing: 0.045em;
   text-align: center;
   text-transform: uppercase;
@@ -917,7 +955,7 @@ main {
   margin-top: 0.7rem;
   color: var(--muted);
   font-family: "DM Mono", monospace;
-  font-size: 0.55rem;
+  font-size: 0.75rem;
   letter-spacing: 0.035em;
   text-transform: uppercase;
 }
@@ -1001,7 +1039,7 @@ main {
   margin-bottom: 0.25rem;
   color: #68665f;
   font-family: "DM Mono", monospace;
-  font-size: 0.53rem;
+  font-size: 0.75rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
@@ -1015,10 +1053,18 @@ main {
 .case-index__title em {
   max-width: 64ch;
   margin-top: 0.5rem;
-  font-size: 0.72rem;
+  font-size: 0.75rem;
   font-style: normal;
   line-height: 1.5;
   opacity: 0.68;
+}
+
+.case-index__item:is(:hover, :focus-visible, :active) .case-index__title small {
+  color: var(--graphite);
+}
+
+.case-index__item:is(:hover, :focus-visible, :active) .case-index__title em {
+  opacity: 1;
 }
 
 .case-index__status {
@@ -1063,7 +1109,7 @@ main {
   grid-column: 2;
   margin: 0.2rem 0 0;
   color: #626059;
-  font-size: 0.68rem;
+  font-size: 0.75rem;
   line-height: 1.5;
 }
 
@@ -1168,6 +1214,8 @@ a.contact-link:focus-visible {
 
 .site-footer {
   display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
   justify-content: space-between;
   margin-top: clamp(4rem, 8vw, 9rem);
   padding-top: 1rem;
@@ -1211,7 +1259,7 @@ a.contact-link:focus-visible {
 }
 
 .entry-sequence .lang-switch {
-  background: transparent;
+  background: var(--bone);
   border-color: var(--line-dark);
 }
 
@@ -1260,7 +1308,7 @@ a.contact-link:focus-visible {
   padding: 0 1rem;
   border: 1px solid var(--line-light);
   font-family: "DM Mono", monospace;
-  font-size: 0.6rem;
+  font-size: 0.75rem;
   letter-spacing: 0.07em;
   text-transform: uppercase;
 }
@@ -1366,6 +1414,7 @@ a.contact-link:focus-visible {
 .case-drawer__header button {
   display: flex;
   min-width: 6.8rem;
+  min-height: 2.75rem;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
@@ -1377,6 +1426,8 @@ a.contact-link:focus-visible {
 
 .case-drawer__status {
   display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
   justify-content: space-between;
   margin-top: 2rem;
   padding: 0.8rem;
@@ -1429,7 +1480,7 @@ a.contact-link:focus-visible {
   padding: 0.45rem 0.6rem;
   border: 1px solid var(--graphite);
   font-family: "DM Mono", monospace;
-  font-size: 0.58rem;
+  font-size: 0.75rem;
   text-transform: uppercase;
 }
 
@@ -1525,10 +1576,10 @@ a.contact-link:focus-visible {
   }
 }
 
-/* Keep the fallback notice outside the desktop nav rail on short windows. */
-@media (min-width: 761px) and (max-height: 600px) {
+/* The fallback notice keeps the same reserved rail clearance at every desktop height. */
+@media (min-width: 761px) {
   .visual-status {
-    right: max(calc(var(--gutter) + 11rem), calc(env(safe-area-inset-right) + 11rem));
+    right: max(calc(var(--gutter) + var(--nav-lane) + 1rem), calc(env(safe-area-inset-right) + var(--nav-lane) + 1rem));
     max-width: min(22rem, calc(100vw - 15rem));
   }
 }
@@ -1538,6 +1589,9 @@ a.contact-link:focus-visible {
 @media (max-width: 760px) {
   :root {
     --gutter: 1rem;
+    /* 44px targets + dock padding/border + bottom safe-area + breathing room. */
+    --nav-clearance: calc(6rem + env(safe-area-inset-bottom));
+    --reading-top: calc(max(0.75rem, env(safe-area-inset-top)) + 4.75rem);
   }
 
   .webgl-shell,
@@ -1592,7 +1646,7 @@ a.contact-link:focus-visible {
 
   .calibrate-button {
     right: var(--gutter);
-    bottom: 1.2rem;
+    bottom: max(1.2rem, env(safe-area-inset-bottom));
     left: var(--gutter);
     width: auto;
   }
@@ -1620,6 +1674,8 @@ a.contact-link:focus-visible {
     right: max(0.75rem, env(safe-area-inset-right));
     bottom: max(0.75rem, env(safe-area-inset-bottom));
     left: max(0.75rem, env(safe-area-inset-left));
+    max-width: none;
+    max-height: none;
     padding: 0.55rem 0.6rem;
     transform: none;
   }
@@ -1809,7 +1865,8 @@ a.contact-link:focus-visible {
 
   .case-drawer {
     width: 100%;
-    padding: 1.15rem;
+    padding: max(1.15rem, env(safe-area-inset-top)) max(1.15rem, env(safe-area-inset-right))
+      max(1.15rem, env(safe-area-inset-bottom)) max(1.15rem, env(safe-area-inset-left));
   }
 
   .case-drawer__header {
@@ -1821,7 +1878,8 @@ a.contact-link:focus-visible {
   }
 
   .case-drawer__header button {
-    min-width: auto;
+    min-width: 2.75rem;
+    flex-shrink: 0;
   }
 
   .case-drawer__header button span {
@@ -1835,13 +1893,33 @@ a.contact-link:focus-visible {
 }
 
 @media (max-width: 760px) and (orientation: landscape) and (max-height: 500px) {
+  :root {
+    --nav-lane: 4.5rem;
+    --nav-clearance: max(1rem, env(safe-area-inset-bottom));
+  }
+
+  /* A reserved numeric rail preserves vertical reading space on short phones. */
+  .chapter-nav {
+    top: max(5.25rem, calc(env(safe-area-inset-top) + 5rem));
+    right: max(0.75rem, env(safe-area-inset-right));
+    bottom: auto;
+    left: auto;
+    padding: 0.125rem;
+  }
+
+  .chapter-nav ol { flex-direction: column; }
+
+  .scene-staged:not([data-scene-layout]) main {
+    padding-right: calc(var(--nav-lane) + env(safe-area-inset-right));
+  }
+
   .webgl-shell,
   .webgl-fallback {
     height: 100svh;
   }
 
   .entry-sequence__meta {
-    top: 0.8rem;
+    top: max(0.8rem, env(safe-area-inset-top));
   }
 
   .calibration-mark {
@@ -1851,7 +1929,7 @@ a.contact-link:focus-visible {
 
   .entry-sequence__statement {
     right: 48%;
-    bottom: 1rem;
+    bottom: max(1rem, env(safe-area-inset-bottom));
     left: max(1rem, env(safe-area-inset-left));
     width: auto;
   }
@@ -1868,7 +1946,7 @@ a.contact-link:focus-visible {
 
   .calibrate-button {
     right: max(1rem, env(safe-area-inset-right));
-    bottom: 1rem;
+    bottom: max(1rem, env(safe-area-inset-bottom));
     left: auto;
     width: min(42vw, 20rem);
     min-height: 4rem;
@@ -1880,21 +1958,9 @@ a.contact-link:focus-visible {
     padding-top: 4.5rem;
   }
 
-  .chapter-nav {
-    top: max(5.25rem, calc(env(safe-area-inset-top) + 5rem));
-    right: max(0.75rem, env(safe-area-inset-right));
-    bottom: auto;
-    left: auto;
-    padding: 0.35rem;
-  }
-
   .visual-status {
     right: max(5.5rem, calc(env(safe-area-inset-right) + 5rem));
     max-width: min(22rem, calc(100vw - 7rem));
-  }
-
-  .chapter-nav ol {
-    flex-direction: column;
   }
 
   .identity-section .story-section__content--wide {
@@ -1940,7 +2006,7 @@ a.contact-link:focus-visible {
   }
 
   .case-index__code {
-    font-size: 0.52rem;
+    font-size: 0.75rem;
   }
 
   .case-index__title small {
@@ -1978,6 +2044,7 @@ a.contact-link:focus-visible {
     --signal-ink: LinkText;
     --oxide: CanvasText;
     --muted: GrayText;
+    --focus-on-light: Highlight;
     --line-dark: CanvasText;
     --line-light: CanvasText;
   }

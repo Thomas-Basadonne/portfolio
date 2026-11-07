@@ -1,6 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 import { expectHudContrast, expectHudGeometry } from "./hud-contrast";
+import { controlInventory, focusVisibility, typeInventory } from "./readability";
 
 async function bypassEntry(page: Page) {
   await page.addInitScript(() => window.sessionStorage.setItem("tb:entry-seen", "1"));
@@ -22,6 +23,204 @@ async function expectNoHorizontalOverflow(page: Page) {
     () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
   );
   expect(overflow).toBeLessThanOrEqual(1);
+}
+
+for (const locale of ["en", "it"]) {
+  for (const viewport of [
+    { width: 320, height: 568 }, { width: 390, height: 844 }, { width: 667, height: 375 },
+    { width: 768, height: 1024 }, { width: 1024, height: 500 }, { width: 1440, height: 900 },
+    { width: 2560, height: 1080 }, { width: 720, height: 450 },
+  ]) {
+    test(`readability type and targets ${locale} ${viewport.width}x${viewport.height}`, async ({ page }, info) => {
+      await page.setViewportSize(viewport);
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      await page.goto(`/?lang=${locale}`);
+      await expect(page.locator(".entry-sequence")).toBeVisible();
+      const entryLabels = await typeInventory(page);
+      const entryBoxes = await page.locator(".entry-sequence__meta, .entry-sequence__statement, .calibrate-button")
+        .evaluateAll((elements) => elements.map((element) => {
+          const box = element.getBoundingClientRect();
+          return { name: element.className, top: box.top, bottom: box.bottom, left: box.left, right: box.right };
+        }));
+      for (const box of entryBoxes) {
+        expect.soft(box.left, box.name).toBeGreaterThanOrEqual(0);
+        expect.soft(box.right, box.name).toBeLessThanOrEqual(viewport.width);
+        expect.soft(box.top, box.name).toBeGreaterThanOrEqual(0);
+        expect.soft(box.bottom, box.name).toBeLessThanOrEqual(viewport.height);
+      }
+      const [meta, statement, action] = entryBoxes;
+      expect.soft(statement.top).toBeGreaterThanOrEqual(meta.bottom);
+      expect.soft(statement.right <= action.left || statement.bottom <= action.top).toBe(true);
+      await page.getByRole("button", { name: /calibr/i }).click();
+      await page.locator(".chapter-nav a[href='#work']").click();
+      await expect(page.locator(".hud__identity")).toBeVisible();
+      await page.evaluate(() => document.fonts.ready);
+      const labels = await typeInventory(page);
+      const targets = await controlInventory(page);
+      await page.getByRole("button", { name: /project twin/i }).click();
+      await expect(page.getByRole("dialog")).toBeVisible();
+      const drawerLabels = await typeInventory(page);
+      const drawerTargets = await controlInventory(page);
+      await info.attach("readability-inventory", {
+        body: JSON.stringify({ entryLabels, entryBoxes, labels, targets, drawerLabels, drawerTargets }, null, 2), contentType: "application/json",
+      });
+      for (const row of [...entryLabels, ...labels, ...drawerLabels]) {
+        // 12px is the project's label design floor, NOT a WCAG text-size rule.
+        expect.soft(row.fontSize, `${row.selector}: ${row.text}`).toBeGreaterThanOrEqual(12);
+        // An informational label must be painted: a transparent fill would make it unmeasurable and unreadable.
+        expect.soft(row.fill, `${row.selector}: ${row.text}`).not.toBe("rgba(0, 0, 0, 0)");
+      }
+      for (const row of [...targets, ...drawerTargets]) {
+        // 44px is the ergonomic project target; WCAG 2.5.8 has a different minimum/exceptions.
+        expect.soft(row.width, row.text).toBeGreaterThanOrEqual(44);
+        expect.soft(row.height, row.text).toBeGreaterThanOrEqual(44);
+      }
+      await expectNoHorizontalOverflow(page);
+      const drawerOverflow = await page.locator(".case-drawer").evaluate((drawer) => drawer.scrollWidth - drawer.clientWidth);
+      expect(drawerOverflow).toBeLessThanOrEqual(1);
+    });
+  }
+}
+
+for (const locale of ["en", "it"]) {
+  for (const viewport of [{ width: 320, height: 568 }, { width: 390, height: 844 }, { width: 667, height: 375 }, { width: 720, height: 450 }]) {
+    for (const fallback of [false, true]) {
+      test(`readability scrolling and keyboard ${locale} ${viewport.width} fallback=${fallback}`, async ({ page }, info) => {
+        await page.setViewportSize(viewport);
+        await page.emulateMedia({ reducedMotion: "reduce" });
+        if (fallback) await page.route(/ExperienceCanvas-.*\.js/, (route) => route.abort());
+        await bypassEntry(page);
+        await page.goto(`/?lang=${locale}`);
+        await expect(page.locator(fallback ? ".visual-status--failed" : ".scene-staged[data-visual-ready]")).toBeVisible();
+        await page.evaluate(() => document.fonts.ready);
+        const tails = [
+          ".hero-actions a:last-child", ".principle-equation li:last-child", ".capability-list li:last-child small",
+          ".archive-strip:last-child > div:last-child .item-link:last-child", ".trace-list:last-child li:last-child p", ".site-footer span:last-child",
+        ];
+        const measurements = [];
+        for (const selector of tails) {
+          const target = page.locator(selector);
+          await target.evaluate((element) => element.scrollIntoView({ block: "end", behavior: "instant" }));
+          await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+          const geometry = await target.evaluate((element) => {
+            const box = element.getBoundingClientRect();
+            const overlays = Array.from(document.querySelectorAll(".chapter-nav, .hud__identity, .hud__tools, .visual-status--failed, .scene-stage"))
+              .filter((overlay) => overlay.checkVisibility() && getComputedStyle(overlay).position !== "static"
+                && (!overlay.classList.contains("scene-stage") || matchMedia("(max-width: 1080px) and (orientation: portrait)").matches))
+              .map((overlay) => ({ name: overlay.className, box: overlay.getBoundingClientRect() }));
+            return {
+              top: box.top, bottom: box.bottom, viewport: innerHeight,
+              occluding: overlays.filter(({ box: other }) => box.left < other.right && box.right > other.left && box.top < other.bottom && box.bottom > other.top).map(({ name }) => name),
+            };
+          });
+          measurements.push({ selector, ...geometry });
+          expect.soft(geometry.top, selector).toBeGreaterThanOrEqual(0);
+          expect.soft(geometry.bottom, selector).toBeLessThanOrEqual(viewport.height);
+          expect.soft(geometry.occluding, selector).toEqual([]);
+        }
+        await info.attach("section-tail-geometry", { body: JSON.stringify(measurements, null, 2), contentType: "application/json" });
+        // Native Tab/Shift+Tab, not a collection of programmatic scrollIntoView calls.
+        await page.locator(".hero-actions a").first().focus();
+        const count = await page.locator("main a, main button").count();
+        for (const key of ["Tab", "Shift+Tab"]) {
+          for (let step = 0; step < count; step += 1) {
+            if (await page.evaluate(() => document.activeElement?.closest("main") !== null)) {
+              await expect.poll(async () => (await focusVisibility(page)).visible, { message: `Focus stays in the reading area: ${key} ${step}` }).toBe(true);
+            }
+            await page.keyboard.press(key);
+          }
+        }
+        await expectNoHorizontalOverflow(page);
+      });
+    }
+  }
+}
+
+test("readability visible control labels are included in accessible names", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.locator(".entry-sequence button[lang='en']")).toHaveAccessibleName(/^EN.*English$/);
+  await expect(page.locator(".entry-sequence button[lang='it']")).toHaveAccessibleName(/^IT.*Italiano$/);
+  await page.getByRole("button", { name: /calibrate/i }).click();
+  await expect(page.locator(".hud__identity")).toHaveAccessibleName(/TB.*Thomas Basadonne.*Commerce & AI tools/);
+  await expect(page.locator(".hud button[lang='en']")).toHaveAccessibleName(/^EN.*English$/);
+  await expect(page.locator(".hud button[lang='it']")).toHaveAccessibleName(/^IT.*Italiano$/);
+  const results = await new AxeBuilder({ page }).withRules(["label-content-name-mismatch"]).analyze();
+  expect(results.violations).toEqual([]);
+});
+
+for (const locale of ["en", "it"]) {
+  for (const width of [390, 1440]) {
+    test(`readability composited text contrast and axe ${locale} ${width}`, async ({ page }, info) => {
+      test.setTimeout(90_000);
+      await page.setViewportSize({ width, height: width === 390 ? 844 : 900 });
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      await page.goto(`/?lang=${locale}`);
+      await expect(page.getByRole("dialog")).toBeVisible();
+      await expectHudContrast(page, info, "entry", ".entry-sequence", 1);
+      expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+      await page.getByRole("button", { name: /calibr/i }).click();
+      await expect(page.locator(".site-shell")).not.toHaveAttribute("inert", "");
+      await page.evaluate(() => document.fonts.ready);
+      await page.mouse.move(0, 0);
+      for (const id of ["about", "capabilities", "work", "experience", "contact"]) {
+        const selector = `#${id} .story-section__content`;
+        for (const block of ["start", "end"] as const) {
+          await page.locator(selector).evaluate((element, block) => element.scrollIntoView({ block, behavior: "instant" }), block);
+          await expectHudContrast(page, info, `${id}-${block}`, selector, 1);
+        }
+      }
+      const project = page.getByRole("button", { name: /project twin/i });
+      await project.hover();
+      const index = await project.evaluate((element) => Array.from(element.parentElement!.children).indexOf(element) + 1);
+      await expectHudContrast(page, info, "case-hover", `.case-index__item:nth-child(${index})`, 1);
+      await project.focus();
+      await page.keyboard.press("Tab");
+      await project.focus();
+      expect(await project.evaluate((element) => getComputedStyle(element).outlineColor)).toBe("rgb(11, 11, 10)");
+      await page.keyboard.press("Enter");
+      await expect(page.getByRole("dialog")).toBeVisible();
+      await expectHudContrast(page, info, "drawer", ".case-drawer", 1);
+      expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+      await page.keyboard.press("Escape");
+      expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+    });
+  }
+}
+
+for (const { viewport, insets } of [
+  { viewport: { width: 390, height: 844 }, insets: { top: 24, left: 12, right: 12, bottom: 34 } },
+  { viewport: { width: 667, height: 375 }, insets: { top: 0, left: 44, right: 44, bottom: 21 } },
+]) {
+  for (const locale of ["en", "it"]) {
+    test(`readability nonzero safe-area ${locale} ${viewport.width} keeps entry, dock and drawer reachable`, async ({ page, browserName }) => {
+      test.skip(browserName !== "chromium", "Nonzero env() insets use Chromium's CDP emulation, not physical iOS hardware.");
+      await page.setViewportSize(viewport);
+      const cdp = await page.context().newCDPSession(page);
+      await cdp.send("Emulation.setSafeAreaInsetsOverride", { insets });
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      await page.goto(`/?lang=${locale}`);
+      const entry = await page.locator(".entry-sequence__meta").boundingBox();
+      expect(entry!.y).toBeGreaterThanOrEqual(insets.top);
+      const enter = page.getByRole("button", { name: /calibr/i });
+      const button = await enter.boundingBox();
+      expect(button!.y + button!.height).toBeLessThanOrEqual(viewport.height - insets.bottom);
+      await enter.click();
+      const dock = await page.locator(".chapter-nav").boundingBox();
+      expect(dock!.x).toBeGreaterThanOrEqual(insets.left);
+      expect(dock!.x + dock!.width).toBeLessThanOrEqual(viewport.width - insets.right);
+      expect(dock!.y + dock!.height).toBeLessThanOrEqual(viewport.height - insets.bottom);
+      await page.locator(".site-footer span:last-child").evaluate((element) => element.scrollIntoView({ block: "end", behavior: "instant" }));
+      const footer = (await page.locator(".site-footer").boundingBox())!;
+      expect(footer.x + footer.width <= dock!.x || footer.y + footer.height <= dock!.y).toBe(true);
+      // scrollY is rounded to a CSS pixel; DOM rectangles retain their fractional remainder.
+      expect(Math.round(footer.y + footer.height)).toBeLessThanOrEqual(viewport.height - insets.bottom);
+      await page.getByRole("button", { name: /project twin/i }).click();
+      await expect(page.getByRole("dialog")).toBeVisible();
+      const padding = await page.locator(".case-drawer").evaluate((element) => parseFloat(getComputedStyle(element).paddingBottom));
+      expect(padding).toBeGreaterThanOrEqual(insets.bottom);
+      await expectNoHorizontalOverflow(page);
+    });
+  }
 }
 
 test("entry isolates the portfolio and delays the visual bundle", async ({ page }) => {
@@ -193,7 +392,7 @@ test("motion pause remains explicit across drawer and language changes", async (
   await page.getByRole("button", { name: /project twin/i }).click();
   await page.keyboard.press("Escape");
   await expect(page.getByRole("button", { name: "Resume animation", exact: true })).toBeVisible();
-  await page.getByRole("button", { name: "Italiano", exact: true }).click();
+  await page.getByRole("button", { name: "IT — Italiano", exact: true }).click();
   await expect(page.getByRole("button", { name: "Riprendi animazione", exact: true })).toBeVisible();
   await page.getByRole("link", { name: /05 contatti/i }).click();
   await expect(page.locator(".chapter-nav a[aria-current=location]")).toHaveAttribute("href", "#contact");

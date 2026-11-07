@@ -1,0 +1,158 @@
+[
+  {
+    "viewport": {
+      "width": 667,
+      "height": 375
+    },
+    "groups": [
+      {
+        "title": "Hermes Mission Control",
+        "body": "15 pull request merged in una dashboard local-first per agenti: card di utilizzo dei provider, log ricercabili, palette di navigazione, scoping del Kanban, bozze di configurazione preservate e redesign della shell.",
+        "headingBottom": 1332.515625,
+        "bodyTop": 1343.703125,
+        "bodyBottom": 1487.703125,
+        "containerBottom": 1521.703125,
+        "inOrder": true,
+        "contained": true
+      },
+      {
+        "title": "CodexBar",
+        "body": "Corretto il parsing dell'utilizzo del piano gratuito di Ollama (#4308), citato nelle release notes della v0.73.0.",
+        "headingBottom": 1578.5,
+        "bodyTop": 1589.6875,
+        "bodyBottom": 1661.6875,
+        "containerBottom": 1695.6875,
+        "inOrder": true,
+        "contained": true
+      },
+      {
+        "title": "Tolerance / 0.01",
+        "body": "Questo sito: un solo canvas React Three Fiber, capitoli HTML semantici, rendering adattivo e gate di accessibilità.",
+        "headingBottom": 1832.28125,
+        "bodyTop": 1843.46875,
+        "bodyBottom": 1915.46875,
+        "containerBottom": 1949.46875,
+        "inOrder": true,
+        "contained": true
+      },
+      {
+        "title": "Piattaforma AI per il design di abbigliamento",
+        "body": "Co-sviluppata una piattaforma Next.js in produzione dove i clienti disegnano capi con generazione di immagini AI e un editor su canvas.",
+        "headingBottom": 2025.265625,
+        "bodyTop": 2036.453125,
+        "bodyBottom": 2126.453125,
+        "containerBottom": 2126.453125,
+        "inOrder": true,
+        "contained": true
+      },
+      {
+        "title": "SDK per workspace RAG",
+        "body": "Contributo all'SDK TypeScript tipizzato, ai suoi contract test e alla pipeline di release npm via OIDC, più lavoro frontend, per un prodotto RAG su documenti.",
+        "headingBottom": 2183.25,
+        "bodyTop": 2194.4375,
+        "bodyBottom": 2284.4375,
+        "containerBottom": 2284.4375,
+        "inOrder": true,
+        "contained": true
+      },
+      {
+        "title": "Pipeline AI di video digest",
+        "body": "Co-sviluppata una pipeline che trasforma fonti in video verticali con curatela LLM, TTS locale e Remotion.",
+        "headingBottom": 2341.234375,
+        "bodyTop": 2352.421875,
+        "bodyBottom": 2424.421875,
+        "containerBottom": 2424.421875,
+        "inOrder": true,
+        "contained": true
+      },
+      {
+        "title": "RAGsidian",
+        "body": "Chat con un vault Obsidian interamente sul dispositivo, con ChromaDB e Ollama. Il repository pubblico è la versione 2024.",
+        "headingBottom": 2481.21875,
+        "bodyTop": 2492.40625,
+        "bodyBottom": 2582.40625,
+        "containerBottom": 2616.40625,
+        "inOrder": true,
+        "contained": true
+      }
+    ]
+  },
+  {
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "groups": [
+      {
+        "title": "Hermes Mission Control",
+        "body": "15 pull request merged in una dashboard local-first per agenti: card di utilizzo dei provider, log ricercabili, palette di navigazione, scoping del Kanban, bozze di configurazione preservate e redesign della shell.",
+        "headingBottom": 2228.390625,
+        "bodyTop": 2239.578125,
+        "bodyBottom": 2491.578125,
+        "containerBottom": 2543.578125,
+        "inOrder": true,
+        "contained": true
+      },
+      {
+        "title": "CodexBar",
+        "body": "Corretto il parsing dell'utilizzo del piano gratuito di Ollama (#4308), citato nelle release notes della v0.73.0.",
+        "headingBottom": 2245.046875,
+        "bodyTop": 2256.234375,
+        "bodyBottom": 2436.90625,
+        "containerBottom": 2543.578125,
+        "inOrder": true,
+        "contained": true
+      },
+      {
+        "title": "Tolerance / 0.01",
+        "body": "Questo sito: un solo canvas React Three Fiber, capitoli HTML semantici, rendering adattivo e gate di accessibilità.",
+        "headingBottom": 2695.421875,
+        "bodyTop": 2706.609375,
+        "bodyBottom": 2864.28125,
+        "containerBottom": 2911.953125,
+        "inOrder": true,
+        "contained": true
+      },
+      {
+        "title": "Piattaforma AI per il design di abbigliamento",
+        "body": "Co-sviluppata una piattaforma Next.js in produzione dove i clienti disegnano capi con generazione di immagini AI e un editor su canvas.",
+        "headingBottom": 2738.765625,
+        "bodyTop": 2749.953125,
+        "bodyBottom": 2911.953125,
+        "containerBottom": 2911.953125,
+        "inOrder": true,
+        "contained": true
+      },
+      {
+        "title": "SDK per workspace RAG",
+        "body": "Contributo all'SDK TypeScript tipizzato, ai suoi contract test e alla pipeline di release npm via OIDC, più lavoro frontend, per un prodotto RAG su documenti.",
+        "headingBottom": 3006.75,
+        "bodyTop": 3017.9375,
+        "bodyBottom": 3197.9375,
+        "containerBottom": 3197.9375,
+        "inOrder": true,
+        "contained": true
+      },
+      {
+        "title": "Pipeline AI di video digest",
+        "body": "Co-sviluppata una pipeline che trasforma fonti in video verticali con curatela LLM, TTS locale e Remotion.",
+        "headingBottom": 3024.25,
+        "bodyTop": 3035.4375,
+        "bodyBottom": 3197.9375,
+        "containerBottom": 3197.9375,
+        "inOrder": true,
+        "contained": true
+      },
+      {
+        "title": "RAGsidian",
+        "body": "Chat con un vault Obsidian interamente sul dispositivo, con ChromaDB e Ollama. Il repository pubblico è la versione 2024.",
+        "headingBottom": 3254.734375,
+        "bodyTop": 3265.921875,
+        "bodyBottom": 3427.921875,
+        "containerBottom": 3461.921875,
+        "inOrder": true,
+        "contained": true
+      }
+    ]
+  }
+]

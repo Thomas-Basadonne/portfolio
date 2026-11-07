@@ -1,0 +1,462 @@
+{
+  "before": {
+    "types": {
+      "": {
+        "minSize": 8.32,
+        "maxSize": 10.88,
+        "lineHeights": [
+          "16.32px",
+          "9.568px",
+          "normal"
+        ],
+        "colors": [
+          "rgb(104, 102, 95)",
+          "rgb(138, 135, 126)",
+          "rgb(98, 96, 89)"
+        ]
+      },
+      "capability-list__code mono-label": {
+        "minSize": 10.56,
+        "maxSize": 10.56,
+        "lineHeights": [
+          "14.256px"
+        ],
+        "colors": [
+          "rgb(255, 77, 0)"
+        ]
+      },
+      "case-index__code mono-label": {
+        "minSize": 8.32,
+        "maxSize": 10.56,
+        "lineHeights": [
+          "11.232px",
+          "14.256px"
+        ],
+        "colors": [
+          "rgb(11, 11, 10)"
+        ]
+      },
+      "case-index__status mono-label": {
+        "minSize": 10.56,
+        "maxSize": 10.56,
+        "lineHeights": [
+          "14.256px"
+        ],
+        "colors": [
+          "rgb(11, 11, 10)"
+        ]
+      },
+      "chapter-kicker mono-label": {
+        "minSize": 10.56,
+        "maxSize": 10.56,
+        "lineHeights": [
+          "14.256px"
+        ],
+        "colors": [
+          "rgb(11, 11, 10)",
+          "rgb(233, 229, 218)"
+        ]
+      },
+      "entry-sequence__meta mono-label": {
+        "minSize": 10.56,
+        "maxSize": 10.56,
+        "lineHeights": [
+          "14.256px"
+        ],
+        "colors": [
+          "rgb(11, 11, 10)"
+        ]
+      },
+      "entry-sequence__note mono-label": {
+        "minSize": 10.56,
+        "maxSize": 10.56,
+        "lineHeights": [
+          "14.256px"
+        ],
+        "colors": [
+          "rgb(93, 91, 85)"
+        ]
+      },
+      "hero-spec mono-label": {
+        "minSize": 10.56,
+        "maxSize": 10.56,
+        "lineHeights": [
+          "14.256px"
+        ],
+        "colors": [
+          "rgb(201, 197, 186)"
+        ]
+      },
+      "hud__readout mono-label": {
+        "minSize": 10.56,
+        "maxSize": 10.56,
+        "lineHeights": [
+          "14.256px"
+        ],
+        "colors": [
+          "rgb(233, 229, 218)"
+        ]
+      },
+      "is-active": {
+        "minSize": 8.96,
+        "maxSize": 8.96,
+        "lineHeights": [
+          "normal"
+        ],
+        "colors": [
+          "rgb(11, 11, 10)",
+          "rgb(233, 229, 218)"
+        ]
+      },
+      "item-link mono-label": {
+        "minSize": 10.56,
+        "maxSize": 10.56,
+        "lineHeights": [
+          "14.256px"
+        ],
+        "colors": [
+          "rgb(152, 45, 0)"
+        ]
+      },
+      "lang-switch mono-label": {
+        "minSize": 10.56,
+        "maxSize": 10.56,
+        "lineHeights": [
+          "14.256px"
+        ],
+        "colors": [
+          "rgb(11, 11, 10)",
+          "rgb(233, 229, 218)"
+        ]
+      },
+      "mono-label": {
+        "minSize": 10.56,
+        "maxSize": 10.56,
+        "lineHeights": [
+          "14.256px"
+        ],
+        "colors": [
+          "rgb(11, 11, 10)"
+        ]
+      },
+      "site-footer mono-label": {
+        "minSize": 10.56,
+        "maxSize": 10.56,
+        "lineHeights": [
+          "14.256px"
+        ],
+        "colors": [
+          "rgb(11, 11, 10)"
+        ]
+      },
+      "timeline-heading mono-label": {
+        "minSize": 10.56,
+        "maxSize": 10.56,
+        "lineHeights": [
+          "14.256px"
+        ],
+        "colors": [
+          "rgb(11, 11, 10)"
+        ]
+      }
+    },
+    "targets": {
+      "TBThomas BasadonneFrontend Developer · Commerce & AI tools": {
+        "minWidth": 46.78125,
+        "minHeight": 46.78125
+      },
+      "EN": {
+        "minWidth": 44,
+        "minHeight": 44
+      },
+      "IT": {
+        "minWidth": 44,
+        "minHeight": 44
+      },
+      "00Start": {
+        "minWidth": 44,
+        "minHeight": 28.796875
+      },
+      "01About": {
+        "minWidth": 44,
+        "minHeight": 28.796875
+      },
+      "02Capabilities": {
+        "minWidth": 44,
+        "minHeight": 28.796875
+      },
+      "03Work": {
+        "minWidth": 44,
+        "minHeight": 28.796875
+      },
+      "04Experience": {
+        "minWidth": 44,
+        "minHeight": 28.796875
+      },
+      "05Contact": {
+        "minWidth": 44,
+        "minHeight": 28.796875
+      },
+      "00Inizio": {
+        "minWidth": 44,
+        "minHeight": 28.796875
+      },
+      "01Chi sono": {
+        "minWidth": 44,
+        "minHeight": 28.796875
+      },
+      "02Competenze": {
+        "minWidth": 44,
+        "minHeight": 28.796875
+      },
+      "03Progetti": {
+        "minWidth": 44,
+        "minHeight": 28.796875
+      },
+      "04Esperienza": {
+        "minWidth": 44,
+        "minHeight": 28.796875
+      },
+      "05Contatti": {
+        "minWidth": 44,
+        "minHeight": 28.796875
+      }
+    }
+  },
+  "after": {
+    "types": {
+      "": {
+        "minSize": 12,
+        "maxSize": 12,
+        "lineHeights": [
+          "13.8px",
+          "18px",
+          "normal"
+        ],
+        "colors": [
+          "rgb(104, 102, 95)",
+          "rgb(138, 135, 126)",
+          "rgb(98, 96, 89)"
+        ]
+      },
+      "capability-list__code mono-label": {
+        "minSize": 12,
+        "maxSize": 12,
+        "lineHeights": [
+          "18px"
+        ],
+        "colors": [
+          "rgb(255, 77, 0)"
+        ]
+      },
+      "case-index__code mono-label": {
+        "minSize": 12,
+        "maxSize": 12,
+        "lineHeights": [
+          "18px"
+        ],
+        "colors": [
+          "rgb(11, 11, 10)"
+        ]
+      },
+      "case-index__status mono-label": {
+        "minSize": 12,
+        "maxSize": 12,
+        "lineHeights": [
+          "18px"
+        ],
+        "colors": [
+          "rgb(11, 11, 10)"
+        ]
+      },
+      "chapter-kicker mono-label": {
+        "minSize": 12,
+        "maxSize": 12,
+        "lineHeights": [
+          "18px"
+        ],
+        "colors": [
+          "rgb(11, 11, 10)",
+          "rgb(233, 229, 218)"
+        ]
+      },
+      "entry-sequence__meta mono-label": {
+        "minSize": 12,
+        "maxSize": 12,
+        "lineHeights": [
+          "18px"
+        ],
+        "colors": [
+          "rgb(11, 11, 10)"
+        ]
+      },
+      "entry-sequence__note mono-label": {
+        "minSize": 12,
+        "maxSize": 12,
+        "lineHeights": [
+          "18px"
+        ],
+        "colors": [
+          "rgb(93, 91, 85)"
+        ]
+      },
+      "hero-spec mono-label": {
+        "minSize": 12,
+        "maxSize": 12,
+        "lineHeights": [
+          "18px"
+        ],
+        "colors": [
+          "rgb(201, 197, 186)"
+        ]
+      },
+      "hud__readout mono-label": {
+        "minSize": 12,
+        "maxSize": 12,
+        "lineHeights": [
+          "18px"
+        ],
+        "colors": [
+          "rgb(233, 229, 218)"
+        ]
+      },
+      "is-active": {
+        "minSize": 12,
+        "maxSize": 12,
+        "lineHeights": [
+          "normal"
+        ],
+        "colors": [
+          "rgb(11, 11, 10)",
+          "rgb(233, 229, 218)"
+        ]
+      },
+      "item-link mono-label": {
+        "minSize": 12,
+        "maxSize": 12,
+        "lineHeights": [
+          "18px"
+        ],
+        "colors": [
+          "rgb(152, 45, 0)"
+        ]
+      },
+      "lang-switch mono-label": {
+        "minSize": 12,
+        "maxSize": 12,
+        "lineHeights": [
+          "18px"
+        ],
+        "colors": [
+          "rgb(11, 11, 10)",
+          "rgb(233, 229, 218)"
+        ]
+      },
+      "mono-label": {
+        "minSize": 12,
+        "maxSize": 12,
+        "lineHeights": [
+          "18px"
+        ],
+        "colors": [
+          "rgb(11, 11, 10)"
+        ]
+      },
+      "site-footer mono-label": {
+        "minSize": 12,
+        "maxSize": 12,
+        "lineHeights": [
+          "18px"
+        ],
+        "colors": [
+          "rgb(11, 11, 10)"
+        ]
+      },
+      "timeline-heading mono-label": {
+        "minSize": 12,
+        "maxSize": 12,
+        "lineHeights": [
+          "18px"
+        ],
+        "colors": [
+          "rgb(11, 11, 10)"
+        ]
+      }
+    },
+    "targets": {
+      "TB Thomas Basadonne Frontend Developer · Commerce & AI tools — Thomas Basadonne, frontend developer — back to start": {
+        "minWidth": 46.78125,
+        "minHeight": 46.78125
+      },
+      "EN": {
+        "minWidth": 44,
+        "minHeight": 44
+      },
+      "IT": {
+        "minWidth": 44,
+        "minHeight": 44
+      },
+      "00Start": {
+        "minWidth": 44,
+        "minHeight": 44
+      },
+      "01About": {
+        "minWidth": 44,
+        "minHeight": 44
+      },
+      "02Capabilities": {
+        "minWidth": 44,
+        "minHeight": 44
+      },
+      "03Work": {
+        "minWidth": 44,
+        "minHeight": 44
+      },
+      "04Experience": {
+        "minWidth": 44,
+        "minHeight": 44
+      },
+      "05Contact": {
+        "minWidth": 44,
+        "minHeight": 44
+      },
+      "TB Thomas Basadonne Frontend Developer · Commerce & AI tools — Thomas Basadonne, frontend developer — torna all'inizio": {
+        "minWidth": 46.78125,
+        "minHeight": 46.78125
+      },
+      "00Inizio": {
+        "minWidth": 44,
+        "minHeight": 44
+      },
+      "01Chi sono": {
+        "minWidth": 44,
+        "minHeight": 44
+      },
+      "02Competenze": {
+        "minWidth": 44,
+        "minHeight": 44
+      },
+      "03Progetti": {
+        "minWidth": 44,
+        "minHeight": 44
+      },
+      "04Esperienza": {
+        "minWidth": 44,
+        "minHeight": 44
+      },
+      "05Contatti": {
+        "minWidth": 44,
+        "minHeight": 44
+      }
+    }
+  },
+  "sourceHashes": {
+    "src/styles/index.css": "ea60b7a2bcb2a94294270b830f6f8efb026ccff703718f134991cf6f7b768ccf",
+    "src/components/scene-stages.css": "46c336a0e3348fa6af359c3929a728ddf2fac933e6a9b9a341230dd3556f28f4",
+    "src/components/Hud.tsx": "31317dc8151498ad4d5e3d206e12f8b26e7435fda7e61930878c61305f2b9d2e",
+    "src/components/LanguageSwitch.tsx": "5ede387e3453b5c19d22c3cd3962e23691d29140193ffc072962033a9a625d7d",
+    "src/components/CaseStudyDrawer.tsx": "d03c6e2b0e4331212d93e99b1fa097da6c3996bd64cb04924293679c785c828a",
+    "src/hooks/useExperienceController.ts": "8a070edc80a9b2ee79d2cd8917124c7725eee642a505ed8185b6bb44d95ca85e"
+  },
+  "base": "9fbbd7584db95953be8021eb90d0d4c4d52d64f2"
+}

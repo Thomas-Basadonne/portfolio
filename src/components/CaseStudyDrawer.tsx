@@ -18,7 +18,7 @@ function DataField({ label, value }: { label: string; value: string }) {
 
 export function CaseStudyDrawer({ caseStudy, ui, onClose }: CaseStudyDrawerProps) {
   const closeRef = useRef<HTMLButtonElement>(null);
-  const drawerRef = useRef<HTMLElement>(null);
+  const drawerRef = useRef<HTMLDivElement>(null);
   const isOpen = caseStudy !== null;
 
   useEffect(() => {
@@ -60,7 +60,7 @@ export function CaseStudyDrawer({ caseStudy, ui, onClose }: CaseStudyDrawerProps
 
   return (
     <div className="case-overlay" role="presentation" onMouseDown={onClose}>
-      <article
+      <div
         ref={drawerRef}
         className="case-drawer"
         role="dialog"
@@ -134,7 +134,7 @@ export function CaseStudyDrawer({ caseStudy, ui, onClose }: CaseStudyDrawerProps
         </dl>
 
         <p className="case-drawer__footnote mono-label">{caseStudy.evidence}</p>
-      </article>
+      </div>
     </div>
   );
 }

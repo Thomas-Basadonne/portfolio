@@ -20,7 +20,7 @@ export function LanguageSwitch({ locale, ui, onChange, className }: LanguageSwit
           type="button"
           lang={option}
           aria-pressed={option === locale}
-          aria-label={ui.languageNames[option]}
+          aria-label={`${option.toUpperCase()} — ${ui.languageNames[option]}`}
           onClick={() => onChange(option)}
           data-cursor="engage"
         >
