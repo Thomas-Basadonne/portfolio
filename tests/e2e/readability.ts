@@ -49,8 +49,9 @@ export async function focusVisibility(page: Page) {
     const visibleTop = Math.max(box.top, safeTop);
     const visibleBottom = Math.min(box.bottom, safeBottom);
     const visibleHeight = Math.max(0, visibleBottom - visibleTop);
-    // Subpixel clipping of a fully visible control must not count as occlusion.
-    const required = Math.min(box.height, 24) - 1;
+    // The criterion is "not entirely obscured": any usable band inside the reading window counts.
+    // Full visibility of section tails is asserted separately.
+    const required = 1;
     const x = Math.max(0, Math.min(innerWidth - 1, box.left + box.width / 2));
     const y = Math.max(safeTop, Math.min(safeBottom - 1, visibleTop + visibleHeight / 2));
     const painted = document.elementFromPoint(x, y);
