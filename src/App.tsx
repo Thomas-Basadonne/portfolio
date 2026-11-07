@@ -7,15 +7,16 @@ import {
   useRef,
   useState,
 } from "react";
+import { createPortal } from "react-dom";
 import { getContent, legacySectionIds, type CaseStudy } from "./content/portfolio";
 import { CaseStudyDrawer } from "./components/CaseStudyDrawer";
 import { CustomCursor } from "./components/CustomCursor";
 import { EntrySequence } from "./components/EntrySequence";
 import { Hud } from "./components/Hud";
+import { MotionControl } from "./components/MotionControl";
 import { PortfolioStory } from "./components/PortfolioStory";
 import { VisualLayerBoundary } from "./components/VisualLayerBoundary";
 import { useExperienceController } from "./hooks/useExperienceController";
-import { experienceStore } from "./lib/experienceStore";
 import {
   experienceReducer,
   getInitialExperiencePhase,
@@ -36,12 +37,16 @@ export default function App() {
   const { locale, setLocale } = useLocale();
   const content = getContent(locale);
   const [mountCanvas, setMountCanvas] = useState(false);
+  const [userPaused, setUserPaused] = useState(false);
+  const [stageNode, setStageNode] = useState<HTMLDivElement | null>(null);
   const [selectedCaseId, setSelectedCaseId] = useState<string | null>(null);
   const selectedCase = content.caseStudies.find((entry) => entry.id === selectedCaseId) ?? null;
   const siteRef = useRef<HTMLDivElement>(null);
   const caseTriggerRef = useRef<HTMLElement | null>(null);
   const entered = phase !== "entry";
-  const { activeChapter, progressPercent, reducedMotion } = useExperienceController(entered);
+  const { activeChapter, progressPercent, reducedMotion, motionAvailable } = useExperienceController(entered, {
+    ready: phase === "ready", drawerOpen: selectedCase !== null, userPaused, layoutKey: locale,
+  });
   const selectCase = useCallback((caseStudy: CaseStudy) => {
     caseTriggerRef.current =
       document.activeElement instanceof HTMLElement ? document.activeElement : null;
@@ -70,12 +75,7 @@ export default function App() {
     });
   }, [enter]);
 
-  useEffect(() => {
-    const blocked = !entered || selectedCase !== null;
-    experienceStore.entered = entered;
-    experienceStore.paused = blocked || document.hidden;
-    if (!blocked) experienceStore.requestRender?.();
-  }, [entered, selectedCase]);
+
 
   useEffect(() => {
     if (!entered || window.location.hash.length < 2) return;
@@ -89,7 +89,7 @@ export default function App() {
     window.requestAnimationFrame(() => {
       document.getElementById(targetId)?.scrollIntoView({ behavior: "auto" });
     });
-  }, [entered]);
+  }, [entered, phase]);
 
   useEffect(() => {
     if (!entered || phase === "failed" || mountCanvas) return;
@@ -129,19 +129,22 @@ export default function App() {
       />
       <div
         ref={siteRef}
-        className="site-shell"
+        className="site-shell scene-staged"
+        data-scene-layout={phase !== "failed" ? "" : undefined}
+        data-visual-ready={phase === "ready" ? "" : undefined}
         inert={backgroundBlocked || undefined}
         aria-hidden={backgroundBlocked}
       >
-        {mountCanvas && phase !== "failed" ? (
+        {mountCanvas && phase !== "failed" && stageNode ? createPortal(
           <VisualLayerBoundary onFailure={visualFailed}>
-            <Suspense fallback={<div className="webgl-fallback" aria-hidden="true" />}>
+            <Suspense fallback={null}>
               <ExperienceCanvas
                 onReady={visualReady}
                 onFailure={visualFailed}
               />
             </Suspense>
-          </VisualLayerBoundary>
+          </VisualLayerBoundary>,
+          stageNode,
         ) : (
           <div className="webgl-fallback" aria-hidden="true" />
         )}
@@ -153,7 +156,11 @@ export default function App() {
           locale={locale}
           onLocaleChange={setLocale}
         />
-        <PortfolioStory content={content} onSelectCase={selectCase} />
+        {phase === "ready" && motionAvailable && stageNode && createPortal(
+          <MotionControl locale={locale} paused={userPaused} onToggle={() => setUserPaused((paused) => !paused)} />,
+          stageNode,
+        )}
+        <PortfolioStory content={content} onSelectCase={selectCase} stageRef={setStageNode} />
       </div>
 
       {entered && phase === "loading" && (

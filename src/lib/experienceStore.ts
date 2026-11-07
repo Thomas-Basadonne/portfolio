@@ -9,6 +9,18 @@ export const experienceStore = {
   isMobile: false,
   entered: false,
   paused: true,
+  userPaused: false,
+  /** Continuous story position (chapter index + progress through it), spring-smoothed. */
+  story: 0,
+  /** Horizontal place of the model in the stage: 0 = left column, 1 = right column (spring-smoothed). */
+  side: 0.5,
+  /** Share of the stage width the model is framed in: one column (0.5) beside the text, or the whole band. */
+  region: 1,
+  chapter: 0,
+  stageProgress: 0,
+  stageVisible: true,
+  motionTime: 0,
+  interacting: false,
   quality: "high" as RenderQuality,
   requestRender: null as null | (() => void),
 };

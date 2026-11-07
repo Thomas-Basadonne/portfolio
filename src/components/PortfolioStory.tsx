@@ -1,8 +1,11 @@
+import type { Ref } from "react";
 import type { CaseStudy, ListItem, PortfolioContent } from "../content/portfolio";
+import { SceneStage } from "./SceneStage";
 
 type PortfolioStoryProps = {
   content: PortfolioContent;
   onSelectCase: (caseStudy: CaseStudy) => void;
+  stageRef?: Ref<HTMLDivElement>;
 };
 
 function ItemLink({ item, newTabLabel }: { item: ListItem; newTabLabel: string }) {
@@ -32,13 +35,14 @@ function Timeline({ items }: { items: ListItem[] }) {
   );
 }
 
-export function PortfolioStory({ content, onSelectCase }: PortfolioStoryProps) {
+export function PortfolioStory({ content, onSelectCase, stageRef }: PortfolioStoryProps) {
   const { profile, ui, about, capabilitiesSection, capabilities, work, caseStudies, openSource, lab } =
     content;
   const { experienceSection, experience, education, contact } = content;
 
   return (
     <main id="main-content" tabIndex={-1}>
+      <SceneStage ref={stageRef} />
       <section className="story-section identity-section" id="identity" data-chapter="00">
         <div className="story-section__content story-section__content--wide">
           <div className="hero-spec mono-label">

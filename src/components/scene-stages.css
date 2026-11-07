@@ -1,0 +1,112 @@
+/*
+ * Filone A (#13/#16): the one persistent stage and the reading columns around it. Global nav, docking and type
+ * scale stay with #24; this file only places the stage and the text it must never cross.
+ * The layout is reserved from entry (no shift when the visual layer arrives) and released if it fails.
+ */
+.scene-rail { display: none; }
+.scene-staged[data-scene-layout] .scene-rail { display: block; }
+
+.scene-stage {
+  --stage-top: calc(var(--gutter) + 5rem);
+  --stage-bottom: var(--gutter);
+  position: sticky;
+  top: var(--stage-top);
+  height: calc(100svh - var(--stage-top) - var(--stage-bottom));
+  overflow: hidden;
+  pointer-events: none;
+}
+.scene-stage .motion-control { pointer-events: auto; }
+/* index.css sizes the old full-screen shell (fixed, 61svh on phones); inside the stage it simply fills it. */
+.scene-stage .webgl-shell {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  width: auto;
+  height: auto;
+  opacity: 0;
+  transition: opacity 600ms var(--ease-mechanical);
+}
+.scene-stage .webgl-shell::after { display: none; }
+.scene-staged[data-visual-ready] .scene-stage .webgl-shell { opacity: 1; }
+
+/*
+ * Wide screens and landscape phones (SIDE_BY_SIDE_QUERY in the controller): the stage spans the content box
+ * behind the text, and the model and the text swap columns chapter by chapter. The model changes side across
+ * the empty band between two chapters, so it never travels over a paragraph.
+ */
+@media (min-width: 1081px), (orientation: landscape) and (min-width: 600px) {
+  .scene-staged[data-scene-layout] main {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    column-gap: clamp(1.5rem, 3vw, 3.5rem);
+    /* The fixed chapter rail (126 px wide, docked by #24) keeps its own lane on the right. */
+    padding: 0 calc(var(--gutter) + 9.5rem) 0 var(--gutter);
+  }
+  /* Explicit rows: the rail shares every chapter row (auto-placement would push the chapters below it). */
+  .scene-staged[data-scene-layout] .scene-rail { grid-column: 1 / -1; grid-row: 1 / 7; }
+  .scene-staged[data-scene-layout] [data-chapter="00"] { grid-row: 1; }
+  .scene-staged[data-scene-layout] [data-chapter="01"] { grid-row: 2; }
+  .scene-staged[data-scene-layout] [data-chapter="02"] { grid-row: 3; }
+  .scene-staged[data-scene-layout] [data-chapter="03"] { grid-row: 4; }
+  .scene-staged[data-scene-layout] [data-chapter="04"] { grid-row: 5; }
+  .scene-staged[data-scene-layout] [data-chapter="05"] { grid-row: 6; }
+  /* Each chapter ends with half a viewport of open stage: the beat in which the model changes side. */
+  .scene-staged[data-scene-layout] .story-section {
+    position: relative;
+    z-index: 1;
+    display: block;
+    grid-column: 1;
+    min-height: auto;
+    padding-right: 0;
+    padding-bottom: 50svh;
+    padding-left: 0;
+    container-type: inline-size;
+  }
+  .scene-staged[data-scene-layout] .contact-section { padding-bottom: 0; }
+  .scene-staged[data-scene-layout] .story-section:is([data-chapter="01"], [data-chapter="03"], [data-chapter="05"]) {
+    grid-column: 2;
+  }
+  .scene-staged[data-scene-layout] .story-section__content { width: 100%; }
+  .scene-staged[data-scene-layout] .identity-section { min-height: 100svh; padding-bottom: 0; }
+  .scene-staged[data-scene-layout] .hero-title { font-size: clamp(3rem, 12.5cqi, 7.6rem); }
+  .scene-staged[data-scene-layout] .hero-thesis { position: static; width: auto; margin-top: clamp(2rem, 6vh, 4rem); }
+  .scene-staged[data-scene-layout] .hero-thesis h2 { font-size: clamp(2.4rem, 8.5cqi, 5.6rem); }
+  .scene-staged[data-scene-layout] .story-section h2 { font-size: clamp(2.4rem, 9.5cqi, 6.4rem); }
+  .scene-staged[data-scene-layout] .story-section__content--contact h2 { font-size: clamp(2.6rem, 10.5cqi, 8rem); }
+  .scene-staged[data-scene-layout] .contact-link { grid-template-columns: 6.5rem 1fr auto; }
+  .scene-staged[data-scene-layout] .contact-link strong { font-size: clamp(1.2rem, 4.4cqi, 2.8rem); }
+  .scene-staged[data-scene-layout] .scroll-cue { display: none; }
+  /* One control for the whole story, in the rail lane's bottom corner: never over text or the model. */
+  .scene-staged[data-scene-layout] .motion-control { position: fixed; right: var(--gutter); bottom: var(--gutter); left: auto; }
+}
+@media (orientation: landscape) and (max-height: 500px) {
+  .scene-stage { --stage-top: 5.25rem; --stage-bottom: 0.75rem; }
+}
+
+/*
+ * Portrait screens: a sticky band from the very top (it backs the header strip, so text never shows above it);
+ * the reading flow scrolls beneath it, chapter after chapter with no empty screens.
+ */
+@media (max-width: 1080px) and (orientation: portrait) {
+  /* Declared on the shell so the band and the chapters' scroll margin share one measure. */
+  .scene-staged[data-scene-layout] { --band-header: 4.9rem; --band-height: calc(var(--band-header) + 32svh); }
+  .scene-staged[data-scene-layout] .scene-rail { display: contents; }
+  .scene-stage {
+    z-index: 3;
+    top: 0;
+    height: var(--band-height);
+    background: var(--graphite);
+  }
+  .scene-stage .webgl-shell { top: var(--band-header); }
+  .scene-staged[data-scene-layout] .story-section {
+    min-height: auto;
+    padding-top: clamp(1.5rem, 4svh, 2.5rem);
+    padding-bottom: clamp(1.5rem, 4svh, 2.5rem);
+    scroll-margin-top: var(--band-height);
+  }
+  .scene-staged[data-scene-layout] .identity-section { padding-top: 2rem; }
+}
+
+@media (forced-colors: active) {
+  .scene-staged[data-scene-layout] .scene-rail { display: none; }
+}
