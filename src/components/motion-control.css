@@ -1,0 +1,28 @@
+/*
+ * The single control lives in a fixed corner of the persistent stage it controls: it never covers reading
+ * text and needs no slot in the fixed chrome (#24).
+ */
+.motion-control {
+  position: absolute;
+  z-index: 4;
+  bottom: 0.75rem;
+  left: 0.75rem;
+  display: grid;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  place-items: center;
+  color: var(--bone);
+  background: var(--graphite);
+  border: 1px solid var(--bone-dim);
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.motion-control:hover { border-color: var(--signal); }
+.motion-control:focus-visible { outline: 2px solid var(--bone); outline-offset: 3px; }
+
+@media (forced-colors: active) {
+  .motion-control { color: CanvasText; background: Canvas; border-color: CanvasText; }
+  .motion-control:focus-visible { outline-color: CanvasText; }
+}

@@ -1,5 +1,6 @@
 import { useLayoutEffect, useMemo, useRef } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
+import { Quaternion, Vector3, type PerspectiveCamera } from "three";
 import { experienceStore, type RenderQuality } from "../lib/experienceStore";
 import { createMachine } from "./tb001/machine";
 import { createMachineTextures } from "./tb001/textures";
@@ -59,29 +60,49 @@ export function TB001Model({ quality, drive }: TB001ModelProps) {
   return null;
 }
 
-/** Product adapter only: existing demand scheduling and lateral slots, no #16 choreography. */
+const HATCH_AXIS = new Vector3(0, 0, 1);
+const spin = new Quaternion();
+
+/** Applies the chapter choreography in the persistent stage; scheduling belongs to the controller. */
 export function CompilerMachine({ quality }: { quality: RenderQuality }) {
   const { camera, size, scene } = useThree();
-  const time = useRef(0);
   const placement = useMemo(createPresentation, []);
-  const input = useMemo(() => ({ ...experienceStore, aspect: 1 }), []);
-  const drive = (target: MachinePose, delta: number) => {
+  const input = useMemo(() => ({
+    progress: 0, chapter: 0, stageProgress: 0, isMobile: false, reducedMotion: false, userPaused: false,
+    pointerX: 0, pointerY: 0, aspect: 1, time: 0,
+  }), []);
+  const drive = (target: MachinePose) => {
     if (experienceStore.paused) return;
-    if (!experienceStore.reducedMotion) time.current += delta;
+    input.chapter = experienceStore.chapter;
+    input.stageProgress = experienceStore.stageProgress;
+    input.userPaused = experienceStore.userPaused;
     input.progress = experienceStore.progress;
     input.isMobile = experienceStore.isMobile;
     input.reducedMotion = experienceStore.reducedMotion;
     input.pointerX = experienceStore.pointerX;
     input.pointerY = experienceStore.pointerY;
-    input.aspect = size.width / Math.max(1, size.height);
+    // The model is framed in its region (a column or the whole band) and the projection is shifted off-axis so
+    // the region sits where the layout puts it: the canvas never resizes and the model never distorts.
+    const width = Math.max(1, size.width), height = Math.max(1, size.height);
+    const regionWidth = width * experienceStore.region;
+    const centre = regionWidth / 2 + (width - regionWidth) * experienceStore.side;
+    const lens = camera as PerspectiveCamera;
+    lens.aspect = regionWidth / height;
+    lens.setViewOffset(regionWidth, height, regionWidth / 2 - centre, 0, width, height);
+    input.aspect = regionWidth / height;
+    input.time = experienceStore.motionTime;
     writePresentation(placement, input);
-    writePose(target, placement.cycle, placement.explode, experienceStore.reducedMotion ? 0 : time.current);
+    writePose(target, placement.cycle, placement.explode, experienceStore.motionTime);
     const root = scene.getObjectByName("TB-001");
     if (root) {
       root.position.set(placement.x, placement.y, 0);
-      root.rotation.set(placement.rotationX, placement.rotationY, 0);
+      root.rotation.set(placement.rotationX, placement.rotationY, placement.rotationZ, "ZXY");
+      root.quaternion.multiply(spin.setFromAxisAngle(HATCH_AXIS, placement.spin));
     }
-    camera.position.set(placement.cameraX, placement.cameraY, placement.cameraZ);
+    // Crossing between columns the camera eases back a little: the model travels as a smaller object and
+    // regains its size on arrival.
+    const crossing = experienceStore.region < 1 ? 4 * experienceStore.side * (1 - experienceStore.side) : 0;
+    camera.position.set(placement.cameraX, placement.cameraY, placement.cameraZ * (1 + 0.18 * crossing));
     camera.lookAt(0, placement.lookY, 0);
   };
   return <TB001Model quality={quality} drive={drive} />;

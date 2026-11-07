@@ -168,6 +168,167 @@ test("visual chunk failure leaves the complete portfolio usable", async ({ page 
   await expect(page.getByRole("navigation", { name: "Portfolio sections" })).toBeVisible();
 });
 
+test("motion pause remains explicit across drawer and language changes", async ({ page }) => {
+  await bypassEntry(page);
+  await page.goto("/#work");
+  const pause = page.getByRole("button", { name: "Pause animation", exact: true });
+  await expect(pause).toBeVisible();
+  await pause.focus();
+  await page.keyboard.press("Enter");
+  await expect(page.getByRole("button", { name: "Resume animation", exact: true })).toBeFocused();
+  await page.getByRole("button", { name: /project twin/i }).click();
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("button", { name: "Resume animation", exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Italiano", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Riprendi animazione", exact: true })).toBeVisible();
+  await page.getByRole("link", { name: /05 contatti/i }).click();
+  await expect(page.locator(".chapter-nav a[aria-current=location]")).toHaveAttribute("href", "#contact");
+  const resume = page.getByRole("button", { name: "Riprendi animazione", exact: true });
+  await expect(resume).toBeVisible();
+  // One control for the whole story, never over reading text.
+  await expect.poll(async () => resume.evaluate((button) => {
+    const control = button.getBoundingClientRect();
+    return Array.from(document.querySelectorAll("[data-chapter] h1, [data-chapter] h2, [data-chapter] h3, [data-chapter] p, [data-chapter] a"))
+      .map((element) => element.getBoundingClientRect())
+      .filter((box) => box.width > 0 && box.height > 0)
+      .every((box) => control.right <= box.left || control.left >= box.right || control.bottom <= box.top || control.top >= box.bottom);
+  })).toBe(true);
+});
+
+test("visible idle renders until the user pauses animation", async ({ page }) => {
+  await page.addInitScript(() => {
+    const counter = { draws: 0 };
+    Reflect.set(window, "__motionProbe", counter);
+    const patched = new Map<object, Set<string>>();
+    for (const kind of [window.WebGLRenderingContext, window.WebGL2RenderingContext]) {
+      if (!kind) continue;
+      for (const name of ["drawArrays", "drawElements", "drawArraysInstanced", "drawElementsInstanced"]) {
+        let owner = kind.prototype;
+        while (owner && !Object.hasOwn(owner, name)) owner = Object.getPrototypeOf(owner);
+        if (!owner || patched.get(owner)?.has(name)) continue;
+        const original = Reflect.get(owner, name);
+        patched.set(owner, (patched.get(owner) ?? new Set()).add(name));
+        Reflect.set(owner, name, function (this: WebGLRenderingContext, ...args: unknown[]) {
+          const value = Reflect.apply(original, this, args);
+          counter.draws += 1;
+          return value;
+        });
+      }
+    }
+  });
+  await bypassEntry(page);
+  await page.goto("/");
+  const pause = page.getByRole("button", { name: "Pause animation", exact: true });
+  await expect(pause).toBeVisible();
+  await page.waitForTimeout(1200);
+  const draws = () => page.evaluate(() => Number(Reflect.get(window, "__motionProbe").draws));
+  const idleStart = await draws();
+  expect(idleStart).toBeGreaterThan(0);
+  await page.waitForTimeout(700);
+  expect(await draws()).toBeGreaterThan(idleStart);
+  await pause.click();
+  await page.waitForTimeout(700);
+  const pausedStart = await draws();
+  await page.waitForTimeout(700);
+  expect(await draws()).toBe(pausedStart);
+});
+
+const CHAPTERS = ["identity", "about", "capabilities", "work", "experience", "contact"] as const;
+
+test("one persistent stage holds the model while chapters alternate around it", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await bypassEntry(page);
+  await page.goto("/");
+  await expect(page.locator(".webgl-shell canvas")).toHaveAttribute("data-context-guard", "ready");
+  await expect(page.locator("[data-scene-stage]")).toHaveCount(1);
+  const stageBox = () => page.locator("[data-scene-stage]").evaluate((element) => {
+    const box = element.getBoundingClientRect();
+    return [box.left, box.top, box.width, box.height].map(Math.round);
+  });
+  for (const viewport of [{ width: 1440, height: 900 }, { width: 390, height: 844 }, { width: 667, height: 375 }]) {
+    await page.setViewportSize(viewport);
+    const sideBySide = await page.evaluate(() =>
+      matchMedia("(min-width: 1081px), (orientation: landscape) and (min-width: 600px)").matches);
+    let first: number[] | undefined;
+    for (const [index, id] of CHAPTERS.entries()) {
+      await page.locator(`.chapter-nav a[href="#${id}"]`).click();
+      await expect(page.locator(".chapter-nav a[aria-current=location]")).toHaveAttribute("href", `#${id}`);
+      // The stage never moves or resizes between chapters: only the model inside it does.
+      first ??= await stageBox();
+      expect(await stageBox(), `${viewport.width}x${viewport.height} ${id}`).toEqual(first);
+      const geometry = await page.locator(`#${id}`).evaluate((section) => {
+        const main = document.getElementById("main-content")!;
+        const style = getComputedStyle(main);
+        const left = main.getBoundingClientRect().left + parseFloat(style.paddingLeft);
+        const right = main.getBoundingClientRect().right - parseFloat(style.paddingRight);
+        const boxes = Array.from(section.children).map((child) => child.getBoundingClientRect()).filter((box) => box.height > 0);
+        const stage = document.querySelector("[data-scene-stage]")!.getBoundingClientRect();
+        const heading = section.querySelector("h1, h2")!.getBoundingClientRect();
+        return {
+          middle: (left + right) / 2,
+          textLeft: Math.min(...boxes.map((box) => box.left)),
+          textRight: Math.max(...boxes.map((box) => box.right)),
+          headingTop: heading.top,
+          stageBottom: stage.bottom,
+        };
+      });
+      if (sideBySide) {
+        // Text takes the column the model leaves: left for 00/02/04, right for 01/03/05.
+        if (index % 2 === 0) expect(geometry.textRight, id).toBeLessThanOrEqual(geometry.middle + 1);
+        else expect(geometry.textLeft, id).toBeGreaterThanOrEqual(geometry.middle - 1);
+      } else if (id !== "identity") {
+        // Portrait: a chapter reached from the navigation starts below the sticky band.
+        expect(geometry.headingTop, id).toBeGreaterThanOrEqual(geometry.stageBottom - 1);
+      }
+    }
+  }
+});
+
+test("the scene canvas keeps its size and place while the story scrolls", async ({ page }) => {
+  await bypassEntry(page);
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/#work");
+  await expect(page.locator(".scene-staged")).toHaveAttribute("data-visual-ready", "");
+  const state = () => page.locator(".webgl-shell canvas").evaluate((element: HTMLCanvasElement) => {
+    const box = element.getBoundingClientRect();
+    return { width: element.width, height: element.height, left: Math.round(box.left), top: Math.round(box.top) };
+  });
+  const before = await state();
+  for (const delta of [40, 400, -260, 1200]) {
+    await page.mouse.wheel(0, delta);
+    await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+    expect(await state()).toEqual(before);
+  }
+});
+
+test("forced colors keep chapter navigation in sync while the visual layer is hidden", async ({ page }) => {
+  await page.emulateMedia({ forcedColors: "active" });
+  await bypassEntry(page);
+  await page.goto("/");
+  await expect(page.locator(".webgl-shell")).toBeHidden();
+  for (const id of ["experience", "about"]) {
+    await page.evaluate((target) => document.getElementById(target)!.scrollIntoView(), id);
+    await expect(page.locator(".chapter-nav a[aria-current=location]")).toHaveAttribute("href", `#${id}`);
+  }
+});
+
+test("the visual layer arriving does not shift the reading layout", async ({ page }) => {
+  await page.route(/ExperienceCanvas-.*\.js/, async (route) => {
+    await new Promise((resolve) => setTimeout(resolve, 900));
+    await route.continue();
+  });
+  await bypassEntry(page);
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+  await page.evaluate(() => document.fonts.ready);
+  const positions = () => page.evaluate(() => ["about", "work", "contact"].map((id) =>
+    Math.round(document.getElementById(id)!.getBoundingClientRect().top + scrollY)));
+  const before = await positions();
+  await expect(page.locator(".webgl-shell canvas")).toHaveAttribute("data-context-guard", "ready");
+  await expect(page.locator(".scene-staged")).toHaveAttribute("data-visual-ready", "");
+  expect(await positions()).toEqual(before);
+});
+
 test("WebGL context loss switches to the deterministic fallback", async ({ page, browserName }) => {
   test.skip(browserName !== "chromium", "The Chromium SwiftShader profile exposes WEBGL_lose_context.");
   await bypassEntry(page);

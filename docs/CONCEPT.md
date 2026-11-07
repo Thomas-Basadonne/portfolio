@@ -44,13 +44,18 @@ state turns the instrument into a transmitter.
 
 ### Layout
 
-A fixed WebGL field occupies the viewport while semantic HTML chapters move through it. Content
-alternates around the machine on wide screens. On mobile, the artifact becomes an upper-stage
-object and content occupies a stable lower reading plane; no desktop layout is merely scaled down.
+The artifact is TB-001 “The Compiler”; “Tolerance / 0.01” remains the editorial frame of precision, not a
+physical measurement or a performance of the machine. Its orbits and nodes are symbolic connections.
+
+One persistent stage holds the artifact while semantic HTML chapters move past it, served by a single WebGL
+canvas. On wide screens the machine and the text swap columns chapter by chapter, the machine travelling across
+the open beat between two chapters; on mobile the artifact becomes an upper-stage object above a stable reading
+plane. The machine never sits over a paragraph. No desktop layout is merely scaled down.
 
 ### Motion rules
 
-1. Every major transform is derived from one normalized scroll timeline.
+1. Every major transform is derived from the chapter being shown and its stage's progress, never from
+   document length; any chapter can be reached directly and resolves the same pose.
 2. Objects never appear randomly; they separate from or return to the core.
 3. Pointer response is subordinate to scroll and is disabled for reduced motion.
 4. No post-processing is required for the visual thesis.
