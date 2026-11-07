@@ -1114,6 +1114,8 @@ main {
 
 .story-section__content--contact .chapter-kicker {
   margin-bottom: clamp(2.5rem, 6vw, 6rem);
+  /* Small graphite text on signal orange needs full strength: 0.62 opacity measured 3.42:1 (axe 4.14). */
+  opacity: 1;
 }
 
 .story-section__content--contact h2 {
