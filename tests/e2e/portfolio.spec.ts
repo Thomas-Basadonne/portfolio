@@ -91,7 +91,9 @@ for (const locale of ["en", "it"]) {
         if (fallback) await page.route(/ExperienceCanvas-.*\.js/, (route) => route.abort());
         await bypassEntry(page);
         await page.goto(`/?lang=${locale}`);
-        await expect(page.locator(fallback ? ".visual-status--failed" : ".scene-staged[data-visual-ready]")).toBeVisible();
+        // Headless Firefox has no WebGL and takes the fallback path; both are a complete page.
+        await expect(page.locator(fallback ? ".visual-status--failed" : ".hud__identity")).toBeVisible();
+        await expect(page.locator(".site-shell")).not.toHaveAttribute("inert", "");
         await page.evaluate(() => document.fonts.ready);
         const tails = [
           ".hero-actions a:last-child", ".principle-equation li:last-child", ".capability-list li:last-child small",

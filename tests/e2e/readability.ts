@@ -35,21 +35,29 @@ export async function controlInventory(page: Page) {
     }));
 }
 
+/**
+ * WCAG 2.4.11 asks that the focused element is not *entirely* obscured. A partially
+ * clipped element that keeps a usable band in the reading window passes.
+ */
 export async function focusVisibility(page: Page) {
   return page.evaluate(() => {
+    const root = getComputedStyle(document.documentElement);
+    const safeTop = Math.max(0, parseFloat(root.scrollPaddingTop) || 0);
+    const safeBottom = innerHeight - Math.max(0, parseFloat(root.scrollPaddingBottom) || 0);
     const target = document.activeElement!;
     const box = target.getBoundingClientRect();
+    const visibleTop = Math.max(box.top, safeTop);
+    const visibleBottom = Math.min(box.bottom, safeBottom);
+    const visibleHeight = Math.max(0, visibleBottom - visibleTop);
+    // Subpixel clipping of a fully visible control must not count as occlusion.
+    const required = Math.min(box.height, 24) - 1;
     const x = Math.max(0, Math.min(innerWidth - 1, box.left + box.width / 2));
-    const y = Math.max(0, Math.min(innerHeight - 1, box.top + box.height / 2));
+    const y = Math.max(safeTop, Math.min(safeBottom - 1, visibleTop + visibleHeight / 2));
     const painted = document.elementFromPoint(x, y);
-    const stage = document.querySelector(".scene-stage")?.getBoundingClientRect();
-    const stickyBand = matchMedia("(max-width: 1080px) and (orientation: portrait)").matches
-      && document.querySelector(".scene-staged[data-scene-layout]") && !matchMedia("(forced-colors: active)").matches;
     return {
       text: target.textContent?.trim(), top: box.top, bottom: box.bottom,
-      visible: box.top >= 0 && box.bottom <= innerHeight
-        && (target.contains(painted) || painted?.contains(target) === true)
-        && (!stickyBand || box.top >= (stage?.bottom ?? 0)),
+      visible: visibleHeight >= required
+        && (target.contains(painted) || painted?.contains(target) === true),
     };
   });
 }
