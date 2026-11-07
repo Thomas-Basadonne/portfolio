@@ -168,9 +168,23 @@ test("visual chunk failure leaves the complete portfolio usable", async ({ page 
   await expect(page.getByRole("navigation", { name: "Portfolio sections" })).toBeVisible();
 });
 
+/**
+ * The visual-layer tests need a browser profile that exposes WebGL (headless Firefox on CI does not): the app then
+ * takes its fallback path, which has its own tests. Same probe as `supportsWebGL()`; a profile WITH WebGL whose
+ * visual layer still fails is not skipped and fails the test.
+ */
+async function requireWebGL(page: Page) {
+  const available = await page.evaluate(() => {
+    const canvas = document.createElement("canvas");
+    return Boolean(canvas.getContext("webgl2") || canvas.getContext("webgl"));
+  });
+  test.skip(!available, "This browser profile exposes no WebGL; the fallback path is covered separately.");
+}
+
 test("motion pause remains explicit across drawer and language changes", async ({ page }) => {
   await bypassEntry(page);
   await page.goto("/#work");
+  await requireWebGL(page);
   const pause = page.getByRole("button", { name: "Pause animation", exact: true });
   await expect(pause).toBeVisible();
   await pause.focus();
@@ -218,6 +232,7 @@ test("visible idle renders until the user pauses animation", async ({ page }) =>
   });
   await bypassEntry(page);
   await page.goto("/");
+  await requireWebGL(page);
   const pause = page.getByRole("button", { name: "Pause animation", exact: true });
   await expect(pause).toBeVisible();
   await page.waitForTimeout(1200);
@@ -239,6 +254,7 @@ test("one persistent stage holds the model while chapters alternate around it", 
   await page.emulateMedia({ reducedMotion: "reduce" });
   await bypassEntry(page);
   await page.goto("/");
+  await requireWebGL(page);
   await expect(page.locator(".webgl-shell canvas")).toHaveAttribute("data-context-guard", "ready");
   await expect(page.locator("[data-scene-stage]")).toHaveCount(1);
   const stageBox = () => page.locator("[data-scene-stage]").evaluate((element) => {
@@ -288,6 +304,7 @@ test("the scene canvas keeps its size and place while the story scrolls", async 
   await bypassEntry(page);
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/#work");
+  await requireWebGL(page);
   await expect(page.locator(".scene-staged")).toHaveAttribute("data-visual-ready", "");
   const state = () => page.locator(".webgl-shell canvas").evaluate((element: HTMLCanvasElement) => {
     const box = element.getBoundingClientRect();
@@ -320,6 +337,7 @@ test("the visual layer arriving does not shift the reading layout", async ({ pag
   await bypassEntry(page);
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/");
+  await requireWebGL(page);
   await page.evaluate(() => document.fonts.ready);
   const positions = () => page.evaluate(() => ["about", "work", "contact"].map((id) =>
     Math.round(document.getElementById(id)!.getBoundingClientRect().top + scrollY)));
