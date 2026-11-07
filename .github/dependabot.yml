@@ -4,6 +4,10 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    ignore:
+      # TB-001 is tuned and gated on the pinned three release (materials, PMREM studio, envelope, bundle
+      # budget): upgrade it deliberately in its own change, not inside a grouped bump.
+      - dependency-name: three
     groups:
       production-dependencies:
         dependency-type: production
