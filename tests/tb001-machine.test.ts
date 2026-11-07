@@ -90,6 +90,14 @@ describe("TB-001 procedural machine", () => {
     result.dispose();
   });
 
+  it("converts the custom signal shader to the renderer output color space", () => {
+    const result = machine("low");
+    const seam = result.root.getObjectByName("seams") as THREE.Mesh<THREE.BufferGeometry, THREE.ShaderMaterial>;
+    expect(seam.material.toneMapped).toBe(false); // Signal is deliberately independent of PBR exposure.
+    expect(seam.material.fragmentShader).toContain("#include <colorspace_fragment>");
+    result.dispose();
+  });
+
   it("preserves the six structural struts connecting the cage to the process frame", () => {
     const result = machine();
     const struts = result.root.getObjectByName("core.struts") as THREE.InstancedMesh | undefined;

@@ -69,6 +69,24 @@ primitive geometry and a small custom shader. DOM content remains complete witho
 Animation state is centralized in a mutable experience controller so the render loop does not force
 React to re-render on every frame.
 
+## TB-001 look-dev decision — WOW-02
+
+The approved dark-stage gunmetal direction is retained: the procedural seven-softbox PMREM supplies
+reflections without an external HDR or an orange point light. The extracted gunmetal factory shares
+its exact PBR settings with a test-only sphere study. Low quality uses the same rig at half PMREM
+face resolution, without wear or anisotropy; the study did not justify adding compensating lights.
+
+Neutral tone mapping, exposure 1 and sRGB output remain the display policy. The custom seam shader
+now explicitly converts linear color to the output space, as built-in materials already do; the
+studio dome intentionally stays linear for PMREM. The core/slits/seams share one orange family, while
+UI signal remains a flat labeled control, separated by position, shape and luminance. The existing
+face-to-face core variation is retained. Dark versus light stage and Neutral versus ACES comparisons
+are review fixtures, not new site themes or a claim of universally better taste. No further geometry,
+normal/displacement or post-processing change is warranted by this infrastructure ticket.
+
+See [LOOKDEV.md](LOOKDEV.md) for reproducible A/B sheets, actual-model and lifecycle checks, GPU
+encoding regression, first-frame/PMREM diagnostics, payload budgets and the remaining device limits.
+
 ## Content integrity
 
 The source repository was empty. Only facts stated in the brief or found on Thomas’s public

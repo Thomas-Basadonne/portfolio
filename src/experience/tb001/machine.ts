@@ -3,6 +3,7 @@ import { innerDir, petalDir, PETALS, pose, SPEC, type MachinePose } from "./pose
 import { ownMachineResources } from "./resources";
 import { shellSegment } from "./shell";
 import type { MachineTextures } from "./textures";
+import { createGunmetalMaterial } from "./materials";
 
 export interface MachineStats {
   triangles: number;
@@ -51,7 +52,7 @@ export function createMachine({ quality, textures }: MachineOptions): Machine {
   const wear = textures.wear;
   const steel = new THREE.MeshStandardMaterial({ color: "#a4a6aa", metalness: 0.85, roughness: 0.32 });
   const dark = new THREE.MeshStandardMaterial({ color: "#4a4c50", metalness: 0.55, roughness: 0.52, roughnessMap: high ? wear : null, envMapIntensity: 0.9 });
-  const gun = new THREE.MeshPhysicalMaterial({ color: "#7a7e85", metalness: 1, roughness: 0.32, roughnessMap: high ? wear : null, anisotropy: high ? 0.55 : 0, envMapIntensity: 1 });
+  const gun = createGunmetalMaterial(quality, wear);
   const panelGun = gun.clone();
   panelGun.map = textures.panels;
   if (high) { panelGun.bumpMap = textures.panelBump; panelGun.bumpScale = 4; }
@@ -59,7 +60,24 @@ export function createMachine({ quality, textures }: MachineOptions): Machine {
   const seamMaterial = new THREE.ShaderMaterial({
     uniforms: { uK: { value: 1 }, uCol: { value: new THREE.Color("#ff6a10") }, uObl: { value: SPEC.shell.oblo }, uCap: { value: SPEC.shell.cap }, uGap: { value: SPEC.shell.gap * 1.6 } },
     vertexShader: "varying vec3 vP; void main(){ vP=position; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }",
-    fragmentShader: "uniform float uK,uObl,uCap,uGap; uniform vec3 uCol; varying vec3 vP; void main(){vec3 d=normalize(vP); float th=acos(clamp(d.z,-1.0,1.0)); float ph=atan(d.y,d.x); float q=abs(mod(ph+6.2831853,1.5707963)); q=min(q,1.5707963-q); float s=1.0-smoothstep(0.0,uGap,q*sin(th)); s=max(s,1.0-smoothstep(0.0,uGap,abs(th-1.5707963))); s=max(s,1.0-smoothstep(0.0,uGap,abs(th-uObl))); s=max(s,1.0-smoothstep(0.0,uGap,abs(th-uCap))); gl_FragColor=vec4(uCol*1.7*uK*s,1.0);}",
+    fragmentShader: /* glsl */ `
+      uniform float uK,uObl,uCap,uGap;
+      uniform vec3 uCol;
+      varying vec3 vP;
+      void main() {
+        vec3 d=normalize(vP);
+        float th=acos(clamp(d.z,-1.0,1.0));
+        float ph=atan(d.y,d.x);
+        float q=abs(mod(ph+6.2831853,1.5707963));
+        q=min(q,1.5707963-q);
+        float s=1.0-smoothstep(0.0,uGap,q*sin(th));
+        s=max(s,1.0-smoothstep(0.0,uGap,abs(th-1.5707963)));
+        s=max(s,1.0-smoothstep(0.0,uGap,abs(th-uObl)));
+        s=max(s,1.0-smoothstep(0.0,uGap,abs(th-uCap)));
+        gl_FragColor=vec4(uCol*1.7*uK*s,1.0);
+        #include <colorspace_fragment>
+      }
+    `,
     transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false,
   });
   const { r0, r1, oblo, cap, gap } = SPEC.shell;
