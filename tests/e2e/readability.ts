@@ -36,6 +36,60 @@ export async function controlInventory(page: Page) {
 }
 
 /**
+ * Words split between two letters inside the reading flow. The email and the mobile contact display type
+ * break anywhere by design; everything else must wrap at word boundaries, so a grid track that collapses
+ * below its longest word shows up here even when nothing overflows horizontally.
+ */
+export async function midWordBreaks(page: Page) {
+  return page.evaluate(() => {
+    const breaks: string[] = [];
+    const walker = document.createTreeWalker(document.querySelector("main")!, NodeFilter.SHOW_TEXT);
+    const range = document.createRange();
+    const letter = /[\p{L}\p{N}]/u;
+    while (walker.nextNode()) {
+      const node = walker.currentNode;
+      const text = node.textContent ?? "";
+      const parent = node.parentElement;
+      if (!parent || !text.trim() || !parent.checkVisibility()) continue;
+      if (parent.closest(".visually-hidden, .contact-link strong, .story-section__content--contact h2")) continue;
+      // Vertical type (the scroll cue) advances per glyph along the block axis by design.
+      if (getComputedStyle(parent).writingMode !== "horizontal-tb") continue;
+      let previousTop: number | null = null;
+      for (let index = 0; index < text.length; index += 1) {
+        range.setStart(node, index);
+        range.setEnd(node, index + 1);
+        const rect = range.getClientRects()[0];
+        if (!rect) { previousTop = null; continue; }
+        if (previousTop !== null && rect.top > previousTop + 2 && letter.test(text[index]) && letter.test(text[index - 1])) {
+          breaks.push(`${text.slice(Math.max(0, index - 10), index)}|${text.slice(index, index + 10)}`);
+        }
+        previousTop = rect.top;
+      }
+    }
+    return breaks;
+  });
+}
+
+/** Every chapter link is painted inside the rail and the viewport, and the rail clears the other fixed controls. */
+export async function chapterRailFit(page: Page) {
+  return page.evaluate(() => {
+    const nav = document.querySelector(".chapter-nav")!;
+    const box = nav.getBoundingClientRect();
+    const intersects = (a: DOMRect, b: DOMRect) => a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
+    const hidden = Array.from(nav.querySelectorAll("a"))
+      .filter((link) => {
+        const rect = link.getBoundingClientRect();
+        return rect.top < box.top - 0.5 || rect.bottom > box.bottom + 0.5 || rect.top < 0 || rect.bottom > innerHeight;
+      })
+      .map((link) => link.textContent?.trim());
+    const collisions = Array.from(document.querySelectorAll(".hud__identity, .hud__tools, .motion-control"))
+      .filter((element) => element.checkVisibility() && intersects(box, element.getBoundingClientRect()))
+      .map((element) => element.className);
+    return { hidden, collisions, scrollable: nav.scrollHeight - nav.clientHeight > 1 };
+  });
+}
+
+/**
  * WCAG 2.4.11 asks that the focused element is not *entirely* obscured. A partially
  * clipped element that keeps a usable band in the reading window passes.
  */

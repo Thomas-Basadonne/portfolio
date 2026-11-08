@@ -31,6 +31,15 @@ The baseline run of the new tests is `browser-checks.json → baseline` (7 faile
 - `zoom-200-it-drawer.jpg`, `zoom-200-it-contact.jpg` — actual composited output at native 200 % browser zoom, captured over CDP because Playwright's CSS-scale screenshot was blank under `tabs.setZoom`.
 - `work-reading-landscape.jpg`, `work-reading-desktop.jpg` — the archive at 667 landscape and 1440 with the reading position under the fixed chrome.
 
+## Post-review fixes
+
+Review on `7a3bb28` found two regressions; both are now covered by the readability battery.
+
+- **Words split mid-word.** `overflow-wrap: anywhere` on `.story-section__content` lowered every descendant's min-content size, so the archive's content-sized grid tracks collapsed (`Herm|es` at 1024×500, one letter per line at 844×390). The rule is gone; a narrow side-by-side column (`@container (max-width: 25rem)`) stacks the archive instead, and portrait phones no longer pad `main` on the right, which had narrowed the full-bleed contact panel. `midWordBreaks()` asserts no letter-to-letter break in `main` outside the email and the mobile contact display type, which break anywhere by design.
+- **Rail scrolled chapters away.** On short windows wider than 760 px (844×390, 915×412, 932×430) six 44 px rows did not fit between the HUD tools and the motion control, so 04–05 sat in a hidden scroll area; at 1024×500 the rail also touched the motion control. At `(min-width: 761px) and (max-height: 560px)` the rail is a two-column numeric grid; labels stay in the accessible names. `chapterRailFit()` asserts that every link is painted, the rail does not scroll and it clears identity, tools and motion control.
+
+Against `7a3bb28` the new assertions fail 15 of 24 Chromium cases; on the fix they pass. 568×320 still overflows, as it does on `main`.
+
 ## Limits
 
 - Firefox on macOS cannot launch headless in this environment (`RenderCompositorSWGL`); the Firefox cell of the matrix is CI-only, not locally observed.

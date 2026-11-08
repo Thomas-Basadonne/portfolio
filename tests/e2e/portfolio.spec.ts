@@ -1,7 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 import { expectHudContrast, expectHudGeometry } from "./hud-contrast";
-import { controlInventory, focusVisibility, typeInventory } from "./readability";
+import { chapterRailFit, controlInventory, focusVisibility, midWordBreaks, typeInventory } from "./readability";
 
 async function bypassEntry(page: Page) {
   await page.addInitScript(() => window.sessionStorage.setItem("tb:entry-seen", "1"));
@@ -29,7 +29,7 @@ for (const locale of ["en", "it"]) {
   for (const viewport of [
     { width: 320, height: 568 }, { width: 390, height: 844 }, { width: 667, height: 375 },
     { width: 768, height: 1024 }, { width: 1024, height: 500 }, { width: 1440, height: 900 },
-    { width: 2560, height: 1080 }, { width: 720, height: 450 },
+    { width: 2560, height: 1080 }, { width: 720, height: 450 }, { width: 844, height: 390 }, { width: 932, height: 430 },
   ]) {
     test(`readability type and targets ${locale} ${viewport.width}x${viewport.height}`, async ({ page }, info) => {
       await page.setViewportSize(viewport);
@@ -57,13 +57,18 @@ for (const locale of ["en", "it"]) {
       await page.evaluate(() => document.fonts.ready);
       const labels = await typeInventory(page);
       const targets = await controlInventory(page);
+      // Collapsed grid tracks split words without overflowing; the rail must not scroll chapters out of view.
+      const breaks = await midWordBreaks(page);
+      const rail = await chapterRailFit(page);
       await page.getByRole("button", { name: /project twin/i }).click();
       await expect(page.getByRole("dialog")).toBeVisible();
       const drawerLabels = await typeInventory(page);
       const drawerTargets = await controlInventory(page);
       await info.attach("readability-inventory", {
-        body: JSON.stringify({ entryLabels, entryBoxes, labels, targets, drawerLabels, drawerTargets }, null, 2), contentType: "application/json",
+        body: JSON.stringify({ entryLabels, entryBoxes, labels, targets, breaks, rail, drawerLabels, drawerTargets }, null, 2), contentType: "application/json",
       });
+      expect.soft(breaks, "words split between two letters").toEqual([]);
+      expect.soft(rail).toEqual({ hidden: [], collisions: [], scrollable: false });
       for (const row of [...entryLabels, ...labels, ...drawerLabels]) {
         // 12px is the project's label design floor, NOT a WCAG text-size rule.
         expect.soft(row.fontSize, `${row.selector}: ${row.text}`).toBeGreaterThanOrEqual(12);
@@ -136,6 +141,25 @@ for (const locale of ["en", "it"]) {
       });
     }
   }
+}
+
+for (const viewport of [{ width: 761, height: 400 }, { width: 844, height: 390 }, { width: 932, height: 430 }, { width: 1024, height: 500 }]) {
+  test(`readability chapter rail fits a short ${viewport.width}x${viewport.height} window with the motion control`, async ({ page }) => {
+    await page.setViewportSize(viewport);
+    await bypassEntry(page);
+    await page.goto("/?lang=it");
+    await expect(page.locator(".hud__identity")).toBeVisible();
+    await expect(page.locator(".site-shell")).not.toHaveAttribute("inert", "");
+    // The motion control exists only with the visual layer; the rail must fit with or without it.
+    await page.locator(".motion-control, .visual-status--failed").first().waitFor({ timeout: 10_000 }).catch(() => {});
+    for (const id of ["identity", "contact"]) {
+      await page.locator(`.chapter-nav a[href='#${id}']`).click();
+      await expect(page.locator(".chapter-nav a[aria-current=location]")).toHaveAttribute("href", `#${id}`);
+      expect(await chapterRailFit(page)).toEqual({ hidden: [], collisions: [], scrollable: false });
+    }
+    // Compact cells keep each chapter's label in its accessible name.
+    await expect(page.locator(".chapter-nav a[href='#contact']")).toHaveAccessibleName(/05.*Contatti/);
+  });
 }
 
 test("readability visible control labels are included in accessible names", async ({ page }) => {

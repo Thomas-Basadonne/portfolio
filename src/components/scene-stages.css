@@ -123,7 +123,6 @@
 /* Portrait phones reserve the bottom dock; short landscape phones reserve the numeric rail. */
 @media (max-width: 760px) {
   .scene-staged[data-scene-layout] main {
-    padding-right: max(var(--gutter), env(safe-area-inset-right));
     padding-bottom: var(--nav-clearance);
   }
   .scene-stage { --stage-bottom: var(--nav-clearance); }
