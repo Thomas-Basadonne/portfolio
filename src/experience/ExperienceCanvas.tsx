@@ -2,7 +2,7 @@ import { Suspense, useEffect, useRef, useState } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { experienceStore } from "../lib/experienceStore";
 import { reportClientError } from "../lib/reportClientError";
-import { NeutralToneMapping } from "three";
+import { NeutralToneMapping, SRGBColorSpace } from "three";
 import { CompilerMachine } from "./CompilerMachine";
 
 type ExperienceCanvasProps = {
@@ -88,6 +88,8 @@ export function ExperienceCanvas({ onReady, onFailure }: ExperienceCanvasProps) 
         gl={{
           alpha: true,
           toneMapping: NeutralToneMapping,
+          toneMappingExposure: 1,
+          outputColorSpace: SRGBColorSpace,
           antialias: quality === "high",
           powerPreference: quality === "high" ? "high-performance" : "default",
         }}

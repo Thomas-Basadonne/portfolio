@@ -1,4 +1,5 @@
 import { chromium } from "@playwright/test";
+import { NeutralToneMapping } from "three";
 import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
 import { readFile, readdir } from "node:fs/promises";
@@ -35,6 +36,10 @@ try {
     for (const quality of ["high", "low"]) {
       await page.evaluate(quality => window.tb001Review.set({ quality }), quality);
       await page.waitForTimeout(300);
+      const prepared = await page.evaluate(() => window.tb001Review.sample());
+      assert.equal(prepared.pmrem.filter(p => !p.disposed).length, 1, "Exactly one owned PMREM may remain live");
+      assert.deepEqual(prepared.pipeline, { toneMapping: NeutralToneMapping, exposure: 1, outputColorSpace: "srgb", colorManagement: true });
+      assert(prepared.firstUsefulFrameMs > 0, "No completed useful frame");
       for (const testCase of [
         { name: "01", cycle: 0, explode: 0, time: 0.5, az: 32, el: 12, distance: 5.6 },
         { name: "02", cycle: 0.35, explode: 0, time: 4.5, az: 22, el: 10, distance: 6 },
@@ -50,6 +55,7 @@ try {
         await page.screenshot({ path });
         result.cases.push({ viewport, quality, ...testCase, ...sample, collisions: hits, path });
         assert(sample.calls > 0);
+        assert.equal(sample.pmrem.length, prepared.pmrem.length, "A pose change must not rebuild PMREM");
         assert(sample.bounds.min[0] >= -0.98 && sample.bounds.max[0] <= 0.98 && sample.bounds.min[1] >= -0.98 && sample.bounds.max[1] <= 0.98, `cropped ${viewport.width}/${quality}/${testCase.name}: ${JSON.stringify(sample.bounds)}`);
         assert.deepEqual(hits, {}, `collision in ${quality}/${testCase.name}`);
         if (["03", "04"].includes(testCase.name)) assert(sample.core.vis >= 0.9, `core occluded: ${JSON.stringify(sample.core)}`);
@@ -62,6 +68,7 @@ try {
     await page.waitForFunction(t => !window.tb001Review.sample().mounted && window.tb001Review.sample().tick > t, start);
     const empty = await page.evaluate(() => window.tb001Review.sample());
     assert.equal(empty.environment, null);
+    assert(empty.pmrem.every(p => p.disposed), "Every owned PMREM target must release on unmount");
     assert(empty.memory.geometries < baseline.memory.geometries, "geometry memory did not release");
     assert(empty.memory.textures < baseline.memory.textures, "texture memory did not release");
     const counts = [];

@@ -10,12 +10,36 @@ import { coreVisibility, collisions, inventory, boundsOnScreen } from "../helper
 type ReviewInput = { cycle: number; explode: number; time: number; az: number; el: number; distance: number };
 const input: ReviewInput = { cycle: 0, explode: 0, time: 0.5, az: 32, el: 12, distance: 5.6 };
 let tick = 0;
+let renderer: THREE.WebGLRenderer;
+let firstUsefulFrameMs: number | null = null;
+const pmrem: { elapsedMs: number; size: number; disposed: boolean }[] = [];
+const fromScene = THREE.PMREMGenerator.prototype.fromScene;
+// Instrument only this dev fixture, including StrictMode setup/cleanup. No product telemetry.
+THREE.PMREMGenerator.prototype.fromScene = function (...args: Parameters<typeof fromScene>) {
+  renderer.getContext().finish();
+  const start = performance.now();
+  const target = fromScene.apply(this, args);
+  renderer.getContext().finish();
+  const entry = { elapsedMs: performance.now() - start, size: args[4]?.size ?? 256, disposed: false };
+  pmrem.push(entry);
+  target.addEventListener("dispose", () => { entry.disposed = true; });
+  return target;
+};
 
 function Fixture() {
   const [quality, setQuality] = useState<"high" | "low">("high");
   const [mounted, setMounted] = useState(true);
   const state = useThree();
-  useFrame(() => { tick++; });
+  renderer = state.gl;
+  useFrame(() => {
+    tick++;
+    if (firstUsefulFrameMs === null) requestAnimationFrame(() => {
+      if (state.gl.info.render.calls > 0) {
+        state.gl.getContext().finish();
+        firstUsefulFrameMs ??= performance.now();
+      }
+    });
+  });
   const drive = (pose: MachinePose) => {
     writePose(pose, input.cycle, input.explode, input.time);
     const { camera, size } = state;
@@ -42,7 +66,8 @@ function Fixture() {
       const context = state.gl.getContext();
       const debug = context.getExtension("WEBGL_debug_renderer_info");
       return {
-        tick, mounted: Boolean(root), quality,
+        tick, mounted: Boolean(root), quality, pmrem, firstUsefulFrameMs,
+        pipeline: { toneMapping: state.gl.toneMapping, exposure: state.gl.toneMappingExposure, outputColorSpace: state.gl.outputColorSpace, colorManagement: THREE.ColorManagement.enabled },
         gpu: debug ? context.getParameter(debug.UNMASKED_RENDERER_WEBGL) : context.getParameter(context.RENDERER),
         calls: state.gl.info.render.calls, triangles: state.gl.info.render.triangles,
         memory: { ...state.gl.info.memory },
@@ -61,5 +86,5 @@ function Fixture() {
   return mounted ? <TB001Model quality={quality} drive={drive} /> : null;
 }
 createRoot(document.getElementById("root")!).render(
-  <StrictMode><Canvas frameloop="demand" camera={{ fov: 30, near: 0.1, far: 100 }} dpr={1} gl={{ alpha: true, antialias: true, toneMapping: THREE.NeutralToneMapping }}><Fixture /></Canvas></StrictMode>,
+  <StrictMode><Canvas frameloop="demand" camera={{ fov: 30, near: 0.1, far: 100 }} dpr={1} gl={{ alpha: true, antialias: true, toneMapping: THREE.NeutralToneMapping }}><StrictMode><Fixture /></StrictMode></Canvas></StrictMode>,
 );
