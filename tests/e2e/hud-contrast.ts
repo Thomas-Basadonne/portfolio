@@ -4,49 +4,87 @@ import { expect, type Page, type TestInfo } from "@playwright/test";
  * Hide glyphs only for the background capture: translucent surfaces still composite
  * over the real chapter/WebGL, and antialiasing cannot masquerade as the background.
  */
-export async function expectHudContrast(page: Page, info: TestInfo, label: string) {
+export async function expectHudContrast(page: Page, info: TestInfo, label: string, selector = ".hud", minimumRuns = 10) {
   // Focus-induced scrolling can update the active chapter on the next frame.
   await page.evaluate(() => new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))));
-  const runs = await page.locator(".hud").evaluate((hud) => {
+  // Instrumentation must not leak between measurements: WebKit keeps a detached <style> applied,
+  // so the mask is one persistent sheet that is disabled instead of removed.
+  await page.evaluate(() => {
+    const sheet = document.getElementById("contrast-probe-mask") as HTMLStyleElement | null;
+    if (sheet) { sheet.disabled = true; sheet.textContent = ""; }
+  });
+  const runs = await page.locator(selector).evaluate((hud, visibleOnly) => {
     const walker = document.createTreeWalker(hud, NodeFilter.SHOW_TEXT);
     const result = [];
     while (walker.nextNode()) {
       const node = walker.currentNode;
       const parent = node.parentElement;
       if (!parent || !node.textContent?.trim() || !parent.checkVisibility({ checkOpacity: true })) continue;
+      // Visually hidden text is not painted text in any state.
+      if (parent.closest(".visually-hidden")) continue;
       const range = document.createRange();
       range.selectNodeContents(node);
-      const rect = range.getBoundingClientRect();
-      if (!rect.width || !rect.height) continue;
-      const style = getComputedStyle(parent);
-      let opacity = 1;
-      for (let ancestor: Element | null = parent; ancestor; ancestor = ancestor.parentElement) {
-        const ancestorStyle = getComputedStyle(ancestor);
-        opacity *= Number(ancestorStyle.opacity);
-        if (ancestorStyle.mixBlendMode !== "normal" || ancestorStyle.filter !== "none") {
-          throw new Error("Functional HUD text must not depend on blend modes or filters");
+      const rects = visibleOnly ? Array.from(range.getClientRects()) : [range.getBoundingClientRect()];
+      for (const rect of rects) {
+        if (!rect.width || !rect.height) continue;
+        const style = getComputedStyle(parent);
+        if (visibleOnly && (rect.top < 0 || rect.bottom > innerHeight || rect.left < 0 || rect.right > innerWidth
+          || parent.closest(".visually-hidden, [aria-hidden='true']"))) continue;
+        // A transparent fill has no foreground to measure; the type inventory asserts that no
+        // informational label uses one (outlined display type paints its stroke instead).
+        if (style.color === "rgba(0, 0, 0, 0)") continue;
+        if (visibleOnly && parent.closest("main")) {
+          if (rect.top < parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop)) continue;
+          // A line currently passing behind fixed chrome is an occlusion, not a text-color defect.
+          // Its ability to reach the reading zone is asserted separately by the scrolling tests.
+          const occluded = Array.from(document.querySelectorAll(".chapter-nav, .hud__identity, .hud__tools, .visual-status--failed"))
+            .some((overlay) => {
+              const box = overlay.getBoundingClientRect();
+              return rect.left < box.right && rect.right > box.left && rect.top < box.bottom && rect.bottom > box.top;
+            });
+          if (occluded) continue;
         }
+        let opacity = 1;
+        for (let ancestor: Element | null = parent; ancestor; ancestor = ancestor.parentElement) {
+          const ancestorStyle = getComputedStyle(ancestor);
+          opacity *= Number(ancestorStyle.opacity);
+          if (ancestorStyle.mixBlendMode !== "normal" || ancestorStyle.filter !== "none") {
+            throw new Error("Functional text must not depend on blend modes or filters");
+          }
+        }
+        result.push({
+          text: node.textContent.trim(),
+          color: style.color,
+          opacity,
+          fontSize: Number.parseFloat(style.fontSize),
+          fontWeight: Number.parseFloat(style.fontWeight),
+          rect: { x: rect.x, y: rect.y, width: rect.width, height: rect.height },
+        });
       }
-      result.push({
-        text: node.textContent.trim(),
-        color: style.color,
-        opacity,
-        fontSize: Number.parseFloat(style.fontSize),
-        fontWeight: Number.parseFloat(style.fontWeight),
-        rect: { x: rect.x, y: rect.y, width: rect.width, height: rect.height },
-      });
     }
     return result;
-  });
-  expect(runs.length).toBeGreaterThan(10);
+  }, selector !== ".hud");
+  expect(runs.length).toBeGreaterThan(minimumRuns);
   await info.attach(`${label}-visual`, { body: await page.screenshot({ scale: "css" }), contentType: "image/png" });
-  const mask = await page.addStyleTag({ content: ".hud, .hud * { color: transparent !important; -webkit-text-fill-color: transparent !important; text-shadow: none !important; }" });
+  await page.evaluate((css) => {
+    let sheet = document.getElementById("contrast-probe-mask") as HTMLStyleElement | null;
+    if (!sheet) {
+      sheet = document.createElement("style");
+      sheet.id = "contrast-probe-mask";
+      document.head.append(sheet);
+    }
+    sheet.textContent = css;
+    sheet.disabled = false;
+  }, `:is(${selector}), :is(${selector}) * { color: transparent !important; -webkit-text-fill-color: transparent !important; text-shadow: none !important; }`);
   let background: Awaited<ReturnType<Page["screenshot"]>>;
   try {
     await page.evaluate(() => new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))));
     background = await page.screenshot({ scale: "css" });
   } finally {
-    await mask.evaluate((element) => element.parentNode?.removeChild(element));
+    await page.evaluate(() => {
+      const sheet = document.getElementById("contrast-probe-mask") as HTMLStyleElement | null;
+      if (sheet) { sheet.disabled = true; sheet.textContent = ""; }
+    });
   }
   const measurements = await page.evaluate(async ({ image, textRuns }) => {
     const bytes = Uint8Array.from(atob(image), (character) => character.charCodeAt(0));

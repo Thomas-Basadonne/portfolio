@@ -14,12 +14,13 @@ export function Hud({ activeChapter, progressPercent, content, locale, onLocaleC
 
   return (
     <header className="hud">
-      <a className="hud__identity" href="#identity" aria-label={ui.hudHome}>
-        <span className="hud__monogram">TB</span>
-        <span>
-          {profile.name}
+      <a className="hud__identity" href="#identity" aria-labelledby="hud-monogram hud-name hud-purpose" title={ui.hudHome}>
+        <span id="hud-monogram" className="hud__monogram">TB</span>{" "}
+        <span id="hud-name">
+          {profile.name}{" "}
           <small>{profile.role}</small>
         </span>
+        <span id="hud-purpose" className="visually-hidden"> — {ui.hudHome}</span>
       </a>
 
       <div className="hud__tools">

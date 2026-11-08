@@ -1,0 +1,91 @@
+{
+  "cases": [
+    {
+      "locale": "en",
+      "zoom": 2,
+      "before": {
+        "width": 1440,
+        "height": 956
+      },
+      "viewport": {
+        "width": 720,
+        "height": 478,
+        "dpr": 2
+      },
+      "sections": [
+        {
+          "id": "identity",
+          "overflow": 0
+        },
+        {
+          "id": "about",
+          "overflow": 0
+        },
+        {
+          "id": "capabilities",
+          "overflow": 0
+        },
+        {
+          "id": "work",
+          "overflow": 0
+        },
+        {
+          "id": "experience",
+          "overflow": 0
+        },
+        {
+          "id": "contact",
+          "overflow": 0
+        }
+      ],
+      "drawer": {
+        "overflow": 0
+      }
+    },
+    {
+      "locale": "it",
+      "zoom": 2,
+      "before": {
+        "width": 1440,
+        "height": 956
+      },
+      "viewport": {
+        "width": 720,
+        "height": 478,
+        "dpr": 2
+      },
+      "sections": [
+        {
+          "id": "identity",
+          "overflow": 0
+        },
+        {
+          "id": "about",
+          "overflow": 0
+        },
+        {
+          "id": "capabilities",
+          "overflow": 0
+        },
+        {
+          "id": "work",
+          "overflow": 0
+        },
+        {
+          "id": "experience",
+          "overflow": 0
+        },
+        {
+          "id": "contact",
+          "overflow": 0
+        }
+      ],
+      "drawer": {
+        "overflow": 0
+      }
+    }
+  ],
+  "errors": [],
+  "success": true,
+  "profileRemoved": true
+}

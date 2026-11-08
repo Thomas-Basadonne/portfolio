@@ -1,6 +1,6 @@
 /*
- * Filone A (#13/#16): the one persistent stage and the reading columns around it. Global nav, docking and type
- * scale stay with #24; this file only places the stage and the text it must never cross.
+ * The one persistent stage and the reading columns around it. Docking clearance is shared with index.css
+ * so the stage, text and fixed navigation keep separate lanes (#24).
  * The layout is reserved from entry (no shift when the visual layer arrives) and released if it fails.
  */
 .scene-rail { display: none; }
@@ -39,8 +39,8 @@
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     column-gap: clamp(1.5rem, 3vw, 3.5rem);
-    /* The fixed chapter rail (126 px wide, docked by #24) keeps its own lane on the right. */
-    padding: 0 calc(var(--gutter) + 9.5rem) 0 var(--gutter);
+    /* The fixed chapter rail keeps its own lane, shared with the fallback layout. */
+    padding: 0 calc(var(--gutter) + var(--nav-lane)) var(--nav-clearance) var(--gutter);
   }
   /* Explicit rows: the rail shares every chapter row (auto-placement would push the chapters below it). */
   .scene-staged[data-scene-layout] .scene-rail { grid-column: 1 / -1; grid-row: 1 / 7; }
@@ -88,25 +88,62 @@
  * the reading flow scrolls beneath it, chapter after chapter with no empty screens.
  */
 @media (max-width: 1080px) and (orientation: portrait) {
-  /* Declared on the shell so the band and the chapters' scroll margin share one measure. */
-  .scene-staged[data-scene-layout] { --band-header: 4.9rem; --band-height: calc(var(--band-header) + 32svh); }
+  /* The band measure lives on the shell, so engines without :has() still get a sized band. */
+  .scene-staged[data-scene-layout] {
+    --band-header: calc(max(0.75rem, env(safe-area-inset-top)) + 4.25rem);
+    --band-height: calc(var(--band-header) + 32svh);
+  }
   .scene-staged[data-scene-layout] .scene-rail { display: contents; }
-  .scene-stage {
+  .scene-staged[data-scene-layout] .scene-stage {
     z-index: 3;
     top: 0;
     height: var(--band-height);
     background: var(--graphite);
   }
-  .scene-stage .webgl-shell { top: var(--band-header); }
+  .scene-staged[data-scene-layout] .scene-stage .webgl-shell { top: var(--band-header); }
   .scene-staged[data-scene-layout] .story-section {
     min-height: auto;
     padding-top: clamp(1.5rem, 4svh, 2.5rem);
     padding-bottom: clamp(1.5rem, 4svh, 2.5rem);
+    /* Anchor and section scrolling clears the band in every engine. */
     scroll-margin-top: var(--band-height);
   }
   .scene-staged[data-scene-layout] .identity-section { padding-top: 2rem; }
+  /* Progressive enhancement: the root owns the inset (focus scrolling included) where :has() exists. */
+  @supports selector(:has(*)) {
+    :root:has(.scene-staged[data-scene-layout]) {
+      --band-header: calc(max(0.75rem, env(safe-area-inset-top)) + 4.25rem);
+      --band-height: calc(var(--band-header) + 32svh);
+      --reading-top: calc(var(--band-height) + 1rem);
+    }
+    .scene-staged[data-scene-layout] .story-section { scroll-margin-top: 0; }
+  }
+}
+
+/* Portrait phones reserve the bottom dock; short landscape phones reserve the numeric rail. */
+@media (max-width: 760px) {
+  .scene-staged[data-scene-layout] main {
+    padding-bottom: var(--nav-clearance);
+  }
+  .scene-stage { --stage-bottom: var(--nav-clearance); }
+  .scene-staged[data-scene-layout] .motion-control { bottom: var(--nav-clearance); }
+}
+
+@media (max-width: 760px) and (orientation: landscape) and (max-height: 500px) {
+  .scene-staged[data-scene-layout] main {
+    padding-right: calc(var(--gutter) + var(--nav-lane) + env(safe-area-inset-right));
+  }
+  .scene-staged[data-scene-layout] .motion-control {
+    top: max(0.75rem, env(safe-area-inset-top));
+    right: calc(var(--gutter) + 16rem);
+    bottom: auto;
+  }
 }
 
 @media (forced-colors: active) {
   .scene-staged[data-scene-layout] .scene-rail { display: none; }
+  .scene-staged[data-scene-layout] .story-section { scroll-margin-top: 0; }
+  @supports selector(:has(*)) {
+    :root:has(.scene-staged[data-scene-layout]) { --reading-top: calc(var(--gutter) + 5.5rem); }
+  }
 }
