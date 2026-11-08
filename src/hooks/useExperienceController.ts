@@ -85,7 +85,8 @@ export function useExperienceController(entered: boolean, options: ControllerOpt
 
     /** Scroll offsets where each chapter starts being read; the last chapter ends at the end of the document. */
     const measure = () => {
-      const line = innerHeight * READING_LINE;
+      const readingInset = parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 0;
+      const line = Math.max(innerHeight * READING_LINE, readingInset + 1);
       const sections = Array.from(document.querySelectorAll<HTMLElement>("[data-chapter]"));
       starts = sections.map((section) => Math.max(0, section.getBoundingClientRect().top + scrollY - line));
       starts[0] = 0;
