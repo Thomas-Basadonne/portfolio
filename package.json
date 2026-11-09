@@ -11,6 +11,8 @@
     "dev": "vite",
     "build": "tsc -b && vite build && node scripts/prerender.mjs",
     "preview": "vite preview",
+    "build:cloudflare": "VITE_COMMIT_REF=$WORKERS_CI_COMMIT_SHA pnpm build && node scripts/cloudflare-headers.mjs",
+    "preview:cloudflare": "pnpm build:cloudflare && wrangler dev",
     "typecheck": "tsc -b --pretty false",
     "lint": "oxlint --deny-warnings src tests scripts netlify worker server vite.config.ts vitest.config.ts playwright.config.ts",
     "test:unit": "vitest run --config vitest.config.ts",
@@ -44,6 +46,7 @@
     "oxlint": "1.74.0",
     "typescript": "^7.0.2",
     "vite": "^8.1.5",
-    "vitest": "4.1.10"
+    "vitest": "4.1.10",
+    "wrangler": "4.158.0"
   }
 }
