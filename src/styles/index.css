@@ -1504,6 +1504,56 @@ a.contact-link:focus-visible {
   border-top: 1px solid var(--line-dark);
 }
 
+/* Case-study visual evidence: each box is reserved from width/height, so nothing shifts on load */
+
+.case-media-set {
+  margin-top: 2.5rem;
+}
+
+.case-media {
+  margin: 0;
+}
+
+.case-media__image {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--line-dark);
+  background: var(--graphite);
+}
+
+.case-media figcaption {
+  display: grid;
+  gap: 0.4rem;
+  max-width: 60ch;
+  margin-top: 0.85rem;
+}
+
+.case-media__caption {
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.case-media__open {
+  justify-self: start;
+}
+
+.case-media-set__tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+  gap: 2rem 1.5rem;
+  margin-top: 2.5rem;
+}
+
+/* Every image failed to load: leave no gap where the figures were */
+.case-media-set:not(:has(figure)) {
+  display: none;
+}
+
+.case-media-set + .case-drawer__fields {
+  margin-top: clamp(2.5rem, 5vw, 4rem);
+}
+
 /* Cursor */
 
 .cursor {

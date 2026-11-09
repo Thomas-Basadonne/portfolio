@@ -15,6 +15,30 @@ export type Capability = {
   proof: string;
 };
 
+export type CaseMediaVariant = {
+  /** Site-root path under /case-media/. */
+  src: string;
+  /** Intrinsic width in CSS pixels of this rendition. */
+  width: number;
+};
+
+/**
+ * One piece of visual evidence for a case study. Only static, locally served images are supported.
+ */
+export type CaseMedia = {
+  /** Largest rendition; its width/height reserve the layout box before the file loads. */
+  src: string;
+  width: number;
+  height: number;
+  /** Smaller renditions (strictly narrower than `width`) for responsive loading. */
+  variants?: CaseMediaVariant[];
+  /** What the image shows, for people who cannot see it. */
+  alt: string;
+  caption: string;
+  /** Where the capture comes from and whether the data shown is real or synthetic. */
+  provenance: string;
+};
+
 export type CaseStudy = {
   id: string;
   code: string;
@@ -32,6 +56,8 @@ export type CaseStudy = {
   outcome: string;
   links: ExternalLink[];
   evidence: string;
+  /** Visual evidence, lead image first. Optional: cases without approved assets stay text-only. */
+  media?: CaseMedia[];
 };
 
 export type ListItem = {
@@ -97,6 +123,7 @@ export type PortfolioContent = {
     drawerTechnologies: string;
     drawerOutcome: string;
     drawerLinks: string;
+    drawerMediaOpen: string;
     opensNewTab: string;
     footerNote: string;
   };
@@ -204,6 +231,7 @@ const en: PortfolioContent = {
     drawerTechnologies: "Technologies",
     drawerOutcome: "Outcome",
     drawerLinks: "Links",
+    drawerMediaOpen: "View full size",
     opensNewTab: "(opens in a new tab)",
     footerNote: "Designed as one continuous instrument",
   },
@@ -550,6 +578,7 @@ const it: PortfolioContent = {
     drawerTechnologies: "Tecnologie",
     drawerOutcome: "Risultato",
     drawerLinks: "Link",
+    drawerMediaOpen: "Apri a dimensione intera",
     opensNewTab: "(si apre in una nuova scheda)",
     footerNote: "Progettato come un unico strumento continuo",
   },
