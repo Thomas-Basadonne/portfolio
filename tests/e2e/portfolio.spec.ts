@@ -991,3 +991,73 @@ test("a case without approved media keeps its text-only drawer", async ({ page }
   await expect(dialog.locator("figure")).toHaveCount(0);
   await expect(dialog.locator(".case-drawer__summary")).toHaveText(textOnlyCase!.summary);
 });
+
+/*
+ * Hero text blocks must never sit on top of each other. The bug this pins: in portrait windows between 761px
+ * and 1080px the hero section is only as tall as the title, while the thesis and the scroll cue were still
+ * absolutely anchored to its bottom, so they landed on the name. Landscape and short windows never showed it,
+ * so the matrix mixes both orientations on purpose. The two title lines overlap by design (line-height < 1) and
+ * are measured as one block.
+ */
+const HERO_VIEWPORTS = [
+  ...[761, 800, 861].flatMap((width) => [700, 768, 821, 900, 1000, 1180].map((height) => ({ width, height }))),
+  { width: 1024, height: 1366 },
+  { width: 1080, height: 1400 },
+];
+
+async function heroCollisions(page: Page) {
+  return page.evaluate(() => {
+    const blocks: { name: string; el: Element }[] = [];
+    const add = (name: string, selector: string) =>
+      document.querySelectorAll(selector).forEach((el, index) => blocks.push({ name: `${name}${index || ""}`, el }));
+    add("spec", ".hero-spec span");
+    add("title", ".hero-title");
+    add("role", ".hero-thesis > p:not(.hero-lede)");
+    add("thesis", ".hero-thesis h2");
+    add("lede", ".hero-lede");
+    add("action", ".hero-actions a");
+    add("cue", ".scroll-cue");
+    add("hud-identity", ".hud__identity");
+    add("hud-tools", ".hud__tools");
+    add("rail", ".chapter-nav");
+    add("motion", ".motion-control");
+    const boxes = blocks
+      .map(({ name, el }) => ({ name, rect: el.getBoundingClientRect(), shown: getComputedStyle(el).display !== "none" }))
+      .filter((box) => box.shown && box.rect.width > 1 && box.rect.height > 1);
+    const found: string[] = [];
+    for (let i = 0; i < boxes.length; i += 1) {
+      for (let j = i + 1; j < boxes.length; j += 1) {
+        const a = boxes[i].rect;
+        const b = boxes[j].rect;
+        const w = Math.min(a.right, b.right) - Math.max(a.left, b.left);
+        const h = Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top);
+        if (w > 1 && h > 1) found.push(`${boxes[i].name}×${boxes[j].name} ${Math.round(w)}x${Math.round(h)}`);
+      }
+    }
+    return found;
+  });
+}
+
+for (const locale of ["en", "it"] as const) {
+  for (const layout of ["staged", "fallback"] as const) {
+    test(`hero text blocks never overlap, 761–1080px, both orientations (${locale}, ${layout} layout)`, async ({ page }) => {
+      if (layout === "fallback") await page.route(/ExperienceCanvas-.*\.js/, (route) => route.abort());
+      await bypassEntry(page);
+      await page.setViewportSize({ width: 800, height: 900 });
+      await page.goto(locale === "it" ? "/?lang=it" : "/");
+      await page.evaluate(() => document.fonts.ready);
+      if (layout === "staged") await expect(page.locator(".scene-staged")).toHaveAttribute("data-scene-layout", "");
+      else await expect(page.locator(".scene-staged")).not.toHaveAttribute("data-scene-layout", "");
+
+      const failures: string[] = [];
+      for (const viewport of HERO_VIEWPORTS) {
+        await page.setViewportSize(viewport);
+        // No frame wait: the scene behind can keep the main thread busy, and reading rects forces a fresh layout.
+        await page.evaluate(() => window.scrollTo(0, 0));
+        const found = await heroCollisions(page);
+        if (found.length) failures.push(`${viewport.width}x${viewport.height}: ${found.join(", ")}`);
+      }
+      expect(failures, `hero overlaps:\n${failures.join("\n")}`).toEqual([]);
+    });
+  }
+}
