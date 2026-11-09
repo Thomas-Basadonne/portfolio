@@ -12,7 +12,7 @@
     "build": "tsc -b && vite build && node scripts/prerender.mjs",
     "preview": "vite preview",
     "typecheck": "tsc -b --pretty false",
-    "lint": "oxlint --deny-warnings src tests scripts netlify vite.config.ts vitest.config.ts playwright.config.ts",
+    "lint": "oxlint --deny-warnings src tests scripts netlify worker server vite.config.ts vitest.config.ts playwright.config.ts",
     "test:unit": "vitest run --config vitest.config.ts",
     "test:e2e": "pnpm build && playwright test",
     "test:soak": "node scripts/soak.mjs",
