@@ -1061,3 +1061,57 @@ for (const locale of ["en", "it"] as const) {
     });
   }
 }
+
+/*
+ * The name must fit its line. On phones the surname is right-aligned and the font size follows the viewport, so a
+ * size that is a little too large pushes the word out to the LEFT and clips the first letters (seen between ~420px
+ * and ~580px: the word is ~5.2em wide and the old size was 20.5vw). Measured on the glyph run, not the box.
+ */
+const NAME_WIDTHS = [320, 360, 375, 390, 414, 420, 421, 440, 480, 520, 560, 580, 600, 640, 700, 760, 761, 800, 861, 1024, 1080];
+
+async function nameClipping(page: Page) {
+  return page.evaluate(() => {
+    const title = document.querySelector(".hero-title");
+    if (!title) return ["no hero title"];
+    const box = title.getBoundingClientRect();
+    const problems: string[] = [];
+    title.querySelectorAll("span").forEach((span) => {
+      const range = document.createRange();
+      range.selectNodeContents(span);
+      const run = range.getBoundingClientRect();
+      const word = span.textContent;
+      // 1.5px: the outline stroke is centred on the glyph edge.
+      if (run.left < box.left - 1.5) problems.push(`${word} starts ${Math.round(box.left - run.left)}px left of its box`);
+      if (run.right > box.right + 1.5) problems.push(`${word} ends ${Math.round(run.right - box.right)}px right of its box`);
+      if (run.left < 0) problems.push(`${word} is cut by the left edge (${Math.round(run.left)}px)`);
+      if (run.right > window.innerWidth) problems.push(`${word} is cut by the right edge (+${Math.round(run.right - window.innerWidth)}px)`);
+    });
+    return problems;
+  });
+}
+
+for (const locale of ["en", "it"] as const) {
+  for (const layout of ["staged", "fallback"] as const) {
+    test(`hero name is never clipped, 320–1080px (${locale}, ${layout} layout)`, async ({ page }) => {
+      if (layout === "fallback") await page.route(/ExperienceCanvas-.*\.js/, (route) => route.abort());
+      await bypassEntry(page);
+      await page.setViewportSize({ width: 500, height: 900 });
+      await page.goto(locale === "it" ? "/?lang=it" : "/");
+      await page.evaluate(() => document.fonts.ready);
+      if (layout === "staged") await expect(page.locator(".scene-staged")).toHaveAttribute("data-scene-layout", "");
+      else await expect(page.locator(".scene-staged")).not.toHaveAttribute("data-scene-layout", "");
+
+      const failures: string[] = [];
+      // Portrait and landscape both: the surname is aligned differently in each.
+      for (const height of [700, 1180]) {
+        for (const width of NAME_WIDTHS) {
+          await page.setViewportSize({ width, height });
+          await page.evaluate(() => window.scrollTo(0, 0));
+          const found = await nameClipping(page);
+          if (found.length) failures.push(`${width}x${height}: ${found.join("; ")}`);
+        }
+      }
+      expect(failures, `name clipped:\n${failures.join("\n")}`).toEqual([]);
+    });
+  }
+}

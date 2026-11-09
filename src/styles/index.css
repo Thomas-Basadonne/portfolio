@@ -1866,7 +1866,11 @@ a.contact-link:focus-visible {
 
   .hero-title {
     margin-top: 1.5rem;
-    font-size: clamp(4rem, 20.5vw, 7rem);
+    /*
+     * The surname is ~5.2em wide and right-aligned, so a size that is a little too large pushes it out to the
+     * left and clips the first letters. 5.3 leaves a margin for font metrics and a scrollbar.
+     */
+    font-size: clamp(3rem, calc((100vw - 2 * var(--gutter)) / 5.3), 7rem);
     line-height: 0.76;
   }
 
@@ -2107,10 +2111,6 @@ a.contact-link:focus-visible {
 }
 
 @media (max-width: 420px) {
-  .hero-title {
-    font-size: 18.5vw;
-  }
-
   .case-index__code {
     font-size: 0.75rem;
   }
