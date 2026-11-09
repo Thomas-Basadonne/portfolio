@@ -48,6 +48,7 @@ the Content-Security-Policy of `netlify.toml`: edit the JSON-LD and the check te
 - `src/lib` — centralized experience state and capability detection
 - `src/content` — centralized, publication-ready portfolio facts
 - `docs/CONCEPT.md` — narrative, design system and research synthesis
+- `docs/PERFORMANCE.md` — render tiers, downgrade policy, shader warm-up and measurements
 
 The page remains readable if WebGL fails, respects reduced motion, preserves keyboard navigation
 and reduces render complexity on narrow or slower devices.

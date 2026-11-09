@@ -16,7 +16,7 @@ type TB001ModelProps = {
 
 /** Reusable R3F model. Allocates GPU resources only in the committed effect (StrictMode safe). */
 export function TB001Model({ quality, drive }: TB001ModelProps) {
-  const { gl, scene, invalidate } = useThree();
+  const { gl, scene, camera, invalidate } = useThree();
   const model = useRef<ReturnType<typeof createMachine> | null>(null);
   const currentPose = useMemo(() => pose(0, 0, 0), []);
 
@@ -33,6 +33,10 @@ export function TB001Model({ quality, drive }: TB001ModelProps) {
       scene.environmentIntensity = 1.12;
       scene.add(machine.root);
       model.current = machine;
+      // Start linking every program now (hidden parts included: three walks the whole graph) so the driver can
+      // build them in parallel instead of one after another on the first draw. `compileAsync` is deliberately
+      // not used: its readiness poll cannot be cancelled and throws when the materials are disposed first.
+      gl.compile(scene, camera);
       invalidate();
     } catch (error) {
       machine?.dispose();
@@ -50,7 +54,7 @@ export function TB001Model({ quality, drive }: TB001ModelProps) {
       environment.dispose();
       invalidate();
     };
-  }, [quality, gl, scene, invalidate, currentPose]);
+  }, [quality, gl, scene, camera, invalidate, currentPose]);
 
   useFrame((_, delta) => {
     if (!model.current) return;
