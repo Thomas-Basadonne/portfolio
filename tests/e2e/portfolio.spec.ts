@@ -1,6 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 import { expectHudContrast, expectHudGeometry } from "./hud-contrast";
+import { portfolioContent } from "../../src/content/portfolio";
 import { MOTION_RATES } from "../../src/lib/motionPolicy";
 import { chapterRailFit, controlInventory, focusVisibility, midWordBreaks, typeInventory } from "./readability";
 
@@ -317,10 +318,23 @@ test("case drawer traps focus and restores it", async ({ page }) => {
   await page.keyboard.press("Enter");
   const dialog = page.getByRole("dialog", { name: "Project Twin" });
   await expect(dialog).toBeVisible();
-  await expect(dialog.getByRole("button", { name: /close/i })).toBeFocused();
+  const close = dialog.getByRole("button", { name: /close/i });
+  await expect(close).toBeFocused();
   await expect(page.locator(".site-shell")).toHaveAttribute("inert", "");
+  // Project Twin has no case links: the stops are close, then one full-size link per evidence image.
+  const mediaLinks = dialog.getByRole("link", { name: /view full size/i });
+  const stops = await mediaLinks.count();
+  expect(stops).toBeGreaterThan(1);
+  for (let index = 0; index < stops; index += 1) {
+    await page.keyboard.press("Tab");
+    await expect(mediaLinks.nth(index)).toBeFocused();
+  }
   await page.keyboard.press("Tab");
-  await expect(dialog.getByRole("button", { name: /close/i })).toBeFocused();
+  await expect(close).toBeFocused();
+  await page.keyboard.press("Shift+Tab");
+  await expect(mediaLinks.nth(stops - 1)).toBeFocused();
+  await page.keyboard.press("Tab");
+  await expect(close).toBeFocused();
   await page.keyboard.press("Escape");
   await expect(dialog).toBeHidden();
   await expect(trigger).toBeFocused();
@@ -849,4 +863,129 @@ test("HUD contact forced colors preserve text and keyboard focus", async ({ page
   await expect(nav).toBeFocused();
   expect(await nav.evaluate((element) => getComputedStyle(element).outlineStyle)).not.toBe("none");
   await expectHudContrast(page, info, "forced-colors-focus");
+});
+
+const mediaCases = portfolioContent.en.caseStudies.filter((entry) => entry.media?.length);
+const textOnlyCase = portfolioContent.en.caseStudies.find((entry) => !entry.media?.length);
+
+async function openCase(page: Page, locale: "en" | "it", title: string) {
+  await bypassEntry(page);
+  await page.goto(locale === "it" ? "/?lang=it#work" : "/#work");
+  await page.getByRole("button", { name: new RegExp(title, "i") }).click();
+  const dialog = page.getByRole("dialog", { name: title });
+  await expect(dialog).toBeVisible();
+  return dialog;
+}
+
+for (const entry of mediaCases) {
+  const items = entry.media!;
+  const lead = items[0];
+
+  test.describe(`case media: ${entry.id}`, () => {
+    test("requests nothing before the drawer opens, then reserves every box and lazy-loads", async ({ page }) => {
+      const requested: string[] = [];
+      page.on("request", (request) => {
+        if (request.url().includes("/case-media/")) requested.push(request.url());
+      });
+      // The files are held back until the test releases them, so the "before load" state is deterministic.
+      let release!: () => void;
+      const gate = new Promise<void>((resolve) => {
+        release = resolve;
+      });
+      await page.route("**/case-media/**", async (route) => {
+        await gate;
+        await route.continue();
+      });
+
+      await bypassEntry(page);
+      await page.goto("/#work");
+      await scrollToEnd(page);
+      expect(requested, "case assets must not load while the drawer is closed").toEqual([]);
+
+      await page.getByRole("button", { name: new RegExp(entry.title, "i") }).click();
+      const dialog = page.getByRole("dialog", { name: entry.title });
+      const images = dialog.locator("img.case-media__image");
+      await expect(images).toHaveCount(items.length);
+      for (const [index, media] of items.entries()) {
+        const image = images.nth(index);
+        await expect(image).toHaveAttribute("loading", "lazy");
+        await expect(image).toHaveAttribute("width", String(media.width));
+        await expect(image).toHaveAttribute("height", String(media.height));
+        await expect(image).toHaveAttribute("alt", media.alt);
+        // Before the (held-back) file arrives the box already has its final aspect ratio.
+        const box = (await image.boundingBox())!;
+        expect(box.height / box.width).toBeCloseTo(media.height / media.width, 1);
+      }
+
+      const leadImage = images.first();
+      expect(await leadImage.evaluate((node: HTMLImageElement) => node.complete)).toBe(false);
+      const before = (await leadImage.boundingBox())!;
+      release();
+      // Generous: the WebGL scene behind the drawer can keep the main thread busy when workers run in parallel.
+      await expect
+        .poll(() => leadImage.evaluate((node: HTMLImageElement) => node.naturalWidth), { timeout: 20_000 })
+        .toBeGreaterThan(0);
+      const after = (await leadImage.boundingBox())!;
+      expect(Math.abs(after.height - before.height)).toBeLessThanOrEqual(1);
+      expect(Math.abs(after.width - before.width)).toBeLessThanOrEqual(1);
+      expect(requested.length).toBeGreaterThan(0);
+      expect(requested.every((url) => new URL(url).pathname.endsWith(".webp"))).toBe(true);
+    });
+
+    for (const locale of ["en", "it"] as const) {
+      test(`shows localized alt, caption and provenance for every image (${locale})`, async ({ page }) => {
+        const localized = portfolioContent[locale].caseStudies.find((candidate) => candidate.id === entry.id)!;
+        const dialog = await openCase(page, locale, localized.title);
+        for (const [index, media] of localized.media!.entries()) {
+          await expect(dialog.locator("img.case-media__image").nth(index)).toHaveAttribute("alt", media.alt);
+          const caption = dialog.locator("figcaption").nth(index);
+          await expect(caption).toContainText(media.caption);
+          await expect(caption).toContainText(media.provenance);
+        }
+      });
+    }
+
+    test("missing files keep every text field and link, and leave no gap", async ({ page }) => {
+      await page.route("**/case-media/**", (route) => route.fulfill({ status: 404, body: "not found" }));
+      const dialog = await openCase(page, "en", entry.title);
+      await expect(dialog.locator(".case-media")).toHaveCount(0);
+      expect(await dialog.locator(".case-media-set").evaluate((node) => node.getBoundingClientRect().height)).toBe(0);
+      await expect(dialog.locator(".case-drawer__summary")).toHaveText(entry.summary);
+      await expect(dialog.locator(".case-field")).not.toHaveCount(0);
+      for (const link of entry.links) await expect(dialog.locator(`a[href="${link.href}"]`)).toBeVisible();
+      expect(await dialog.evaluate((node) => node.scrollWidth - node.clientWidth)).toBeLessThanOrEqual(1);
+    });
+
+    test("one failed image removes only its own figure", async ({ page }) => {
+      test.skip(items.length < 2, "needs at least two images");
+      await page.route(`**${lead.src}`, (route) => route.fulfill({ status: 404, body: "not found" }));
+      await page.route(`**${lead.variants?.[0]?.src ?? lead.src}`, (route) => route.fulfill({ status: 404, body: "not found" }));
+      const dialog = await openCase(page, "en", entry.title);
+      await expect(dialog.locator("figure")).toHaveCount(items.length - 1);
+      await expect(dialog.locator(".case-field")).not.toHaveCount(0);
+    });
+
+    test("adds one predictable focus stop per image and does not overflow on a phone", async ({ page }) => {
+      await page.setViewportSize({ width: 375, height: 667 });
+      const dialog = await openCase(page, "en", entry.title);
+      const focusable = 'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])';
+      const expectedStops = 1 + items.length + entry.links.length; // close + one full-size link per image + case links
+      expect(await dialog.locator(focusable).count()).toBe(expectedStops);
+      const mediaStops = dialog.locator("figure").locator(focusable);
+      await expect(mediaStops).toHaveCount(items.length);
+      for (const [index, media] of items.entries()) await expect(mediaStops.nth(index)).toHaveAttribute("href", media.src);
+      expect(await dialog.evaluate((node) => node.scrollWidth - node.clientWidth)).toBeLessThanOrEqual(1);
+
+      await expect(dialog.getByRole("button", { name: /close/i })).toBeFocused();
+      for (let step = 0; step < expectedStops; step += 1) await page.keyboard.press("Tab");
+      await expect(dialog.getByRole("button", { name: /close/i })).toBeFocused();
+    });
+  });
+}
+
+test("a case without approved media keeps its text-only drawer", async ({ page }) => {
+  test.skip(!textOnlyCase, "every case has media");
+  const dialog = await openCase(page, "en", textOnlyCase!.title);
+  await expect(dialog.locator("figure")).toHaveCount(0);
+  await expect(dialog.locator(".case-drawer__summary")).toHaveText(textOnlyCase!.summary);
 });
