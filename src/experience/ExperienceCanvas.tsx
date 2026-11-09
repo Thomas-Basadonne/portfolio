@@ -1,6 +1,7 @@
-import { Suspense, useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { experienceStore } from "../lib/experienceStore";
+import { experienceStore, type RenderQuality } from "../lib/experienceStore";
+import { capabilityQuality, createFrameMonitor, QUALITY_TIERS } from "../lib/qualityPolicy";
 import { reportClientError } from "../lib/reportClientError";
 import { NeutralToneMapping, SRGBColorSpace } from "three";
 import { CompilerMachine } from "./CompilerMachine";
@@ -15,14 +16,14 @@ type NavigatorCapabilities = Navigator & {
   connection?: { saveData?: boolean };
 };
 
-function initialQuality(): "low" | "high" {
+function deviceQuality(): RenderQuality {
   const capabilities = navigator as NavigatorCapabilities;
-  const constrained =
-    window.matchMedia("(max-width: 760px)").matches ||
-    capabilities.connection?.saveData === true ||
-    (capabilities.deviceMemory !== undefined && capabilities.deviceMemory <= 4) ||
-    navigator.hardwareConcurrency <= 4;
-  return constrained ? "low" : "high";
+  return capabilityQuality({
+    narrowViewport: window.matchMedia("(max-width: 760px)").matches,
+    saveData: capabilities.connection?.saveData === true,
+    deviceMemory: capabilities.deviceMemory,
+    hardwareConcurrency: navigator.hardwareConcurrency,
+  });
 }
 
 function RenderBridge() {
@@ -44,56 +45,73 @@ function SceneLifecycle({
   onDecline,
   onReady,
 }: {
-  quality: "low" | "high";
+  quality: RenderQuality;
   onDecline: () => void;
   onReady: () => void;
 }) {
-  const slowFrames = useRef(0);
+  const monitor = useMemo(createFrameMonitor, []);
+  const lastFrame = useRef(0);
 
   useEffect(() => {
     onReady();
   }, [onReady]);
 
-  useFrame((_, delta) => {
+  // Every rendered frame counts, scrolling or not: a frame that takes 140 ms is slow even while the page is still.
+  // What is dropped is the gap that is not a frame time — after a pause, a hidden tab or a closed drawer.
+  useFrame(() => {
+    const now = performance.now();
+    const previous = lastFrame.current;
+    lastFrame.current = now;
     if (quality === "low") return;
-    slowFrames.current = delta > 0.04 ? slowFrames.current + 1 : Math.max(0, slowFrames.current - 1);
-    if (slowFrames.current >= 5) onDecline();
+    if (experienceStore.paused || previous === 0) monitor.reset();
+    else if (monitor.push(now - previous)) onDecline();
   });
 
   return null;
 }
 
 export function ExperienceCanvas({ onReady, onFailure }: ExperienceCanvasProps) {
-  const [quality, setQuality] = useState<"low" | "high">(initialQuality);
+  const [capable, setCapable] = useState<RenderQuality>(deviceQuality);
+  // A measured slowdown is final for the session: no upgrade, so no flapping between tiers (each switch
+  // rebuilds the environment and the model).
+  const [declined, setDeclined] = useState(false);
+  const quality: RenderQuality = declined ? "low" : capable;
+  const tier = QUALITY_TIERS[quality];
 
   useEffect(() => {
     const viewport = window.matchMedia("(max-width: 760px)");
-    const update = () => setQuality(initialQuality());
+    const update = () => setCapable(deviceQuality());
     viewport.addEventListener("change", update);
     return () => viewport.removeEventListener("change", update);
   }, []);
 
-  const applyQuality = (nextQuality: "low" | "high") => {
-    experienceStore.quality = nextQuality;
-    setQuality(nextQuality);
+  // One source of truth: the controller's cadence reads the store, the canvas reads this component's state.
+  useEffect(() => {
+    experienceStore.quality = quality;
     experienceStore.requestRender?.();
-  };
+  }, [quality]);
 
   return (
-    <div className="webgl-shell" aria-hidden="true">
+    <div className="webgl-shell" aria-hidden="true" data-quality={quality}>
       <Canvas
         camera={{ fov: 38, near: 0.1, far: 70, position: [0, 0, 7.1] }}
-        dpr={quality === "high" ? [1, 1.5] : [0.65, 1]}
+        dpr={[...tier.dpr]}
         frameloop="demand"
         gl={{
           alpha: true,
           toneMapping: NeutralToneMapping,
           toneMappingExposure: 1,
           outputColorSpace: SRGBColorSpace,
-          antialias: quality === "high",
-          powerPreference: quality === "high" ? "high-performance" : "default",
+          // Fixed when the context is created: a later downgrade keeps the antialiased buffer.
+          antialias: tier.antialias,
+          powerPreference: tier.powerPreference,
         }}
         onCreated={({ gl }) => {
+          // A shader that fails to link would otherwise leave an empty stage: hand over to the fallback.
+          gl.debug.onShaderError = () => {
+            reportClientError("visual", new Error("WebGL shader failed to compile"));
+            onFailure();
+          };
           gl.domElement.dataset.contextGuard = "ready";
           gl.domElement.addEventListener(
             "webglcontextlost",
@@ -109,7 +127,7 @@ export function ExperienceCanvas({ onReady, onFailure }: ExperienceCanvasProps) 
         <RenderBridge />
         <SceneLifecycle
           quality={quality}
-          onDecline={() => applyQuality("low")}
+          onDecline={() => setDeclined(true)}
           onReady={onReady}
         />
         <Suspense fallback={null}>

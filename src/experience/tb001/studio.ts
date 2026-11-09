@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import type { RenderQuality } from "../../lib/experienceStore";
+import { QUALITY_TIERS } from "../../lib/qualityPolicy";
 
 /** Reflection rig from the approved #18 v0.4 spike; no HDR, lights, background or post. */
 export function createStudioScene(quality: RenderQuality) {
@@ -70,7 +71,7 @@ export function createStudioEnvironment(renderer: THREE.WebGLRenderer, quality: 
   const studio = createStudioScene(quality);
   const generator = new THREE.PMREMGenerator(renderer);
   try {
-    return generator.fromScene(studio.scene, 0.04, 0.1, 100, { size: quality === "high" ? 256 : 128 });
+    return generator.fromScene(studio.scene, 0.04, 0.1, 100, { size: QUALITY_TIERS[quality].environmentSize });
   } finally {
     generator.dispose();
     studio.dispose();

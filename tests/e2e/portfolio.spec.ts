@@ -1,6 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 import { expectHudContrast, expectHudGeometry } from "./hud-contrast";
+import { MOTION_RATES } from "../../src/lib/motionPolicy";
 import { chapterRailFit, controlInventory, focusVisibility, midWordBreaks, typeInventory } from "./readability";
 
 async function bypassEntry(page: Page) {
@@ -473,6 +474,37 @@ test("visible idle renders until the user pauses animation", async ({ page }) =>
   expect(await draws()).toBe(pausedStart);
 });
 
+test("a constrained device renders in the low tier at the low cadence", async ({ page }) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, "hardwareConcurrency", { get: () => 4 });
+    const counter = { frames: 0 };
+    Reflect.set(window, "__frameProbe", counter);
+    // three clears the target once per rendered frame; counting it counts frames without assuming draw calls.
+    for (const kind of [window.WebGLRenderingContext, window.WebGL2RenderingContext]) {
+      if (!kind) continue;
+      const original = kind.prototype.clear;
+      kind.prototype.clear = function (this: WebGLRenderingContext, mask: number) {
+        counter.frames += 1;
+        return original.call(this, mask);
+      };
+    }
+  });
+  await bypassEntry(page);
+  await page.goto("/");
+  await requireWebGL(page);
+  const shell = page.locator(".webgl-shell");
+  await expect(shell.locator("canvas")).toHaveAttribute("data-context-guard", "ready");
+  await expect(shell).toHaveAttribute("data-quality", "low");
+  await page.waitForTimeout(1500);
+  const frames = () => page.evaluate(() => Number(Reflect.get(window, "__frameProbe").frames));
+  const start = await frames();
+  await page.waitForTimeout(2000);
+  const rendered = (await frames()) - start;
+  // The store used to keep the high cadence (30 fps idle) while the canvas drew the low tier.
+  expect(rendered).toBeGreaterThan(0);
+  expect(rendered).toBeLessThanOrEqual(MOTION_RATES.low.idle * 2 + 4);
+});
+
 const CHAPTERS = ["identity", "about", "capabilities", "work", "experience", "contact"] as const;
 
 test("one persistent stage holds the model while chapters alternate around it", async ({ page }) => {
@@ -586,6 +618,23 @@ test("WebGL context loss switches to the deterministic fallback", async ({ page,
     return Boolean(extension);
   });
   expect(contextLost).toBe(true);
+  await expect(page.getByText(/visual layer unavailable/i)).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1, name: /thomas basadonne/i })).toBeVisible();
+});
+
+test("a shader that fails to link switches to the deterministic fallback", async ({ page }) => {
+  await page.addInitScript(() => {
+    for (const kind of [window.WebGLRenderingContext, window.WebGL2RenderingContext]) {
+      if (!kind) continue;
+      const original = kind.prototype.getProgramParameter;
+      kind.prototype.getProgramParameter = function (this: WebGLRenderingContext, program: WebGLProgram, name: number) {
+        return name === this.LINK_STATUS ? false : original.call(this, program, name);
+      };
+    }
+  });
+  await bypassEntry(page);
+  await page.goto("/");
+  await requireWebGL(page);
   await expect(page.getByText(/visual layer unavailable/i)).toBeVisible();
   await expect(page.getByRole("heading", { level: 1, name: /thomas basadonne/i })).toBeVisible();
 });
