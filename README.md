@@ -59,3 +59,7 @@ Netlify serves immutable fingerprinted assets, a strict CSP and a custom 404. A 
 rate-limited function records only sanitized technical failures in Netlify function logs. It stores
 no cookies, query strings, form data or user identifiers. Deploys are immutable in Netlify: rollback
 by selecting the previous successful production deploy in the Netlify UI, or redeploying that commit.
+
+A Cloudflare Workers pilot runs the same site in parallel (`pnpm build:cloudflare`, `wrangler.jsonc`,
+`worker/`): headers are generated from `netlify.toml` and the error route shares `server/`. Status,
+verification and rollback are in `docs/HOSTING.md`.

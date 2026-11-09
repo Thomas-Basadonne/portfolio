@@ -1,7 +1,10 @@
 import { defineConfig, devices } from "@playwright/test";
 
 const port = Number(process.env.PORTFOLIO_TEST_PORT ?? 4173);
-const baseURL = `http://127.0.0.1:${port}`;
+// Set to test an already running host (e.g. `wrangler dev` or a workers.dev preview) instead of
+// `vite preview`, which serves neither the CSP nor the API route.
+const externalURL = process.env.PORTFOLIO_TEST_BASE_URL;
+const baseURL = externalURL ?? `http://127.0.0.1:${port}`;
 
 export default defineConfig({
   testDir: "./tests/e2e",
@@ -21,10 +24,12 @@ export default defineConfig({
     { name: "firefox", use: { ...devices["Desktop Firefox"] } },
     { name: "webkit", use: { ...devices["Desktop Safari"] } },
   ],
-  webServer: {
-    command: `pnpm preview --host 127.0.0.1 --port ${port} --strictPort`,
-    url: baseURL,
-    reuseExistingServer: false,
-    timeout: 30_000,
-  },
+  webServer: externalURL
+    ? undefined
+    : {
+        command: `pnpm preview --host 127.0.0.1 --port ${port} --strictPort`,
+        url: baseURL,
+        reuseExistingServer: false,
+        timeout: 30_000,
+      },
 });
