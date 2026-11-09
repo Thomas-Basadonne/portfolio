@@ -871,6 +871,8 @@ const textOnlyCase = portfolioContent.en.caseStudies.find((entry) => !entry.medi
 async function openCase(page: Page, locale: "en" | "it", title: string) {
   await bypassEntry(page);
   await page.goto(locale === "it" ? "/?lang=it#work" : "/#work");
+  // The page is prerendered: a click before hydration is silently dropped. The HUD only exists once React runs.
+  await expect(page.locator(".hud__readout")).toBeVisible();
   await page.getByRole("button", { name: new RegExp(title, "i") }).click();
   const dialog = page.getByRole("dialog", { name: title });
   await expect(dialog).toBeVisible();
