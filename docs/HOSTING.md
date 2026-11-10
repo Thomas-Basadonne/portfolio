@@ -56,6 +56,25 @@ WebKit is only meaningful over real HTTPS: locally, `upgrade-insecure-requests` 
 The e2e suite is green in CI (Linux); local macOS runs have known failures on every host, so compare sets of
 failing tests in the same environment, not counts.
 
+Against any host that serves the real CSP, the 16 composited-contrast tests (`tests/e2e/hud-contrast.ts`) fail on
+every browser: they inject an inline `<style>` to hide the glyphs before capturing the background, `style-src 'self'`
+blocks it, and the text is measured against itself. They pass on `vite preview` (no CSP) and in CI. Exclude them
+with `--grep-invert "composited|HUD contact|HUD fallback"` when testing a live host, or treat them as expected.
+
+## Cut-over verification — 10 November 2026 (version `80cd8b54`, commit `87ba88f`)
+
+- `compare-hosts.mjs` against the last Netlify production deploy: same status and headers on every probed path;
+  the only difference is the CSP inline-script hash, expected because the JSON-LD URL changed.
+- `/_headers` is not served (404). `/api/client-error`: 204 for a valid report, 400 for invalid JSON and for
+  `null`; `GET` gets the 404 page with the CSP and `nosniff`.
+- e2e against `workers.dev`, Chromium and WebKit: 213 passed, 5 skipped, 32 failed = the 16 composited-contrast
+  tests above × 2 browsers. The same 16 fail on the previous Netlify production deploy (`dd6aadd`, via its deploy
+  permalink) and pass on `vite preview` of the same build: not caused by the host.
+- Rate limit from one IP (colo MXP): 11 sequential reports all 204; minutes later, 30 sequential all 204, then
+  60 concurrent → 30 × 204 and 30 × 429. The limiter enforces, but loosely and with delay: about 60 reports got
+  through in under a minute before the first 429 (the pilot saw the 429 at the 11th). Accepted for a log endpoint.
+- Old URL: every path and query on `netlify.app` answers 301 to the same path on `workers.dev`, which answers 200.
+
 ## Rollback
 
 - Bad Worker version: `pnpm exec wrangler rollback` (or the previous version in the dashboard). The Rate Limiting
