@@ -50,6 +50,7 @@ jobs:
           - { browser: firefox, shard: 1, total: 1 }
     env:
       PLAYWRIGHT_BLOB_OUTPUT_NAME: report-${{ matrix.browser }}-${{ matrix.shard }}.zip
+      PLAYWRIGHT_WORKERS: 3
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - uses: ./.github/actions/setup
