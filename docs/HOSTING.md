@@ -34,13 +34,29 @@ away: the largest file is under 1 MB.
 
 ## The old Netlify URL
 
-`https://thomas-basadonne-portfolio.netlify.app` is kept only so that existing links (LinkedIn, CV, shares) keep
-working: every path answers **301** to the same path on the canonical URL. The Netlify site has builds stopped and
-no longer reads this repository; its only deploy is a redirect stub published by hand with this `_redirects`:
+`https://thomas-basadonne-portfolio.netlify.app` was the public and canonical URL from 17 July to 10 November 2026.
+It now only answers **301** to the same path and query on the canonical URL. The Netlify site (`cc38b57c-…`) still has
+the repository linked in its settings, but with **builds stopped** (`build_settings.stop_builds`): a push to `main`
+builds nothing there. Its only live deploy is a redirect stub published by hand with this `_redirects`:
 
 ```text
 /*  https://thomas-basadonne-portfolio.thomasbasadonne.workers.dev/:splat  301!
 ```
+
+Who may still hold the old URL (checked 10 November 2026):
+
+| Place | Status |
+|---|---|
+| GitHub profile `website` | moved to the canonical URL |
+| `portfolio` repository homepage | moved to the canonical URL |
+| Code on GitHub (code search) | only this repository's docs and audits |
+| CV (`docs/Profile.pdf`, LinkedIn-generated, untracked) | no portfolio link at all |
+| Search engines | one web search found no indexed page; Search Console is not set up, so not proven |
+| LinkedIn `website` field, messages, applications, shares | not verifiable from here |
+
+The stub is free and has a second job: deleting the Netlify site releases the `thomas-basadonne-portfolio`
+subdomain, which anyone could then claim and serve under the old links. Delete it only after LinkedIn and any
+application in flight point to the canonical URL.
 
 ## Verifying a deploy
 
