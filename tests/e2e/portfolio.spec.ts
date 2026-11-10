@@ -576,7 +576,8 @@ test("the scene canvas keeps its size and place while the story scrolls", async 
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/#work");
   await requireWebGL(page);
-  await expect(page.locator(".scene-staged")).toHaveAttribute("data-visual-ready", "");
+  // Generous: software WebGL on CI can take longer than the default 5s to compile the scene.
+  await expect(page.locator(".scene-staged")).toHaveAttribute("data-visual-ready", "", { timeout: 20_000 });
   const state = () => page.locator(".webgl-shell canvas").evaluate((element: HTMLCanvasElement) => {
     const box = element.getBoundingClientRect();
     return { width: element.width, height: element.height, left: Math.round(box.left), top: Math.round(box.top) };
@@ -614,7 +615,8 @@ test("the visual layer arriving does not shift the reading layout", async ({ pag
     Math.round(document.getElementById(id)!.getBoundingClientRect().top + scrollY)));
   const before = await positions();
   await expect(page.locator(".webgl-shell canvas")).toHaveAttribute("data-context-guard", "ready");
-  await expect(page.locator(".scene-staged")).toHaveAttribute("data-visual-ready", "");
+  // Generous: software WebGL on CI can take longer than the default 5s to compile the scene.
+  await expect(page.locator(".scene-staged")).toHaveAttribute("data-visual-ready", "", { timeout: 20_000 });
   expect(await positions()).toEqual(before);
 });
 
