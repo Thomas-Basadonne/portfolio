@@ -15,6 +15,30 @@ export type Capability = {
   proof: string;
 };
 
+export type CaseMediaVariant = {
+  /** Site-root path under /case-media/. */
+  src: string;
+  /** Intrinsic width in CSS pixels of this rendition. */
+  width: number;
+};
+
+/**
+ * One piece of visual evidence for a case study. Only static, locally served images are supported.
+ */
+export type CaseMedia = {
+  /** Largest rendition; its width/height reserve the layout box before the file loads. */
+  src: string;
+  width: number;
+  height: number;
+  /** Smaller renditions (strictly narrower than `width`) for responsive loading. */
+  variants?: CaseMediaVariant[];
+  /** What the image shows, for people who cannot see it. */
+  alt: string;
+  caption: string;
+  /** Where the capture comes from and whether the data shown is real or synthetic. */
+  provenance: string;
+};
+
 export type CaseStudy = {
   id: string;
   code: string;
@@ -32,6 +56,8 @@ export type CaseStudy = {
   outcome: string;
   links: ExternalLink[];
   evidence: string;
+  /** Visual evidence, lead image first. Optional: cases without approved assets stay text-only. */
+  media?: CaseMedia[];
 };
 
 export type ListItem = {
@@ -97,6 +123,7 @@ export type PortfolioContent = {
     drawerTechnologies: string;
     drawerOutcome: string;
     drawerLinks: string;
+    drawerMediaOpen: string;
     opensNewTab: string;
     footerNote: string;
   };
@@ -204,6 +231,7 @@ const en: PortfolioContent = {
     drawerTechnologies: "Technologies",
     drawerOutcome: "Outcome",
     drawerLinks: "Links",
+    drawerMediaOpen: "View full size",
     opensNewTab: "(opens in a new tab)",
     footerNote: "Designed as one continuous instrument",
   },
@@ -327,7 +355,45 @@ const en: PortfolioContent = {
       outcome:
         "Seven tagged releases in two weeks, CI quality gates, an extensive test suite, decision records and a one-click macOS launcher.",
       links: [],
-      evidence: "Evidence boundary: the repository is private and real screenshots would expose client code.",
+      evidence: "Evidence boundary: the repository is private; the screenshots come from a generated synthetic fixture, so no client code or data is shown.",
+      media: [
+        {
+          src: "/case-media/project-twin/global-graph-1440.webp",
+          width: 1440,
+          height: 900,
+          variants: [{ src: "/case-media/project-twin/global-graph-720.webp", width: 720 }],
+          alt:
+            "Project Twin Explorer in the global graph view: 121 module groups, 6,931 symbols and 17,261 relations drawn as a force-directed network, with a ranked list of modules on the right. The interface is in Italian and read-only.",
+          caption:
+            "The whole graph at a glance: symbols grouped by module path, relations aggregated between groups. 6,931 symbols is the size of the generated fixture, not of any client project.",
+          provenance:
+            "Real screenshot of the production build running on a generated Magento-shaped fixture (invented names; no client code or data). The interface is in Italian.",
+        },
+        {
+          src: "/case-media/project-twin/group-selection-1440.webp",
+          width: 1440,
+          height: 900,
+          variants: [{ src: "/case-media/project-twin/group-selection-720.webp", width: 720 }],
+          alt:
+            "The same view with the module group Acme / Quote selected: its 70 symbols are drawn individually, the other 73 boundary groups collapse into small aggregates, and an inspector lists the symbols by number of relations.",
+          caption:
+            "Selecting a group opens it up: its symbols are drawn and ranked, while everything else stays aggregated so the picture remains readable.",
+          provenance:
+            "Real screenshot of the production build running on a generated Magento-shaped fixture (invented names; no client code or data). The interface is in Italian.",
+        },
+        {
+          src: "/case-media/project-twin/local-map-1440.webp",
+          width: 1440,
+          height: 900,
+          variants: [{ src: "/case-media/project-twin/local-map-720.webp", width: 720 }],
+          alt:
+            "Local map of the CheckoutController class in the same fixture: a plugin decorates it, it extends an external framework class, calls two services and dispatches the sales_order_place_after event.",
+          caption:
+            "One symbol up close: declared relations in both directions, with the nodes the current view hides counted in the status line.",
+          provenance:
+            "Real screenshot of the production build running on a generated Magento-shaped fixture (invented names; no client code or data). The interface is in Italian.",
+        },
+      ],
     },
     {
       id: "privacy-guard",
@@ -351,7 +417,45 @@ const en: PortfolioContent = {
       technologies: technologies.privacyGuard,
       outcome: "Private beta. The desktop release and its core repositories are not public yet.",
       links: [],
-      evidence: "Evidence boundary: shared ownership; no download or open-source claim until the release is public.",
+      evidence: "Evidence boundary: shared ownership; no download or open-source claim until the release is public. The screenshots show the public product website, not the app.",
+      media: [
+        {
+          src: "/case-media/privacy-guard/demo-1440.webp",
+          width: 1440,
+          height: 713,
+          variants: [{ src: "/case-media/privacy-guard/demo-720.webp", width: 720 }],
+          alt:
+            "Section “Paste messy text. Get safe output.” of the Privacy Guard website: a terminal-style demo with a sample sentence on the left and the same sentence on the right, where a name, email, SSN, phone number, URL and card number are replaced by [NAME], [EMAIL], [SSN], [PHONE], [URL] and [CARD] placeholders.",
+          caption:
+            "The website's demo: a sample sentence in, placeholders out. It illustrates the output; detection runs in the desktop app, not on the page.",
+          provenance:
+            "Real screenshot of the product website, not of the app, captured on 9 November 2026. The demo on the page runs on sample data, as the page states.",
+        },
+        {
+          src: "/case-media/privacy-guard/edit-mode-1440.webp",
+          width: 1440,
+          height: 901,
+          variants: [{ src: "/case-media/privacy-guard/edit-mode-720.webp", width: 720 }],
+          alt:
+            "Section “AI finds it. You stay in control.” of the website: a document view of contract-draft.docx in edit mode with detected entities shown as clickable placeholders, a three-step explanation of the review flow and export buttons.",
+          caption:
+            "Review before export: detections can be revealed, restored or added by hand. The window on the site illustrates that flow.",
+          provenance:
+            "Real screenshot of the product website, not of the app, captured on 9 November 2026. The document shown is an illustrative sample.",
+        },
+        {
+          src: "/case-media/privacy-guard/architecture-1440.webp",
+          width: 1440,
+          height: 901,
+          variants: [{ src: "/case-media/privacy-guard/architecture-720.webp", width: 720 }],
+          alt:
+            "Section “Built local-first, top to bottom” of the website: four cards (a React UI on Tauri, a Rust backend with Axum and SQLite, a local AI model for PII detection and a Rust regex fallback) linked by labels for Tauri IPC, stdin/stdout JSON and fallback.",
+          caption:
+            "The architecture as the website presents it: UI, Rust core, local model, and a deterministic fallback when the model is unavailable.",
+          provenance:
+            "Real screenshot of the product website, not of the app, captured on 9 November 2026. It shows the architecture as the website describes it.",
+        },
+      ],
     },
     {
       id: "la-fetuseria",
@@ -376,7 +480,45 @@ const en: PortfolioContent = {
       outcome:
         "In field test with the owner. Row-level security is tested in SQL, and every change passes lint, typecheck, tests and build in CI.",
       links: [],
-      evidence: "Evidence boundary: the app holds real customer data, so it is not publicly linked.",
+      evidence: "Evidence boundary: the app holds real customer data, so it is not publicly linked; the screenshots show only the public showcase site.",
+      media: [
+        {
+          src: "/case-media/la-fetuseria/home-hero-1440.webp",
+          width: 1440,
+          height: 1000,
+          variants: [{ src: "/case-media/la-fetuseria/home-hero-720.webp", width: 720 }],
+          alt:
+            "Home page of the La Fetuseria showcase site: the headline “Accolti e coccolati come a casa” (welcomed and pampered like at home), an event banner for a Social Dinner on 20 November, a garden photo in a house-shaped frame and the buttons Book a table and The rooms.",
+          caption:
+            "The guest-facing site: house-shaped photo frames, a headline you can drag, an events banner. Visitors can only send requests; the agenda behind it is a separate app.",
+          provenance:
+            "Real screenshot of the public showcase site, captured on 9 November 2026 from a local build of the repository (commit d5c38cb, which added the dogs, reviews and Instagram sections). The Vercel preview is behind a login and was not used. The management app is not shown.",
+        },
+        {
+          src: "/case-media/la-fetuseria/kitchen-1440.webp",
+          width: 1440,
+          height: 1000,
+          variants: [{ src: "/case-media/la-fetuseria/kitchen-720.webp", width: 720 }],
+          alt:
+            "Kitchen section: the headline “Cucina lucana” (Lucanian cuisine), a dining-room photo in a house-shaped frame and a card titled “Oggi in cucina” listing the day's menu.",
+          caption:
+            "The kitchen section: handmade pasta from Basilicata and the menu of the day on a card.",
+          provenance:
+            "Real screenshot of the public showcase site, captured on 9 November 2026 from a local build of the repository (commit d5c38cb, which added the dogs, reviews and Instagram sections). The Vercel preview is behind a login and was not used. The management app is not shown.",
+        },
+        {
+          src: "/case-media/la-fetuseria/garden-1440.webp",
+          width: 1440,
+          height: 1000,
+          variants: [{ src: "/case-media/la-fetuseria/garden-720.webp", width: 720 }],
+          alt:
+            "Garden section: the headline “Fuori si sta bene” (it's good outside), photos of the olive grove and the pool in house-shaped frames, and the events list starting with a Social Dinner on Friday 20 November.",
+          caption:
+            "Garden, pool and the list of events, in the same hand-made visual language as the rest of the site.",
+          provenance:
+            "Real screenshot of the public showcase site, captured on 9 November 2026 from a local build of the repository (commit d5c38cb, which added the dogs, reviews and Instagram sections). The Vercel preview is behind a login and was not used. The management app is not shown.",
+        },
+      ],
     },
     {
       id: "promptify",
@@ -400,6 +542,32 @@ const en: PortfolioContent = {
         "Public repository, installable through Raycast's developer mode. The Store submission was closed without review, so it is not listed there.",
       links: [{ label: "Source on GitHub", href: links.promptify }],
       evidence: "Evidence boundary: everything described here is inspectable in the public repository.",
+      media: [
+        {
+          src: "/case-media/promptify/enhanced-prompt-1300.webp",
+          width: 1300,
+          height: 800,
+          variants: [{ src: "/case-media/promptify/enhanced-prompt-700.webp", width: 700 }],
+          alt:
+            "Promptify inside Raycast showing an Enhanced Prompt: a 21-character input about a chef dog expanded to 699 characters and structured as Subject, Setting / Scene, Composition and Style & Medium, with the Image Generation preset.",
+          caption:
+            "Example with the Image Generation preset: a one-line idea becomes a structured prompt (subject, scene, composition) without leaving Raycast. It is one of several presets, not the only mode.",
+          provenance:
+            "Real screenshot of the extension running in Raycast, from the repository's store metadata. Sample text only.",
+        },
+        {
+          src: "/case-media/promptify/presets-list-1080.webp",
+          width: 1080,
+          height: 745,
+          variants: [{ src: "/case-media/promptify/presets-list-700.webp", width: 700 }],
+          alt:
+            "Promptify preset picker in Raycast listing three built-in presets, General Enhancement, Image Generation and Code & Technical, each with a short description.",
+          caption:
+            "Presets are the core of the extension: three ship built in (general, image, code), and you can create your own or import them as JSON.",
+          provenance:
+            "Real screenshot of the extension running in Raycast, from the repository's store metadata. Sample text only.",
+        },
+      ],
     },
   ],
   openSource: [
@@ -550,6 +718,7 @@ const it: PortfolioContent = {
     drawerTechnologies: "Tecnologie",
     drawerOutcome: "Risultato",
     drawerLinks: "Link",
+    drawerMediaOpen: "Apri a dimensione intera",
     opensNewTab: "(si apre in una nuova scheda)",
     footerNote: "Progettato come un unico strumento continuo",
   },
@@ -672,7 +841,45 @@ const it: PortfolioContent = {
       outcome:
         "Sette release taggate in due settimane, quality gate in CI, una suite di test ampia, decision record e un launcher macOS con un clic.",
       links: [],
-      evidence: "Limite delle prove: il repository è privato e screenshot reali esporrebbero codice cliente.",
+      evidence: "Limite delle prove: il repository è privato; gli screenshot vengono da una fixture sintetica generata, quindi nessun codice o dato cliente è mostrato.",
+      media: [
+        {
+          src: "/case-media/project-twin/global-graph-1440.webp",
+          width: 1440,
+          height: 900,
+          variants: [{ src: "/case-media/project-twin/global-graph-720.webp", width: 720 }],
+          alt:
+            "Explorer di Project Twin nella vista del grafo globale: 121 gruppi di moduli, 6.931 simboli e 17.261 relazioni disegnati come una rete a forze, con l'elenco ordinato dei moduli a destra. L'interfaccia è in italiano e in sola lettura.",
+          caption:
+            "Tutto il grafo a colpo d'occhio: simboli raggruppati per percorso di modulo, relazioni aggregate tra i gruppi. 6.931 simboli è la dimensione della fixture generata, non di un progetto cliente.",
+          provenance:
+            "Screenshot reale del build di produzione su una fixture generata in forma Magento (nomi inventati; nessun codice o dato cliente). L'interfaccia è in italiano.",
+        },
+        {
+          src: "/case-media/project-twin/group-selection-1440.webp",
+          width: 1440,
+          height: 900,
+          variants: [{ src: "/case-media/project-twin/group-selection-720.webp", width: 720 }],
+          alt:
+            "La stessa vista con il gruppo di moduli Acme / Quote selezionato: i suoi 70 simboli sono disegnati uno per uno, gli altri 73 gruppi di confine si riducono a piccoli aggregati e un inspector elenca i simboli per numero di relazioni.",
+          caption:
+            "Selezionare un gruppo lo apre: i suoi simboli sono disegnati e ordinati, mentre il resto resta aggregato e l'immagine rimane leggibile.",
+          provenance:
+            "Screenshot reale del build di produzione su una fixture generata in forma Magento (nomi inventati; nessun codice o dato cliente). L'interfaccia è in italiano.",
+        },
+        {
+          src: "/case-media/project-twin/local-map-1440.webp",
+          width: 1440,
+          height: 900,
+          variants: [{ src: "/case-media/project-twin/local-map-720.webp", width: 720 }],
+          alt:
+            "Mappa locale della classe CheckoutController nella stessa fixture: un plugin la decora, estende una classe esterna del framework, chiama due servizi e dispatcha l'evento sales_order_place_after.",
+          caption:
+            "Un simbolo da vicino: relazioni dichiarate in entrambe le direzioni, con i nodi che la vista corrente nasconde conteggiati nella riga di stato.",
+          provenance:
+            "Screenshot reale del build di produzione su una fixture generata in forma Magento (nomi inventati; nessun codice o dato cliente). L'interfaccia è in italiano.",
+        },
+      ],
     },
     {
       id: "privacy-guard",
@@ -696,7 +903,45 @@ const it: PortfolioContent = {
       technologies: technologies.privacyGuard,
       outcome: "Beta privata. La release desktop e i repository del core non sono ancora pubblici.",
       links: [],
-      evidence: "Limite delle prove: ownership condivisa; nessun download o claim open source finché la release non è pubblica.",
+      evidence: "Limite delle prove: ownership condivisa; nessun download o claim open source finché la release non è pubblica. Gli screenshot mostrano il sito pubblico del prodotto, non l'app.",
+      media: [
+        {
+          src: "/case-media/privacy-guard/demo-1440.webp",
+          width: 1440,
+          height: 713,
+          variants: [{ src: "/case-media/privacy-guard/demo-720.webp", width: 720 }],
+          alt:
+            "Sezione «Paste messy text. Get safe output.» del sito di Privacy Guard: una demo in stile terminale con una frase di esempio a sinistra e la stessa frase a destra, dove nome, email, SSN, telefono, URL e numero di carta sono sostituiti dai segnaposto [NAME], [EMAIL], [SSN], [PHONE], [URL] e [CARD].",
+          caption:
+            "La demo del sito: una frase di esempio in ingresso, segnaposto in uscita. Illustra il risultato; il rilevamento gira nell'app desktop, non nella pagina.",
+          provenance:
+            "Screenshot reale del sito del prodotto, non dell'app, catturato il 9 novembre 2026. La demo nella pagina usa dati di esempio, come dichiara la pagina stessa.",
+        },
+        {
+          src: "/case-media/privacy-guard/edit-mode-1440.webp",
+          width: 1440,
+          height: 901,
+          variants: [{ src: "/case-media/privacy-guard/edit-mode-720.webp", width: 720 }],
+          alt:
+            "Sezione «AI finds it. You stay in control.» del sito: la vista documento di contract-draft.docx in modalità modifica, con le entità rilevate come segnaposto cliccabili, la spiegazione in tre passi del flusso di revisione e i pulsanti di esportazione.",
+          caption:
+            "Rivedere prima di esportare: le rilevazioni si possono rivelare, ripristinare o aggiungere a mano. La finestra sul sito illustra quel flusso.",
+          provenance:
+            "Screenshot reale del sito del prodotto, non dell'app, catturato il 9 novembre 2026. Il documento mostrato è un esempio illustrativo.",
+        },
+        {
+          src: "/case-media/privacy-guard/architecture-1440.webp",
+          width: 1440,
+          height: 901,
+          variants: [{ src: "/case-media/privacy-guard/architecture-720.webp", width: 720 }],
+          alt:
+            "Sezione «Built local-first, top to bottom» del sito: quattro schede (UI React su Tauri, backend Rust con Axum e SQLite, modello AI locale per il rilevamento PII e fallback regex in Rust) collegate dalle etichette Tauri IPC, stdin/stdout JSON e fallback.",
+          caption:
+            "L'architettura come la presenta il sito: UI, core Rust, modello locale e un fallback deterministico quando il modello non è disponibile.",
+          provenance:
+            "Screenshot reale del sito del prodotto, non dell'app, catturato il 9 novembre 2026. Mostra l'architettura come la descrive il sito.",
+        },
+      ],
     },
     {
       id: "la-fetuseria",
@@ -721,7 +966,45 @@ const it: PortfolioContent = {
       outcome:
         "In prova sul campo con la titolare. La row-level security è testata in SQL e ogni modifica passa lint, typecheck, test e build in CI.",
       links: [],
-      evidence: "Limite delle prove: l'app contiene dati reali dei clienti, quindi non ha un link pubblico.",
+      evidence: "Limite delle prove: l'app contiene dati reali dei clienti, quindi non ha un link pubblico; gli screenshot mostrano solo il sito vetrina pubblico.",
+      media: [
+        {
+          src: "/case-media/la-fetuseria/home-hero-1440.webp",
+          width: 1440,
+          height: 1000,
+          variants: [{ src: "/case-media/la-fetuseria/home-hero-720.webp", width: 720 }],
+          alt:
+            "Home del sito vetrina di La Fetuseria: il titolo «Accolti e coccolati come a casa», un banner per la Social Dinner del 20 novembre, una foto del giardino in una cornice a forma di casa e i pulsanti Prenota un tavolo e Le camere.",
+          caption:
+            "Il sito per gli ospiti: cornici fotografiche a forma di casa, un titolo che si trascina, un banner degli eventi. I visitatori possono solo inviare richieste; l'agenda dietro è un'app separata.",
+          provenance:
+            "Screenshot reale del sito vetrina pubblico, catturato il 9 novembre 2026 da una build locale del repository (commit d5c38cb, che ha aggiunto le sezioni cani, recensioni e Instagram). La preview Vercel è protetta da login e non è stata usata. Il gestionale non è mostrato.",
+        },
+        {
+          src: "/case-media/la-fetuseria/kitchen-1440.webp",
+          width: 1440,
+          height: 1000,
+          variants: [{ src: "/case-media/la-fetuseria/kitchen-720.webp", width: 720 }],
+          alt:
+            "Sezione cucina: il titolo «Cucina lucana», una foto della sala in una cornice a forma di casa e una scheda «Oggi in cucina» con il menù del giorno.",
+          caption:
+            "La sezione cucina: pasta fatta a mano dalla Basilicata e il menù del giorno su una scheda.",
+          provenance:
+            "Screenshot reale del sito vetrina pubblico, catturato il 9 novembre 2026 da una build locale del repository (commit d5c38cb, che ha aggiunto le sezioni cani, recensioni e Instagram). La preview Vercel è protetta da login e non è stata usata. Il gestionale non è mostrato.",
+        },
+        {
+          src: "/case-media/la-fetuseria/garden-1440.webp",
+          width: 1440,
+          height: 1000,
+          variants: [{ src: "/case-media/la-fetuseria/garden-720.webp", width: 720 }],
+          alt:
+            "Sezione giardino: il titolo «Fuori si sta bene», foto dell'uliveto e della piscina in cornici a forma di casa e l'elenco degli eventi, che inizia con la Social Dinner di venerdì 20 novembre.",
+          caption:
+            "Giardino, piscina ed elenco degli eventi, nello stesso linguaggio visivo fatto a mano del resto del sito.",
+          provenance:
+            "Screenshot reale del sito vetrina pubblico, catturato il 9 novembre 2026 da una build locale del repository (commit d5c38cb, che ha aggiunto le sezioni cani, recensioni e Instagram). La preview Vercel è protetta da login e non è stata usata. Il gestionale non è mostrato.",
+        },
+      ],
     },
     {
       id: "promptify",
@@ -745,6 +1028,32 @@ const it: PortfolioContent = {
         "Repository pubblico, installabile tramite la developer mode di Raycast. La submission allo Store è stata chiusa senza revisione, quindi non è elencata lì.",
       links: [{ label: "Codice su GitHub", href: links.promptify }],
       evidence: "Limite delle prove: tutto ciò che è descritto qui è verificabile nel repository pubblico.",
+      media: [
+        {
+          src: "/case-media/promptify/enhanced-prompt-1300.webp",
+          width: 1300,
+          height: 800,
+          variants: [{ src: "/case-media/promptify/enhanced-prompt-700.webp", width: 700 }],
+          alt:
+            "Promptify dentro Raycast con un Enhanced Prompt: un input di 21 caratteri su un cane chef diventa un prompt di 699 caratteri, strutturato in Subject, Setting / Scene, Composition e Style & Medium, con il preset Image Generation.",
+          caption:
+            "Esempio con il preset Image Generation: un'idea di una riga diventa un prompt strutturato (soggetto, scena, composizione) senza uscire da Raycast. È uno dei preset disponibili, non l'unica modalità.",
+          provenance:
+            "Screenshot reale dell'estensione in esecuzione in Raycast, dai metadata dello store nel repository. Solo testo di esempio.",
+        },
+        {
+          src: "/case-media/promptify/presets-list-1080.webp",
+          width: 1080,
+          height: 745,
+          variants: [{ src: "/case-media/promptify/presets-list-700.webp", width: 700 }],
+          alt:
+            "Selettore dei preset di Promptify in Raycast con tre preset integrati, General Enhancement, Image Generation e Code & Technical, ciascuno con una breve descrizione.",
+          caption:
+            "I preset sono il cuore dell'estensione: tre sono integrati (generale, immagini, codice) e se ne possono creare di propri o importare da JSON.",
+          provenance:
+            "Screenshot reale dell'estensione in esecuzione in Raycast, dai metadata dello store nel repository. Solo testo di esempio.",
+        },
+      ],
     },
   ],
   openSource: [
