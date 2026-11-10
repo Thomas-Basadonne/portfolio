@@ -1152,6 +1152,27 @@ test("the promise breaks after its lead, never leaving one word behind", async (
   expect(ownLine).toBe(true);
 });
 
+test("the signal colour is kept for the action, not for navigation readouts", async ({ page }) => {
+  await bypassEntry(page);
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+  await expect(page.locator(".hud__readout")).toBeVisible();
+  const state = await page.evaluate(() => {
+    const probe = document.createElement("i");
+    probe.style.color = "var(--signal)";
+    document.body.append(probe);
+    const signal = getComputedStyle(probe).color;
+    probe.remove();
+    const active = document.querySelector(".chapter-nav a.is-active");
+    return {
+      cta: getComputedStyle(document.querySelector(".hero-actions a:first-child")!).backgroundColor === signal,
+      depth: getComputedStyle(document.querySelector(".hud__readout strong")!).color === signal,
+      activeChapter: active ? getComputedStyle(active, "::after").backgroundColor === signal : null,
+    };
+  });
+  expect(state).toEqual({ cta: true, depth: false, activeChapter: false });
+});
+
 /*
  * The name must fit its line. On phones the surname is right-aligned and the font size follows the viewport, so a
  * size that is a little too large pushes the word out to the LEFT and clips the first letters (seen between ~420px

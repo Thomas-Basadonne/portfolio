@@ -579,7 +579,7 @@ a {
 }
 
 .hud__readout strong {
-  color: var(--signal);
+  color: var(--bone);
   font-size: 1rem;
   font-weight: 400;
   letter-spacing: -0.08em;
@@ -652,7 +652,7 @@ a {
 
 .chapter-nav a.is-active::after {
   width: 1.6rem;
-  background: var(--signal);
+  background: var(--bone);
 }
 
 .hud__progress {
@@ -674,7 +674,7 @@ a {
 
 .hud__progress::-webkit-progress-value,
 .hud__progress::-moz-progress-bar {
-  background: var(--signal);
+  background: var(--bone);
 }
 
 /* Story */
@@ -1647,7 +1647,7 @@ a.contact-link:focus-visible {
 
   .chapter-nav a.is-active {
     color: var(--graphite);
-    background: var(--signal);
+    background: var(--bone);
   }
 
   .chapter-nav a.is-active:focus-visible {
@@ -1771,7 +1771,7 @@ a.contact-link:focus-visible {
 
   .chapter-nav a.is-active {
     color: var(--graphite);
-    background: var(--signal);
+    background: var(--bone);
   }
 
   .chapter-nav a.is-active:focus-visible {
