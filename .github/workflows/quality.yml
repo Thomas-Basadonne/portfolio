@@ -50,7 +50,9 @@ jobs:
           - { browser: firefox, shard: 1, total: 1 }
     env:
       PLAYWRIGHT_BLOB_OUTPUT_NAME: report-${{ matrix.browser }}-${{ matrix.shard }}.zip
-      PLAYWRIGHT_WORKERS: 3
+      # Measured in #55: three workers slowed webkit (154 s -> 230 s) and failed four WebGL timing
+      # tests; two is the setting. Change it only with a new measured run.
+      PLAYWRIGHT_WORKERS: 2
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - uses: ./.github/actions/setup
