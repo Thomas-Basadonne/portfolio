@@ -14,15 +14,15 @@ const withHeaders = (response) => {
 };
 
 // Only `/api/*` reaches this code (`run_worker_first` in wrangler.jsonc); everything else is served
-// as a static asset with the `_headers` rules. Netlify answers a non-POST on the function route with
-// the 404 page, so this Worker hands those requests back to the assets for the same result.
+// as a static asset with the `_headers` rules. A non-POST on the API route, or any other /api path,
+// goes back to the assets and gets the 404 page.
 export default {
   async fetch(request, env) {
     const { pathname } = new URL(request.url);
     if (pathname !== CLIENT_ERROR_PATH || request.method !== "POST") return env.ASSETS.fetch(request);
 
-    // Same key as Netlify (`aggregateBy: ["ip"]`). The binding is per Cloudflare location and
-    // approximate: it bounds abuse of a log endpoint, it is not an exact quota.
+    // Keyed by client IP. The binding is per Cloudflare location and approximate: it bounds abuse
+    // of a log endpoint, it is not an exact quota (accepted in #52).
     const ip = request.headers.get("cf-connecting-ip") ?? "unknown";
     const { success } = await env.CLIENT_ERROR_LIMITER.limit({ key: ip });
     if (!success) return withHeaders(new Response(null, { status: 429 }));

@@ -1,5 +1,5 @@
-// Shared by the Netlify function and the Cloudflare Worker while both hosts run in parallel:
-// one implementation keeps the redaction rules and response codes identical on each platform.
+// Request handler of /api/client-error, kept platform-neutral (standard Request/Response) so the
+// redaction rules and response codes are unit-tested without the Workers runtime.
 
 const scrub = (value, limit) =>
   String(value ?? "")

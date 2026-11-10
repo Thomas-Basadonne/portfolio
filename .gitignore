@@ -12,9 +12,6 @@ test-results/
 .env.*
 !.env.example
 
-# Local Netlify folder
-.netlify
-
 # Local Wrangler state
 .wrangler/
 .dev.vars

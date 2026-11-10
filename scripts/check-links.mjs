@@ -24,11 +24,13 @@ for (const required of ["canonical", "og:image", "twitter:card", "application/ld
   if (!html.includes(required)) throw new Error(`Required metadata is missing: ${required}`);
 }
 
-const csp = (await readFile(resolve("netlify.toml"), "utf8")).match(/Content-Security-Policy = "([^"]+)"/)?.[1] ?? "";
+// Read from dist/ on purpose: it proves public/_headers reached the deployed assets directory.
+const csp = (await readFile(resolve(dist, "_headers"), "utf8")).match(/Content-Security-Policy: (.+)/)?.[1] ?? "";
+if (!csp) throw new Error("dist/_headers has no Content-Security-Policy.");
 const inlineScripts = [...html.matchAll(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g)].map((match) => match[1]);
 for (const script of inlineScripts) {
   const hash = `sha256-${createHash("sha256").update(script).digest("base64")}`;
-  if (!csp.includes(`'${hash}'`)) throw new Error(`Inline script hash ${hash} is missing from the CSP in netlify.toml.`);
+  if (!csp.includes(`'${hash}'`)) throw new Error(`Inline script hash ${hash} is missing from the CSP in public/_headers.`);
 }
 
 console.log(

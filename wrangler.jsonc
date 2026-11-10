@@ -1,6 +1,5 @@
-// Cloudflare Workers (static assets + one API route). Netlify stays live in parallel until the
-// pilot (issue #52) is accepted. First deploy by hand with `wrangler deploy` (explicit approval);
-// Workers Builds from GitHub is connected only after that run is validated (docs/HOSTING.md).
+// Production host: Cloudflare Workers (static assets + one API route). Workers Builds deploys
+// `main` with `pnpm build:cloudflare` + `npx wrangler deploy`; see docs/HOSTING.md.
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "thomas-basadonne-portfolio",

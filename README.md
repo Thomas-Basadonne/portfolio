@@ -39,7 +39,7 @@ Copy rules: every claim must be traceable to a repository, a public profile or a
 co-developed work names its collaborators; client metrics are never published.
 
 `pnpm check:links` also verifies that every inline script in `dist/index.html` has its SHA-256 hash in
-the Content-Security-Policy of `netlify.toml`: edit the JSON-LD and the check tells you the new hash.
+the Content-Security-Policy of `public/_headers`: edit the JSON-LD and the check tells you the new hash.
 
 ## Architecture
 
@@ -55,11 +55,8 @@ and reduces render complexity on narrow or slower devices.
 
 ## Operations and privacy
 
-Netlify serves immutable fingerprinted assets, a strict CSP and a custom 404. A same-origin,
-rate-limited function records only sanitized technical failures in Netlify function logs. It stores
-no cookies, query strings, form data or user identifiers. Deploys are immutable in Netlify: rollback
-by selecting the previous successful production deploy in the Netlify UI, or redeploying that commit.
-
-A Cloudflare Workers pilot runs the same site in parallel (`pnpm build:cloudflare`, `wrangler.jsonc`,
-`worker/`): headers are generated from `netlify.toml` and the error route shares `server/`. Status,
-verification and rollback are in `docs/HOSTING.md`.
+The site runs on Cloudflare Workers (`wrangler.jsonc`): static assets with immutable fingerprinted
+files, a strict CSP and a custom 404, all from `public/_headers`. A same-origin, rate-limited Worker
+route (`worker/`, handler in `server/`) records only sanitized technical failures in Workers Logs. It
+stores no cookies, query strings, form data or user identifiers. Workers Builds deploys every push to
+`main`; build, verification and rollback (`wrangler rollback`) are in `docs/HOSTING.md`.

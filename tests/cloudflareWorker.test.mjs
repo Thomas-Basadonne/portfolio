@@ -1,3 +1,4 @@
+import { readFile } from "node:fs/promises";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import worker from "../worker/index.mjs";
 
@@ -16,7 +17,7 @@ const post = (body, ip = "203.0.113.7") =>
   });
 
 describe("cloudflare worker", () => {
-  it("records a valid report like the Netlify function, rate limited per IP", async () => {
+  it("records a valid report, rate limited per IP", async () => {
     vi.spyOn(console, "error").mockImplementation(() => undefined);
     const bindings = env();
     const response = await worker.fetch(post(JSON.stringify({ kind: "runtime", message: "x" })), bindings);
@@ -34,7 +35,13 @@ describe("cloudflare worker", () => {
     expect((await worker.fetch(post("{}"), limited)).status).toBe(429);
   });
 
-  it("hands non-POST and other /api paths back to the static assets (404 page, as on Netlify)", async () => {
+  it("binds the limiter at 10 reports per 60 s", async () => {
+    const config = await readFile("wrangler.jsonc", "utf8");
+    expect(config).toMatch(/"name":\s*"CLIENT_ERROR_LIMITER"/);
+    expect(config).toMatch(/"simple":\s*\{\s*"limit":\s*10,\s*"period":\s*60\s*\}/);
+  });
+
+  it("hands non-POST and other /api paths back to the static assets (404 page)", async () => {
     const bindings = env();
     await worker.fetch(new Request("https://portfolio.test/api/client-error"), bindings);
     await worker.fetch(new Request("https://portfolio.test/api/other", { method: "POST" }), bindings);

@@ -1,4 +1,4 @@
-// Compares two live hosts of the portfolio (e.g. Netlify and the workers.dev pilot).
+// Compares two live deployments of the portfolio (e.g. production and a Workers preview URL).
 // Usage: node scripts/compare-hosts.mjs <baseline-url> <candidate-url> [--rate-limit]
 // --rate-limit sends 11 synthetic error reports to the candidate only and expects 10 × 204, then 429.
 const [baseline, candidate] = process.argv.slice(2).filter((arg) => !arg.startsWith("--"));
@@ -18,7 +18,7 @@ const headers = [
   "x-frame-options",
   "cache-control",
 ];
-// Netlify drops the spaces after commas in Cache-Control: compare the values, not the formatting.
+// Some hosts drop the spaces after commas in Cache-Control: compare the values, not the formatting.
 const normalize = (name, value) => (value && name === "cache-control" ? value.replace(/,\s*/g, ",") : value);
 
 const read = async (base, path) => {
