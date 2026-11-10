@@ -109,6 +109,19 @@
     scroll-margin-top: var(--band-height);
   }
   .scene-staged[data-scene-layout] .identity-section { padding-top: 2rem; }
+  /*
+   * Portrait tablets: the section above is only as tall as its content, so the thesis and the scroll cue
+   * cannot hang from its bottom edge the way they do over a full-height section; they landed on the name.
+   * They follow the title in the flow instead, like in the side-by-side layout. Phones keep their own rules.
+   */
+  @media (min-width: 761px) {
+    .scene-staged[data-scene-layout] .hero-thesis {
+      position: static;
+      width: auto;
+      margin: clamp(2rem, 6vh, 4rem) 0 0;
+    }
+    .scene-staged[data-scene-layout] .scroll-cue { display: none; }
+  }
   /* Progressive enhancement: the root owns the inset (focus scrolling included) where :has() exists. */
   @supports selector(:has(*)) {
     :root:has(.scene-staged[data-scene-layout]) {
