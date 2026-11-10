@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://thomas-basadonne-portfolio.netlify.app/sitemap.xml
+Sitemap: https://thomas-basadonne-portfolio.thomasbasadonne.workers.dev/sitemap.xml
