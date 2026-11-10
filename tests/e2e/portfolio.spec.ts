@@ -1083,6 +1083,76 @@ for (const locale of ["en", "it"] as const) {
 }
 
 /*
+ * HOME-01 contract (#50), applied in #23: in the first viewport the visitor reads who (name), what (role), the
+ * promise, and reaches the primary CTA, without scrolling and without fixed chrome on top of them. Landscape phones
+ * of 375px and less are left out on purpose: ~290px of height cannot hold the hero, mobile direction is MOB-01 (#49).
+ */
+const FIRST_VIEWPORTS = [
+  { width: 1440, height: 900 }, { width: 1366, height: 768 }, { width: 1280, height: 720 }, { width: 1024, height: 500 },
+  { width: 2560, height: 1080 }, { width: 375, height: 812 }, { width: 390, height: 844 }, { width: 412, height: 915 },
+];
+
+async function firstViewProblems(page: Page) {
+  return page.evaluate(() => {
+    // On portrait screens the stage is an opaque band over the reading flow; side by side it sits behind the text.
+    const band = matchMedia("(max-width: 1080px) and (orientation: portrait)").matches ? ", .scene-stage" : "";
+    const chrome = [...document.querySelectorAll(`.chapter-nav, .hud__identity, .hud__tools, .motion-control${band}`)]
+      .filter((el) => getComputedStyle(el).display !== "none")
+      .map((el) => ({ name: el.className.split(" ")[0], rect: el.getBoundingClientRect() }));
+    const problems: string[] = [];
+    for (const [name, selector] of [
+      ["name", ".hero-title"], ["role", ".hero-thesis > p:first-child"], ["promise", ".hero-thesis h2"], ["cta", ".hero-actions a:first-child"],
+    ]) {
+      const rect = document.querySelector(selector)?.getBoundingClientRect();
+      if (!rect) { problems.push(`${name} missing`); continue; }
+      if (rect.top < 0 || rect.bottom > innerHeight) problems.push(`${name} outside the viewport (${Math.round(rect.top)}–${Math.round(rect.bottom)})`);
+      for (const other of chrome) {
+        const w = Math.min(rect.right, other.rect.right) - Math.max(rect.left, other.rect.left);
+        const h = Math.min(rect.bottom, other.rect.bottom) - Math.max(rect.top, other.rect.top);
+        if (w > 1 && h > 1) problems.push(`${name} under ${other.name} ${Math.round(w)}x${Math.round(h)}`);
+      }
+    }
+    return problems;
+  });
+}
+
+for (const locale of ["en", "it"] as const) {
+  for (const layout of ["staged", "fallback"] as const) {
+    test(`hero contract fits the first viewport: name, role, promise and CTA (${locale}, ${layout} layout)`, async ({ page }) => {
+      test.setTimeout(90_000);
+      if (layout === "fallback") await page.route(/ExperienceCanvas-.*\.js/, (route) => route.abort());
+      await bypassEntry(page);
+      await page.setViewportSize(FIRST_VIEWPORTS[0]);
+      await page.goto(locale === "it" ? "/?lang=it" : "/");
+      await page.evaluate(() => document.fonts.ready);
+      await settleHeroLayout(page, layout);
+
+      const failures: string[] = [];
+      for (const viewport of FIRST_VIEWPORTS) {
+        await page.setViewportSize(viewport);
+        await page.evaluate(() => window.scrollTo(0, 0));
+        const found = await firstViewProblems(page);
+        if (found.length) failures.push(`${viewport.width}x${viewport.height}: ${found.join("; ")}`);
+      }
+      expect(failures, `hero contract broken:\n${failures.join("\n")}`).toEqual([]);
+    });
+  }
+}
+
+test("the promise breaks after its lead, never leaving one word behind", async ({ page }) => {
+  await bypassEntry(page);
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+  await expect(page.locator(".hud__readout")).toBeVisible();
+  const ownLine = await page.evaluate(() => {
+    const h2 = document.querySelector(".hero-thesis h2")!.getBoundingClientRect();
+    const em = document.querySelector(".hero-thesis h2 em")!.getClientRects()[0];
+    return Math.abs(em.left - h2.left) < 2 && em.top > h2.top + 1;
+  });
+  expect(ownLine).toBe(true);
+});
+
+/*
  * The name must fit its line. On phones the surname is right-aligned and the font size follows the viewport, so a
  * size that is a little too large pushes the word out to the LEFT and clips the first letters (seen between ~420px
  * and ~580px: the word is ~5.2em wide and the old size was 20.5vw). Measured on the glyph run, not the box.

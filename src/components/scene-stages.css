@@ -68,9 +68,8 @@
   }
   .scene-staged[data-scene-layout] .story-section__content { width: 100%; }
   .scene-staged[data-scene-layout] .identity-section { min-height: 100svh; padding-bottom: 0; }
-  .scene-staged[data-scene-layout] .hero-title { font-size: clamp(3rem, 12.5cqi, 7.6rem); }
-  .scene-staged[data-scene-layout] .hero-thesis { position: static; width: auto; margin-top: clamp(2rem, 6vh, 4rem); }
-  .scene-staged[data-scene-layout] .hero-thesis h2 { font-size: clamp(2.4rem, 8.5cqi, 5.6rem); }
+  .scene-staged[data-scene-layout] .hero-title { font-size: clamp(1.9rem, 6.6cqi, 3.6rem); }
+  .scene-staged[data-scene-layout] .story-section .hero-thesis h2 { font-size: clamp(2.6rem, 11cqi, 6.4rem); }
   .scene-staged[data-scene-layout] .story-section h2 { font-size: clamp(2.4rem, 9.5cqi, 6.4rem); }
   .scene-staged[data-scene-layout] .story-section__content--contact h2 { font-size: clamp(2.6rem, 10.5cqi, 8rem); }
   .scene-staged[data-scene-layout] .contact-link { grid-template-columns: 6.5rem 1fr auto; }
@@ -108,18 +107,6 @@
     scroll-margin-top: var(--band-height);
   }
   .scene-staged[data-scene-layout] .identity-section { padding-top: 2rem; }
-  /*
-   * Portrait tablets: the section above is only as tall as its content, so the thesis cannot hang from its
-   * bottom edge the way it does over a full-height section; it landed on the name. It follows the title in the
-   * flow instead, like in the side-by-side layout. Phones keep their own rules.
-   */
-  @media (min-width: 761px) {
-    .scene-staged[data-scene-layout] .hero-thesis {
-      position: static;
-      width: auto;
-      margin: clamp(2rem, 6vh, 4rem) 0 0;
-    }
-  }
   /* Progressive enhancement: the root owns the inset (focus scrolling included) where :has() exists. */
   @supports selector(:has(*)) {
     :root:has(.scene-staged[data-scene-layout]) {

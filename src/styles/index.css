@@ -733,7 +733,7 @@ main {
 .identity-section {
   min-height: 112svh;
   align-items: stretch;
-  padding-top: clamp(8rem, 15vh, 11rem);
+  padding-top: clamp(6rem, 15vh, 11rem);
 }
 
 .hero-spec {
@@ -744,46 +744,48 @@ main {
   color: var(--bone-dim);
 }
 
+/*
+ * Hero hierarchy (#23, from HOME-01 #50): the name is one compact line, the role a readable line and the
+ * promise the headline. The text flows in one column, so name, role, promise and CTA share the first viewport.
+ */
 .hero-title {
   display: flex;
   margin: clamp(1rem, 3vh, 2.5rem) 0 0;
-  flex-direction: column;
-  /* 12.2vw: the surname still fits its column at 761px in the Arial-metric fallback face (~5.63em). */
-  font-size: clamp(4.8rem, 12.2vw, 13.5rem);
+  flex-flow: row wrap;
+  gap: 0 0.28em;
+  font-size: clamp(1.9rem, 3.6vw, 3.6rem);
   font-weight: 570;
-  letter-spacing: -0.09em;
-  line-height: 0.69;
+  letter-spacing: -0.06em;
+  line-height: 0.9;
   text-transform: uppercase;
-}
-
-.hero-title span:last-child {
-  align-self: flex-end;
-  color: transparent;
-  -webkit-text-stroke: 1.5px var(--bone);
 }
 
 .hero-thesis {
-  position: absolute;
-  right: clamp(4.5rem, 7vw, 7rem);
-  bottom: 6vh;
-  width: min(36rem, 42vw);
+  margin-top: clamp(1.25rem, 3.5vh, 2.25rem);
 }
 
-.hero-thesis > p {
-  margin: 0 0 1rem;
-  font-family: "DM Mono", monospace;
-  font-size: 0.75rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+.hero-thesis > p:first-child {
+  margin: 0 0 clamp(0.8rem, 2.2vh, 1.25rem);
+  font-size: clamp(1rem, 1.45vw, 1.35rem);
+  font-weight: 520;
+  letter-spacing: -0.02em;
 }
 
-.hero-thesis h2 {
-  max-width: 11ch;
+/* Above the generic chapter heading (.story-section h2 sets its own size and a 12ch measure). */
+.story-section .hero-thesis h2 {
+  max-width: none;
   margin: 0;
-  font-size: clamp(2.8rem, 5vw, 6rem);
+  /* Capped by the height too, so short windows keep the CTA in the first viewport. */
+  font-size: clamp(2.4rem, min(6vw, 9vh), 6.4rem);
   font-weight: 520;
   letter-spacing: -0.075em;
+  word-spacing: 0.08em;
   line-height: 0.89;
+}
+
+/* The emphasis is its own line: "Built to hold." / "Wired to wonder." never leaves one word behind. */
+.hero-thesis h2 em {
+  display: block;
 }
 
 .hero-thesis h2 em,
@@ -1258,22 +1260,12 @@ a.contact-link:focus-visible {
   white-space: nowrap;
 }
 
-@media (min-width: 761px) and (max-height: 820px) {
-  .hero-thesis {
-    position: static;
-    margin: clamp(1.5rem, 5vh, 3rem) 0 0 auto;
-  }
-}
-
-.hero-thesis > .hero-lede {
+.hero-lede {
   max-width: 36ch;
-  margin: 1.25rem 0 0;
+  margin: 0.9rem 0 0;
   color: var(--bone-dim);
-  font-family: inherit;
   font-size: clamp(0.92rem, 1.1vw, 1.08rem);
-  letter-spacing: 0;
   line-height: 1.5;
-  text-transform: none;
 }
 
 .hero-actions {
@@ -1832,35 +1824,22 @@ a.contact-link:focus-visible {
     width: 100%;
   }
 
-  .hero-spec {
-    flex-direction: column;
-    gap: 0.35rem;
-  }
-
+  /* Phones: tighter rhythm, so the Italian promise (three lines) still leaves the CTA above the dock. */
   .hero-title {
-    margin-top: 1.5rem;
-    /*
-     * The surname is right-aligned, so a size that is a little too large pushes it out to the left and clips the
-     * first letters. It is ~5.15em wide in Manrope but up to ~5.63em in the fallback face (Helvetica or Arial
-     * metrics), which font-display: optional keeps for the whole visit when the font is late; 5.7 fits both.
-     */
-    font-size: clamp(3rem, calc((100vw - 2 * var(--gutter)) / 5.7), 7rem);
-    line-height: 0.76;
-  }
-
-  .hero-title span:last-child {
-    margin-top: 0.12em;
+    margin-top: 1rem;
+    font-size: clamp(1.7rem, 7.8vw, 2.4rem);
   }
 
   .hero-thesis {
-    right: 0;
-    bottom: 5.5rem;
-    left: 0;
-    width: auto;
+    margin-top: 1rem;
   }
 
-  .hero-thesis h2 {
-    font-size: clamp(3rem, 14vw, 5rem);
+  .hero-thesis > p:first-child {
+    margin-bottom: 0.75rem;
+  }
+
+  .story-section .hero-thesis h2 {
+    font-size: clamp(2rem, 10vw, 3rem);
   }
 
   .reading-panel,
@@ -2051,17 +2030,9 @@ a.contact-link:focus-visible {
 
   .hero-title {
     margin-top: 0.8rem;
-    font-size: clamp(3.6rem, 12.5vw, 6.2rem);
-    line-height: 0.68;
-  }
-
-  .hero-title span:last-child {
-    align-self: flex-start;
-    margin-top: 0.12em;
   }
 
   .hero-thesis {
-    position: static;
     width: min(28rem, 76vw);
     margin-top: 2rem;
     padding-bottom: 5rem;
@@ -2071,7 +2042,7 @@ a.contact-link:focus-visible {
     margin-bottom: 0.45rem;
   }
 
-  .hero-thesis h2 {
+  .story-section .hero-thesis h2 {
     font-size: clamp(2.2rem, 8vw, 3.7rem);
   }
 
