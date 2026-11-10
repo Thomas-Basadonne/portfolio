@@ -4,6 +4,7 @@
 // `build:cloudflare`); once Netlify is retired, the rules can move to public/_headers.
 import { readFile, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
+import { pathToFileURL } from "node:url";
 
 // Cloudflare limits (Workers static assets): 100 rules, 2,000 characters per line.
 const MAX_RULES = 100;
@@ -13,10 +14,16 @@ export const netlifyHeadersToCloudflare = (toml) => {
   const blocks = toml.split(/^\[\[headers\]\]\s*$/m).slice(1);
   const rules = blocks.map((block) => {
     const path = block.match(/^\s*for\s*=\s*"([^"]+)"/m)?.[1];
-    const values = block.split(/^\s*\[headers\.values\]\s*$/m)[1] ?? "";
-    const headers = [...values.matchAll(/^\s*([A-Za-z0-9-]+)\s*=\s*"([^"]*)"\s*$/gm)].map(
-      ([, name, value]) => `${name}: ${value}`,
-    );
+    // A block ends at the next top-level table ([[redirects]], [build], ...).
+    const values = (block.split(/^\s*\[headers\.values\]\s*$/m)[1] ?? "").split(/^\s*\[(?!headers\.values\])/m)[0];
+    const headers = values
+      .split("\n")
+      .filter((line) => line.trim() !== "" && !line.trim().startsWith("#"))
+      .map((line) => {
+        const match = line.match(/^\s*([A-Za-z0-9-]+)\s*=\s*"([^"]*)"\s*$/);
+        if (!match) throw new Error(`Unreadable header line in [[headers]] for ${path}: ${line.trim()}`);
+        return `${match[1]}: ${match[2]}`;
+      });
     if (!path || headers.length === 0) throw new Error(`Unparseable [[headers]] block:\n${block}`);
     return { path, headers };
   });
@@ -28,7 +35,7 @@ export const netlifyHeadersToCloudflare = (toml) => {
   return { rules, text };
 };
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const { rules, text } = netlifyHeadersToCloudflare(await readFile(resolve("netlify.toml"), "utf8"));
   await writeFile(resolve("dist", "_headers"), text);
   console.log(`Wrote dist/_headers with ${rules.length} rules from netlify.toml.`);
