@@ -1,3 +1,4 @@
+import { readFile } from "node:fs/promises";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import handler, { config } from "../netlify/functions/client-error.mjs";
 
@@ -33,5 +34,19 @@ describe("client error function", () => {
       new Request("https://example.test/api/client-error", { method: "POST", body: "{" }),
     );
     expect(response.status).toBe(400);
+  });
+
+  it("rejects JSON that is not an object", async () => {
+    for (const body of ["null", "42", '"text"']) {
+      const response = await handler(new Request("https://example.test/api/client-error", { method: "POST", body }));
+      expect(response.status).toBe(400);
+    }
+  });
+
+  it("declares the route as a literal Netlify can read statically", async () => {
+    // Netlify parses `config` from the source without running it: an imported identifier is not
+    // read, and the function silently loses its route.
+    const source = await readFile("netlify/functions/client-error.mjs", "utf8");
+    expect(source).toMatch(/^\s*path:\s*"\/api\/client-error",\s*$/m);
   });
 });

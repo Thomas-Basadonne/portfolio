@@ -1,9 +1,10 @@
-import { CLIENT_ERROR_PATH, handleClientError } from "../../server/client-error.mjs";
+import { handleClientError } from "../../server/client-error.mjs";
 
 export default handleClientError;
 
 export const config = {
-  path: CLIENT_ERROR_PATH,
+  // Literal on purpose: Netlify reads this config statically and ignores imported identifiers.
+  path: "/api/client-error",
   method: "POST",
   rateLimit: {
     windowLimit: 10,

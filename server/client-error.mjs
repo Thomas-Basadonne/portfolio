@@ -18,6 +18,7 @@ export const handleClientError = async (request) => {
   } catch {
     return new Response(null, { status: 400 });
   }
+  if (typeof input !== "object" || input === null) return new Response(null, { status: 400 });
 
   const entry = {
     event: "portfolio-client-error",
