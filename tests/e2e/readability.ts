@@ -1,6 +1,6 @@
 import type { Page } from "@playwright/test";
 
-/** Informational labels, not the hidden loading text or decorative scroll-cue. */
+/** Informational labels, not the hidden loading text. */
 export const informativeLabels = [
   ".entry-sequence .mono-label", ".hud__identity small", ".hud__monogram", ".hud__readout", ".lang-switch button",
   ".chapter-nav a", ".hero-spec", ".hero-thesis > p:first-child", ".hero-actions a",

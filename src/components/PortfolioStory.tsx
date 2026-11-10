@@ -65,10 +65,6 @@ export function PortfolioStory({ content, onSelectCase, stageRef }: PortfolioSto
               <a href={contact.channels[0].href}>{ui.heroEmail}</a>
             </div>
           </div>
-          <div className="scroll-cue mono-label" aria-hidden="true">
-            <span>{ui.scrollCue}</span>
-            <i />
-          </div>
         </div>
       </section>
 

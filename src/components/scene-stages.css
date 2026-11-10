@@ -75,7 +75,6 @@
   .scene-staged[data-scene-layout] .story-section__content--contact h2 { font-size: clamp(2.6rem, 10.5cqi, 8rem); }
   .scene-staged[data-scene-layout] .contact-link { grid-template-columns: 6.5rem 1fr auto; }
   .scene-staged[data-scene-layout] .contact-link strong { font-size: clamp(1.2rem, 4.4cqi, 2.8rem); }
-  .scene-staged[data-scene-layout] .scroll-cue { display: none; }
   /* One control for the whole story, in the rail lane's bottom corner: never over text or the model. */
   .scene-staged[data-scene-layout] .motion-control { position: fixed; right: var(--gutter); bottom: var(--gutter); left: auto; }
 }
@@ -110,9 +109,9 @@
   }
   .scene-staged[data-scene-layout] .identity-section { padding-top: 2rem; }
   /*
-   * Portrait tablets: the section above is only as tall as its content, so the thesis and the scroll cue
-   * cannot hang from its bottom edge the way they do over a full-height section; they landed on the name.
-   * They follow the title in the flow instead, like in the side-by-side layout. Phones keep their own rules.
+   * Portrait tablets: the section above is only as tall as its content, so the thesis cannot hang from its
+   * bottom edge the way it does over a full-height section; it landed on the name. It follows the title in the
+   * flow instead, like in the side-by-side layout. Phones keep their own rules.
    */
   @media (min-width: 761px) {
     .scene-staged[data-scene-layout] .hero-thesis {
@@ -120,7 +119,6 @@
       width: auto;
       margin: clamp(2rem, 6vh, 4rem) 0 0;
     }
-    .scene-staged[data-scene-layout] .scroll-cue { display: none; }
   }
   /* Progressive enhancement: the root owns the inset (focus scrolling included) where :has() exists. */
   @supports selector(:has(*)) {

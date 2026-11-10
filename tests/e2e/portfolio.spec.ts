@@ -1037,7 +1037,6 @@ async function heroCollisions(page: Page) {
     add("thesis", ".hero-thesis h2");
     add("lede", ".hero-lede");
     add("action", ".hero-actions a");
-    add("cue", ".scroll-cue");
     add("hud-identity", ".hud__identity");
     add("hud-tools", ".hud__tools");
     add("rail", ".chapter-nav");
