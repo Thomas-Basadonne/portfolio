@@ -1140,7 +1140,8 @@ for (const locale of ["en", "it"] as const) {
 
 /*
  * font-display: optional keeps the fallback face for the whole visit when Manrope is late (a slow first visit), and
- * the surname is ~8% wider there. Block the font so the sizing is checked against that face too.
+ * the surname is up to ~9% wider there (Helvetica, or Arial metrics: Liberation Sans on Linux CI). Block the font so
+ * the sizing is checked against that face too.
  */
 for (const height of [700, 1180]) {
   test(`hero name is never clipped with the fallback font, 320–1080px x ${height}`, async ({ page }) => {

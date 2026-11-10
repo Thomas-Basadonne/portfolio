@@ -51,7 +51,8 @@
   --ease-mechanical: cubic-bezier(0.22, 1, 0.36, 1);
   color: var(--bone);
   background: var(--graphite);
-  font-family: "Manrope Variable", "Helvetica Neue", sans-serif;
+  /* Arial before the generic family: a late Manrope falls back to known metrics (Liberation Sans on Linux). */
+  font-family: "Manrope Variable", "Helvetica Neue", Arial, sans-serif;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -747,7 +748,8 @@ main {
   display: flex;
   margin: clamp(1rem, 3vh, 2.5rem) 0 0;
   flex-direction: column;
-  font-size: clamp(4.8rem, 12.4vw, 13.5rem);
+  /* 12.2vw: the surname still fits its column at 761px in the Arial-metric fallback face (~5.63em). */
+  font-size: clamp(4.8rem, 12.2vw, 13.5rem);
   font-weight: 570;
   letter-spacing: -0.09em;
   line-height: 0.69;
@@ -1873,8 +1875,8 @@ a.contact-link:focus-visible {
     margin-top: 1.5rem;
     /*
      * The surname is right-aligned, so a size that is a little too large pushes it out to the left and clips the
-     * first letters. It is ~5.15em wide in Manrope but ~5.56em in the fallback face, which font-display: optional
-     * keeps for the whole visit when the font is late; 5.7 fits both with a margin for a scrollbar.
+     * first letters. It is ~5.15em wide in Manrope but up to ~5.63em in the fallback face (Helvetica or Arial
+     * metrics), which font-display: optional keeps for the whole visit when the font is late; 5.7 fits both.
      */
     font-size: clamp(3rem, calc((100vw - 2 * var(--gutter)) / 5.7), 7rem);
     line-height: 0.76;
