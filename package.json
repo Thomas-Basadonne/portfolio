@@ -14,7 +14,7 @@
     "build:cloudflare": "VITE_COMMIT_REF=$WORKERS_CI_COMMIT_SHA pnpm build",
     "preview:cloudflare": "pnpm build:cloudflare && wrangler dev",
     "typecheck": "tsc -b --pretty false",
-    "lint": "oxlint --deny-warnings src tests scripts netlify worker server vite.config.ts vitest.config.ts playwright.config.ts",
+    "lint": "oxlint --deny-warnings src tests scripts worker server vite.config.ts vitest.config.ts playwright.config.ts",
     "test:unit": "vitest run --config vitest.config.ts",
     "test:e2e": "pnpm build && playwright test",
     "test:soak": "node scripts/soak.mjs",
