@@ -1872,10 +1872,11 @@ a.contact-link:focus-visible {
   .hero-title {
     margin-top: 1.5rem;
     /*
-     * The surname is ~5.2em wide and right-aligned, so a size that is a little too large pushes it out to the
-     * left and clips the first letters. 5.3 leaves a margin for font metrics and a scrollbar.
+     * The surname is right-aligned, so a size that is a little too large pushes it out to the left and clips the
+     * first letters. It is ~5.15em wide in Manrope but ~5.56em in the fallback face, which font-display: optional
+     * keeps for the whole visit when the font is late; 5.7 fits both with a margin for a scrollbar.
      */
-    font-size: clamp(3rem, calc((100vw - 2 * var(--gutter)) / 5.3), 7rem);
+    font-size: clamp(3rem, calc((100vw - 2 * var(--gutter)) / 5.7), 7rem);
     line-height: 0.76;
   }
 

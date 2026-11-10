@@ -1136,3 +1136,28 @@ for (const locale of ["en", "it"] as const) {
   }
 }
 
+/*
+ * font-display: optional keeps the fallback face for the whole visit when Manrope is late (a slow first visit), and
+ * the surname is ~8% wider there. Block the font so the sizing is checked against that face too.
+ */
+for (const height of [700, 1180]) {
+  test(`hero name is never clipped with the fallback font, 320–1080px x ${height}`, async ({ page }) => {
+    test.setTimeout(90_000);
+    await page.route(/manrope-.*\.woff2/, (route) => route.abort());
+    await page.route(/ExperienceCanvas-.*\.js/, (route) => route.abort());
+    await bypassEntry(page);
+    await page.setViewportSize({ width: 500, height });
+    await page.goto("/");
+    await settleHeroLayout(page, "fallback");
+    expect(await page.evaluate(() => document.fonts.check('570 16px "Manrope Variable"'))).toBe(false);
+
+    const failures: string[] = [];
+    for (const width of NAME_WIDTHS) {
+      await page.setViewportSize({ width, height });
+      await page.evaluate(() => window.scrollTo(0, 0));
+      const found = await nameClipping(page);
+      if (found.length) failures.push(`${width}x${height}: ${found.join("; ")}`);
+    }
+    expect(failures, `name clipped:\n${failures.join("\n")}`).toEqual([]);
+  });
+}
