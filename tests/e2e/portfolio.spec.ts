@@ -993,6 +993,25 @@ test("a case without approved media keeps its text-only drawer", async ({ page }
 });
 
 /*
+ * Waits until the hero shows the requested layout for good. "staged" waits for the scene to be ready: the staged
+ * attribute is already set while it loads, and a scene that then fails would silently swap the layout mid-test.
+ * Engines that cannot start WebGL here (headless Firefox on CI) skip the staged variant; fallback still runs.
+ */
+async function settleHeroLayout(page: Page, layout: "staged" | "fallback") {
+  const shell = page.locator(".scene-staged");
+  if (layout === "fallback") {
+    await expect(shell).not.toHaveAttribute("data-scene-layout", "");
+    return;
+  }
+  const phase = () =>
+    shell.evaluate((node) =>
+      node.hasAttribute("data-visual-ready") ? "ready" : node.hasAttribute("data-scene-layout") ? "loading" : "failed",
+    );
+  await expect.poll(phase, { timeout: 20_000 }).not.toBe("loading");
+  test.skip((await phase()) === "failed", "WebGL did not start in this engine, so there is no staged layout to measure.");
+}
+
+/*
  * Hero text blocks must never sit on top of each other. The bug this pins: in portrait windows between 761px
  * and 1080px the hero section is only as tall as the title, while the thesis and the scroll cue were still
  * absolutely anchored to its bottom, so they landed on the name. Landscape and short windows never showed it,
@@ -1041,13 +1060,13 @@ async function heroCollisions(page: Page) {
 for (const locale of ["en", "it"] as const) {
   for (const layout of ["staged", "fallback"] as const) {
     test(`hero text blocks never overlap, 761–1080px, both orientations (${locale}, ${layout} layout)`, async ({ page }) => {
+      test.setTimeout(90_000);
       if (layout === "fallback") await page.route(/ExperienceCanvas-.*\.js/, (route) => route.abort());
       await bypassEntry(page);
       await page.setViewportSize({ width: 800, height: 900 });
       await page.goto(locale === "it" ? "/?lang=it" : "/");
       await page.evaluate(() => document.fonts.ready);
-      if (layout === "staged") await expect(page.locator(".scene-staged")).toHaveAttribute("data-scene-layout", "");
-      else await expect(page.locator(".scene-staged")).not.toHaveAttribute("data-scene-layout", "");
+      await settleHeroLayout(page, layout);
 
       const failures: string[] = [];
       for (const viewport of HERO_VIEWPORTS) {
@@ -1092,26 +1111,28 @@ async function nameClipping(page: Page) {
 
 for (const locale of ["en", "it"] as const) {
   for (const layout of ["staged", "fallback"] as const) {
-    test(`hero name is never clipped, 320–1080px (${locale}, ${layout} layout)`, async ({ page }) => {
-      if (layout === "fallback") await page.route(/ExperienceCanvas-.*\.js/, (route) => route.abort());
-      await bypassEntry(page);
-      await page.setViewportSize({ width: 500, height: 900 });
-      await page.goto(locale === "it" ? "/?lang=it" : "/");
-      await page.evaluate(() => document.fonts.ready);
-      if (layout === "staged") await expect(page.locator(".scene-staged")).toHaveAttribute("data-scene-layout", "");
-      else await expect(page.locator(".scene-staged")).not.toHaveAttribute("data-scene-layout", "");
+    for (const height of [700, 1180]) {
+      test(`hero name is never clipped, 320–1080px x ${height} (${locale}, ${layout} layout)`, async ({ page }) => {
+        // Every resize re-renders the scene behind; on CI's software WebGL a full sweep needs more than the default.
+        test.setTimeout(90_000);
+        if (layout === "fallback") await page.route(/ExperienceCanvas-.*\.js/, (route) => route.abort());
+        await bypassEntry(page);
+        await page.setViewportSize({ width: 500, height: 900 });
+        await page.goto(locale === "it" ? "/?lang=it" : "/");
+        await page.evaluate(() => document.fonts.ready);
+        await settleHeroLayout(page, layout);
 
-      const failures: string[] = [];
-      // Portrait and landscape both: the surname is aligned differently in each.
-      for (const height of [700, 1180]) {
+        const failures: string[] = [];
+        // Portrait and landscape both (one test each): the surname is aligned differently in each.
         for (const width of NAME_WIDTHS) {
           await page.setViewportSize({ width, height });
           await page.evaluate(() => window.scrollTo(0, 0));
           const found = await nameClipping(page);
           if (found.length) failures.push(`${width}x${height}: ${found.join("; ")}`);
         }
-      }
-      expect(failures, `name clipped:\n${failures.join("\n")}`).toEqual([]);
-    });
+        expect(failures, `name clipped:\n${failures.join("\n")}`).toEqual([]);
+      });
+    }
   }
 }
+
