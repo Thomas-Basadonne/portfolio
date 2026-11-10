@@ -1,0 +1,24 @@
+// Cloudflare Workers (static assets + one API route). Netlify stays live in parallel until the
+// pilot (issue #52) is accepted. First deploy by hand with `wrangler deploy` (explicit approval);
+// Workers Builds from GitHub is connected only after that run is validated (docs/HOSTING.md).
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "thomas-basadonne-portfolio",
+  "main": "worker/index.mjs",
+  "compatibility_date": "2026-11-09",
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "not_found_handling": "404-page",
+    "run_worker_first": ["/api/*"]
+  },
+  "ratelimits": [
+    {
+      "name": "CLIENT_ERROR_LIMITER",
+      "namespace_id": "1001",
+      "simple": { "limit": 10, "period": 60 }
+    }
+  ],
+  "observability": { "enabled": true },
+  "preview_urls": true
+}

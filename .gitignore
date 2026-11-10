@@ -14,3 +14,7 @@ test-results/
 
 # Local Netlify folder
 .netlify
+
+# Local Wrangler state
+.wrangler/
+.dev.vars
