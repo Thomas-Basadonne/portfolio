@@ -1518,7 +1518,12 @@ a.contact-link:focus-visible {
   display: block;
   width: 100%;
   height: auto;
-  border: 1px solid var(--line-dark);
+  /*
+   * Outline, not border: a border sits inside the ratio box, and Firefox sizes a not-yet-loaded image from its
+   * width/height attributes differently than a loaded one, so wide images moved by ~1px when the file arrived.
+   */
+  outline: 1px solid var(--line-dark);
+  outline-offset: -1px;
   background: var(--graphite);
 }
 
