@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import type { CaseStudy, PortfolioContent } from "../content/portfolio";
+import { CaseMediaGallery } from "./CaseMediaFigure";
 
 type CaseStudyDrawerProps = {
   caseStudy: CaseStudy | null;
@@ -40,13 +41,14 @@ export function CaseStudyDrawer({ caseStudy, ui, onClose }: CaseStudyDrawerProps
       const last = focusable.at(-1);
       if (!first || !last) return;
 
-      if (event.shiftKey && document.activeElement === first) {
-        event.preventDefault();
-        last.focus();
-      } else if (!event.shiftKey && document.activeElement === last) {
-        event.preventDefault();
-        first.focus();
-      }
+      // Move focus ourselves instead of trusting native tabbing: Safari skips links by default,
+      // so relying on it would let focus leave the dialog whenever a link is the last stop.
+      const index = focusable.indexOf(document.activeElement as HTMLElement);
+      const next = event.shiftKey
+        ? (focusable[index - 1] ?? last)
+        : (focusable[index + 1] ?? first);
+      event.preventDefault();
+      next.focus();
     };
     window.addEventListener("keydown", onKeyDown);
 
@@ -88,6 +90,8 @@ export function CaseStudyDrawer({ caseStudy, ui, onClose }: CaseStudyDrawerProps
         </div>
 
         <p className="case-drawer__summary">{caseStudy.summary}</p>
+
+        {caseStudy.media && <CaseMediaGallery key={caseStudy.id} items={caseStudy.media} ui={ui} />}
 
         <dl className="case-drawer__fields">
           <DataField label={ui.drawerContext} value={caseStudy.context} />
