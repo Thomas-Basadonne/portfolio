@@ -38,7 +38,7 @@ jobs:
     name: e2e ${{ matrix.browser }} ${{ matrix.shard }}/${{ matrix.total }}
     needs: static
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
     strategy:
       fail-fast: false
       matrix:
@@ -63,8 +63,11 @@ jobs:
         with:
           path: ~/.cache/ms-playwright
           key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}-${{ matrix.browser }}
+      # WebKit pulls over 110 system packages from the Azure apt mirror: measured 25-424 s on success and
+      # two cancellations at the old 8-minute cap on 10/11/2026. 15 minutes still stops a stuck
+      # mirror long before the 25-minute hang this cap was introduced for.
       - run: pnpm exec playwright install --with-deps ${{ matrix.browser }}
-        timeout-minutes: 8
+        timeout-minutes: 15
       # The exact build the static gates certified: e2e never rebuilds.
       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
