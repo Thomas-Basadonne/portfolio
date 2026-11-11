@@ -68,8 +68,8 @@
   }
   .scene-staged[data-scene-layout] .story-section__content { width: 100%; }
   .scene-staged[data-scene-layout] .identity-section { min-height: 100svh; padding-bottom: 0; }
-  .scene-staged[data-scene-layout] .hero-title { font-size: clamp(1.9rem, 6.6cqi, 3.6rem); }
-  .scene-staged[data-scene-layout] .story-section .hero-thesis h2 { font-size: clamp(2.6rem, 11cqi, 6.4rem); }
+  .scene-staged[data-scene-layout] .hero-title { font-size: clamp(2.6rem, min(15cqi, 12vh), 9rem); }
+  .scene-staged[data-scene-layout] .story-section .hero-thesis h2 { font-size: clamp(1.9rem, 5.6cqi, 3.8rem); }
   .scene-staged[data-scene-layout] .story-section h2 { font-size: clamp(2.4rem, 9.5cqi, 6.4rem); }
   .scene-staged[data-scene-layout] .story-section__content--contact h2 { font-size: clamp(2.6rem, 10.5cqi, 8rem); }
   .scene-staged[data-scene-layout] .contact-link { grid-template-columns: 6.5rem 1fr auto; }

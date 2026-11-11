@@ -745,23 +745,23 @@ main {
 }
 
 /*
- * Hero hierarchy (#23, from HOME-01 #50): the name is one compact line, the role a readable line and the
- * promise the headline. The text flows in one column, so name, role, promise and CTA share the first viewport.
+ * Hero hierarchy (#23, from HOME-01 #50): the name leads on two solid lines, then the role as a readable
+ * line and the promise as the second level. The text flows in one column, so name, role, promise and CTA
+ * share the first viewport. The name is capped by the height too, for short windows.
  */
 .hero-title {
   display: flex;
   margin: clamp(1rem, 3vh, 2.5rem) 0 0;
-  flex-flow: row wrap;
-  gap: 0 0.28em;
-  font-size: clamp(1.9rem, 3.6vw, 3.6rem);
+  flex-direction: column;
+  font-size: clamp(2.6rem, min(7.5vw, 10.5vh), 9rem);
   font-weight: 570;
-  letter-spacing: -0.06em;
-  line-height: 0.9;
+  letter-spacing: -0.07em;
+  line-height: 0.84;
   text-transform: uppercase;
 }
 
 .hero-thesis {
-  margin-top: clamp(1.25rem, 3.5vh, 2.25rem);
+  margin-top: clamp(1rem, 3vh, 2rem);
 }
 
 .hero-thesis > p:first-child {
@@ -776,7 +776,7 @@ main {
   max-width: none;
   margin: 0;
   /* Capped by the height too, so short windows keep the CTA in the first viewport. */
-  font-size: clamp(2.4rem, min(6vw, 9vh), 6.4rem);
+  font-size: clamp(1.9rem, min(3.6vw, 7vh), 3.8rem);
   font-weight: 520;
   letter-spacing: -0.075em;
   word-spacing: 0.08em;
@@ -1824,22 +1824,30 @@ a.contact-link:focus-visible {
     width: 100%;
   }
 
-  /* Phones: tighter rhythm, so the Italian promise (three lines) still leaves the CTA above the dock. */
+  /* Phones: a smaller two-line name and a tighter rhythm keep the CTA above the dock down to 375x812. */
   .hero-title {
-    margin-top: 1rem;
-    font-size: clamp(1.7rem, 7.8vw, 2.4rem);
+    margin-top: 0.5rem;
+    font-size: clamp(2.4rem, 11.5vw, 3.6rem);
   }
 
   .hero-thesis {
-    margin-top: 1rem;
+    margin-top: 0.75rem;
   }
 
   .hero-thesis > p:first-child {
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.5rem;
   }
 
   .story-section .hero-thesis h2 {
-    font-size: clamp(2rem, 10vw, 3rem);
+    font-size: clamp(1.7rem, 7.6vw, 2.4rem);
+  }
+
+  .hero-lede {
+    margin-top: 0.6rem;
+  }
+
+  .hero-actions {
+    margin-top: 0.9rem;
   }
 
   .reading-panel,
