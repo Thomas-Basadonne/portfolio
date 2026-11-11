@@ -23,6 +23,12 @@ describe("release identity", () => {
     expect(title).toContain(role);
   });
 
+  it("the share image states the public role in its source", () => {
+    const svg = decode(read("public/assets/og-image.svg"));
+    expect(svg).toContain(role.toUpperCase());
+    expect(svg).not.toMatch(/creative/i);
+  });
+
   it("the share image is the declared 1200x630 PNG", () => {
     const png = readFileSync(new URL("../public/assets/og-image.png", import.meta.url));
     expect(png.subarray(1, 4).toString("ascii")).toBe("PNG");
