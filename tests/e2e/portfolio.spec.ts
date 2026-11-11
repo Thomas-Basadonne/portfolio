@@ -5,6 +5,10 @@ import { portfolioContent } from "../../src/content/portfolio";
 import { MOTION_RATES } from "../../src/lib/motionPolicy";
 import { chapterRailFit, controlInventory, focusVisibility, midWordBreaks, typeInventory } from "./readability";
 
+// Anything gated on the scene being compiled (canvas ready, motion control, link-failure fallback): software
+// WebGL on a loaded CI runner can take well over the default 5s, so these waits share one generous budget.
+const SCENE_TIMEOUT = 20_000;
+
 async function bypassEntry(page: Page) {
   await page.addInitScript(() => window.sessionStorage.setItem("tb:entry-seen", "1"));
 }
@@ -15,8 +19,15 @@ async function scrollToEnd(page: Page) {
     // Let hydration's fragment navigation and optional font metrics settle first.
     // Otherwise WebKit can replay #contact after our intentional bottom scroll.
     await document.fonts.ready;
-    await new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
-    window.scrollTo({ top: document.body.scrollHeight, behavior: "instant" });
+    const frames = () => new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
+    await frames();
+    // The page can still grow or replay the fragment after one scroll (seen on CI at 2560x1080: depth 095),
+    // so scroll until the bottom holds for two frames.
+    for (let attempt = 0; attempt < 10; attempt += 1) {
+      window.scrollTo({ top: document.body.scrollHeight, behavior: "instant" });
+      await frames();
+      if (Math.ceil(window.scrollY + window.innerHeight) >= document.documentElement.scrollHeight - 1) return;
+    }
   });
 }
 
@@ -426,7 +437,7 @@ test("motion pause remains explicit across drawer and language changes", async (
   await page.goto("/#work");
   await requireWebGL(page);
   const pause = page.getByRole("button", { name: "Pause animation", exact: true });
-  await expect(pause).toBeVisible();
+  await expect(pause).toBeVisible({ timeout: SCENE_TIMEOUT });
   await pause.focus();
   await page.keyboard.press("Enter");
   await expect(page.getByRole("button", { name: "Resume animation", exact: true })).toBeFocused();
@@ -577,7 +588,7 @@ test("the scene canvas keeps its size and place while the story scrolls", async 
   await page.goto("/#work");
   await requireWebGL(page);
   // Generous: software WebGL on CI can take longer than the default 5s to compile the scene.
-  await expect(page.locator(".scene-staged")).toHaveAttribute("data-visual-ready", "", { timeout: 20_000 });
+  await expect(page.locator(".scene-staged")).toHaveAttribute("data-visual-ready", "", { timeout: SCENE_TIMEOUT });
   const state = () => page.locator(".webgl-shell canvas").evaluate((element: HTMLCanvasElement) => {
     const box = element.getBoundingClientRect();
     return { width: element.width, height: element.height, left: Math.round(box.left), top: Math.round(box.top) };
@@ -614,9 +625,8 @@ test("the visual layer arriving does not shift the reading layout", async ({ pag
   const positions = () => page.evaluate(() => ["about", "work", "contact"].map((id) =>
     Math.round(document.getElementById(id)!.getBoundingClientRect().top + scrollY)));
   const before = await positions();
-  await expect(page.locator(".webgl-shell canvas")).toHaveAttribute("data-context-guard", "ready");
-  // Generous: software WebGL on CI can take longer than the default 5s to compile the scene.
-  await expect(page.locator(".scene-staged")).toHaveAttribute("data-visual-ready", "", { timeout: 20_000 });
+  await expect(page.locator(".webgl-shell canvas")).toHaveAttribute("data-context-guard", "ready", { timeout: SCENE_TIMEOUT });
+  await expect(page.locator(".scene-staged")).toHaveAttribute("data-visual-ready", "", { timeout: SCENE_TIMEOUT });
   expect(await positions()).toEqual(before);
 });
 
@@ -625,8 +635,8 @@ test("WebGL context loss switches to the deterministic fallback", async ({ page,
   await bypassEntry(page);
   await page.goto("/");
   const canvas = page.locator(".webgl-shell canvas");
-  await expect(canvas).toBeVisible();
-  await expect(canvas).toHaveAttribute("data-context-guard", "ready");
+  await expect(canvas).toBeVisible({ timeout: SCENE_TIMEOUT });
+  await expect(canvas).toHaveAttribute("data-context-guard", "ready", { timeout: SCENE_TIMEOUT });
   const contextLost = await canvas.evaluate((element: HTMLCanvasElement) => {
     const context = element.getContext("webgl2") ?? element.getContext("webgl");
     const extension = context?.getExtension("WEBGL_lose_context");
@@ -651,7 +661,7 @@ test("a shader that fails to link switches to the deterministic fallback", async
   await bypassEntry(page);
   await page.goto("/");
   await requireWebGL(page);
-  await expect(page.getByText(/visual layer unavailable/i)).toBeVisible();
+  await expect(page.getByText(/visual layer unavailable/i)).toBeVisible({ timeout: SCENE_TIMEOUT });
   await expect(page.getByRole("heading", { level: 1, name: /thomas basadonne/i })).toBeVisible();
 });
 
