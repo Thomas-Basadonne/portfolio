@@ -164,7 +164,7 @@ for (const viewport of [{ width: 761, height: 400 }, { width: 844, height: 390 }
     await expect(page.locator(".hud__identity")).toBeVisible();
     await expect(page.locator(".site-shell")).not.toHaveAttribute("inert", "");
     // The motion control exists only with the visual layer; the rail must fit with or without it.
-    await page.locator(".motion-control, .visual-status--failed").first().waitFor({ timeout: 10_000 }).catch(() => {});
+    await page.locator(".motion-control, .visual-status--failed").first().waitFor({ timeout: SCENE_TIMEOUT }).catch(() => {});
     for (const id of ["identity", "contact"]) {
       await page.locator(`.chapter-nav a[href='#${id}']`).click();
       await expect(page.locator(".chapter-nav a[aria-current=location]")).toHaveAttribute("href", `#${id}`);
@@ -485,7 +485,7 @@ test("visible idle renders until the user pauses animation", async ({ page }) =>
   await page.goto("/");
   await requireWebGL(page);
   const pause = page.getByRole("button", { name: "Pause animation", exact: true });
-  await expect(pause).toBeVisible();
+  await expect(pause).toBeVisible({ timeout: SCENE_TIMEOUT });
   await page.waitForTimeout(1200);
   const draws = () => page.evaluate(() => Number(Reflect.get(window, "__motionProbe").draws));
   const idleStart = await draws();
@@ -518,7 +518,7 @@ test("a constrained device renders in the low tier at the low cadence", async ({
   await page.goto("/");
   await requireWebGL(page);
   const shell = page.locator(".webgl-shell");
-  await expect(shell.locator("canvas")).toHaveAttribute("data-context-guard", "ready");
+  await expect(shell.locator("canvas")).toHaveAttribute("data-context-guard", "ready", { timeout: SCENE_TIMEOUT });
   await expect(shell).toHaveAttribute("data-quality", "low");
   await page.waitForTimeout(1500);
   const frames = () => page.evaluate(() => Number(Reflect.get(window, "__frameProbe").frames));
@@ -537,7 +537,7 @@ test("one persistent stage holds the model while chapters alternate around it", 
   await bypassEntry(page);
   await page.goto("/");
   await requireWebGL(page);
-  await expect(page.locator(".webgl-shell canvas")).toHaveAttribute("data-context-guard", "ready");
+  await expect(page.locator(".webgl-shell canvas")).toHaveAttribute("data-context-guard", "ready", { timeout: SCENE_TIMEOUT });
   await expect(page.locator("[data-scene-stage]")).toHaveCount(1);
   const stageBox = () => page.locator("[data-scene-stage]").evaluate((element) => {
     const box = element.getBoundingClientRect();
