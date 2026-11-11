@@ -20,6 +20,19 @@ const SYNTHETIC: CaseMedia = {
   provenance: "SYNTHETIC FIXTURE — not a real product screen.",
 };
 
+/** Pixel size from a WebP header (lossy VP8, lossless VP8L or extended VP8X). */
+function webpSize(file: Buffer) {
+  if (file.toString("ascii", 0, 4) !== "RIFF" || file.toString("ascii", 8, 12) !== "WEBP") throw new Error("not a WebP");
+  const chunk = file.toString("ascii", 12, 16);
+  if (chunk === "VP8X") return { width: 1 + file.readUIntLE(24, 3), height: 1 + file.readUIntLE(27, 3) };
+  if (chunk === "VP8L") {
+    const bits = file.readUInt32LE(21);
+    return { width: 1 + (bits & 0x3fff), height: 1 + ((bits >> 14) & 0x3fff) };
+  }
+  if (chunk === "VP8 ") return { width: file.readUInt16LE(26) & 0x3fff, height: file.readUInt16LE(28) & 0x3fff };
+  throw new Error(`unknown WebP chunk ${chunk}`);
+}
+
 describe("case media srcset", () => {
   it("lists the variants and the default rendition by ascending width", () => {
     expect(caseMediaSrcSet(SYNTHETIC)).toBe(
@@ -56,10 +69,18 @@ describe("CaseMediaGallery markup (synthetic fixture)", () => {
     expect(html.match(/case-media--tile/g)).toHaveLength(2);
   });
 
-  it("reserves the layout box with intrinsic dimensions and loads lazily", () => {
+  it("reserves the layout box with intrinsic dimensions; the lead loads first, the tiles lazily", () => {
     expect(html.match(/width="1200"/g)).toHaveLength(3);
     expect(html.match(/height="750"/g)).toHaveLength(3);
-    expect(html.match(/loading="lazy"/g)).toHaveLength(3);
+    // The gallery renders only inside the open drawer, where the lead is in view: no reason to defer it.
+    const images = html.match(/<img\b[^>]*>/g) ?? [];
+    expect(images[0]).toContain('loading="eager"');
+    // HTML attribute names are case-insensitive; React's server output writes fetchPriority.
+    expect(images[0]).toMatch(/fetchpriority="high"/i);
+    for (const tile of images.slice(1)) {
+      expect(tile).toContain('loading="lazy"');
+      expect(tile).not.toMatch(/fetchpriority/i);
+    }
     expect(html.match(/decoding="async"/g)).toHaveLength(3);
     expect(html).toContain(`sizes="${caseMediaSizes.hero}"`);
     expect(html).toContain(`sizes="${caseMediaSizes.tile}"`);
@@ -134,6 +155,13 @@ describe("case study media in the real content", () => {
           expect(statSync(file).size, `${rendition.src} too heavy`).toBeLessThanOrEqual(150 * 1024);
         }
         const widths = (media.variants ?? []).map((variant) => variant.width);
+        for (const rendition of renditions) {
+          // The declared size reserves the layout box and drives srcset: read it from the file, not from memory.
+          const actual = webpSize(readFileSync(new URL(`../public${rendition.src}`, import.meta.url)));
+          expect(actual.width, `${rendition.src} width`).toBe(rendition.width);
+          expect(Math.abs(actual.height - (media.height * rendition.width) / media.width), `${rendition.src} height`)
+            .toBeLessThanOrEqual(1);
+        }
         expect(widths.every((width) => width < media.width)).toBe(true);
         expect(media.height).toBeGreaterThan(0);
       }

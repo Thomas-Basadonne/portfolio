@@ -91,7 +91,9 @@ export function CaseStudyDrawer({ caseStudy, ui, onClose }: CaseStudyDrawerProps
 
         <p className="case-drawer__summary">{caseStudy.summary}</p>
 
-        {caseStudy.media && <CaseMediaGallery key={caseStudy.id} items={caseStudy.media} ui={ui} />}
+        {caseStudy.media && (
+          <CaseMediaGallery key={caseStudy.id} items={caseStudy.media} ui={ui} onFocusLost={() => closeRef.current?.focus()} />
+        )}
 
         <dl className="case-drawer__fields">
           <DataField label={ui.drawerContext} value={caseStudy.context} />

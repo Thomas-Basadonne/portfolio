@@ -905,7 +905,7 @@ for (const entry of mediaCases) {
   const lead = items[0];
 
   test.describe(`case media: ${entry.id}`, () => {
-    test("requests nothing before the drawer opens, then reserves every box and lazy-loads", async ({ page }) => {
+    test("requests nothing before the drawer opens, then reserves every box; the lead loads first", async ({ page }) => {
       const requested: string[] = [];
       page.on("request", (request) => {
         if (request.url().includes("/case-media/")) requested.push(request.url());
@@ -931,7 +931,9 @@ for (const entry of mediaCases) {
       await expect(images).toHaveCount(items.length);
       for (const [index, media] of items.entries()) {
         const image = images.nth(index);
-        await expect(image).toHaveAttribute("loading", "lazy");
+        await expect(image).toHaveAttribute("loading", index === 0 ? "eager" : "lazy");
+        if (index === 0) await expect(image).toHaveAttribute("fetchpriority", "high");
+        else await expect(image).not.toHaveAttribute("fetchpriority");
         await expect(image).toHaveAttribute("width", String(media.width));
         await expect(image).toHaveAttribute("height", String(media.height));
         await expect(image).toHaveAttribute("alt", media.alt);
@@ -1003,6 +1005,60 @@ for (const entry of mediaCases) {
       for (let step = 0; step < expectedStops; step += 1) await page.keyboard.press("Tab");
       await expect(dialog.getByRole("button", { name: /close/i })).toBeFocused();
     });
+
+    test("an image that fails while its link has focus hands focus to the close button", async ({ page }) => {
+      // Hold the lead file until its link has focus, then fail it: the figure (and the link) disappear.
+      let release!: () => void;
+      const gate = new Promise<void>((resolve) => {
+        release = resolve;
+      });
+      for (const src of [lead.src, ...(lead.variants ?? []).map((variant) => variant.src)]) {
+        await page.route(`**${src}`, async (route) => {
+          await gate;
+          await route.fulfill({ status: 404, body: "not found" });
+        });
+      }
+      const dialog = await openCase(page, "en", entry.title);
+      const leadLink = dialog.locator("figure").first().locator("a");
+      await leadLink.focus();
+      await expect(leadLink).toBeFocused();
+      release();
+      await expect(dialog.locator("figure")).toHaveCount(items.length - 1);
+      await expect(dialog.getByRole("button", { name: /close/i })).toBeFocused();
+    });
+  });
+}
+
+/*
+ * `sizes` must describe the drawer column the images really get, or the browser downloads the 1440 rendition where
+ * the 720 is enough (#60: 52rem was declared for a lead that renders 502-778px, tiles assumed two per row from 761px).
+ * Expected pick: the smallest rendition at least as wide as the rendered width times the device pixel ratio.
+ */
+const srcsetCase = mediaCases.find((entry) => entry.media!.some((media) => media.variants?.length));
+for (const [width, height, scale] of [[761, 900, 1], [900, 900, 1], [1024, 768, 1], [1440, 900, 1], [1920, 1080, 1], [390, 844, 2], [1024, 768, 2]] as const) {
+  test(`case media picks the smallest rendition that covers its box at ${width}x${height}@${scale}x`, async ({ browser }) => {
+    test.skip(!srcsetCase, "no case ships responsive variants");
+    const context = await browser.newContext({ viewport: { width, height }, deviceScaleFactor: scale });
+    const page = await context.newPage();
+    try {
+      await page.route(/ExperienceCanvas-.*\.js/, (route) => route.abort());
+      const dialog = await openCase(page, "en", srcsetCase!.title);
+      const images = dialog.locator("img.case-media__image");
+      const misses: string[] = [];
+      for (const [index, media] of srcsetCase!.media!.entries()) {
+        const image = images.nth(index);
+        await image.scrollIntoViewIfNeeded();
+        await expect.poll(() => image.evaluate((node: HTMLImageElement) => node.naturalWidth), { timeout: 20_000 }).toBeGreaterThan(0);
+        const rendered = (await image.boundingBox())!.width * scale;
+        const renditions = [...(media.variants ?? []), { src: media.src, width: media.width }].sort((a, b) => a.width - b.width);
+        const expected = (renditions.find((rendition) => rendition.width >= rendered) ?? renditions.at(-1)!).src;
+        const picked = new URL(await image.evaluate((node: HTMLImageElement) => node.currentSrc)).pathname;
+        if (picked !== expected) misses.push(`${index}: ${Math.round(rendered)}px wants ${expected}, got ${picked}`);
+      }
+      expect(misses).toEqual([]);
+    } finally {
+      await context.close();
+    }
   });
 }
 
@@ -1014,23 +1070,61 @@ test("a case without approved media keeps its text-only drawer", async ({ page }
 });
 
 /*
- * Waits until the hero shows the requested layout for good. "staged" waits for the scene to be ready: the staged
- * attribute is already set while it loads, and a scene that then fails would silently swap the layout mid-test.
- * Engines that cannot start WebGL here (headless Firefox on CI) skip the staged variant; fallback still runs.
+ * The staged hero layout is plain CSS and applies as soon as the scene starts loading (`data-scene-layout`); once the
+ * scene is ready only the canvas fades in. Its geometry tests therefore hold the scene chunk forever and let only the
+ * WebGL detection see a context: deterministic on every engine, including Firefox headless in CI, which has no WebGL
+ * and used to skip the staged variants in silence (#60). Must run before navigation. That the layout does not move
+ * when the scene becomes ready is its own test below.
  */
+async function holdStagedLayout(page: Page, layout: "staged" | "fallback") {
+  if (layout !== "staged") return;
+  await page.route(/ExperienceCanvas-.*\.js/, () => {});
+  await page.addInitScript(() => {
+    const original = HTMLCanvasElement.prototype.getContext;
+    Reflect.set(HTMLCanvasElement.prototype, "getContext", function (this: HTMLCanvasElement, type: string, ...rest: unknown[]) {
+      return Reflect.apply(original, this, [type, ...rest]) ?? (type.startsWith("webgl") ? {} : null);
+    });
+  });
+}
+
 async function settleHeroLayout(page: Page, layout: "staged" | "fallback") {
   const shell = page.locator(".scene-staged");
-  if (layout === "fallback") {
-    await expect(shell).not.toHaveAttribute("data-scene-layout", "");
-    return;
-  }
-  const phase = () =>
-    shell.evaluate((node) =>
-      node.hasAttribute("data-visual-ready") ? "ready" : node.hasAttribute("data-scene-layout") ? "loading" : "failed",
-    );
-  await expect.poll(phase, { timeout: 20_000 }).not.toBe("loading");
-  test.skip((await phase()) === "failed", "WebGL did not start in this engine, so there is no staged layout to measure.");
+  if (layout === "fallback") await expect(shell).not.toHaveAttribute("data-scene-layout", "");
+  else await expect(shell).toHaveAttribute("data-scene-layout", "");
 }
+
+const heroGeometry = (page: Page) => page.evaluate(() => Object.fromEntries([".hero-spec", ".hero-title", ".hero-thesis", ".hero-actions", ".hud__identity"]
+  .map((selector) => {
+    const box = document.querySelector(selector)!.getBoundingClientRect();
+    return [selector, [box.top, box.left, box.width, box.height]];
+  })));
+
+test("the staged hero layout does not move when the scene becomes ready", async ({ page }) => {
+  await bypassEntry(page);
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+  await requireWebGL(page);
+  await expect(page.locator(".scene-staged")).toHaveAttribute("data-visual-ready", "", { timeout: SCENE_TIMEOUT });
+  await page.evaluate(() => document.fonts.ready);
+  const ready = await heroGeometry(page);
+  const held = await page.context().newPage();
+  try {
+    await holdStagedLayout(held, "staged");
+    await bypassEntry(held);
+    await held.setViewportSize({ width: 1440, height: 900 });
+    await held.goto("/");
+    await held.evaluate(() => document.fonts.ready);
+    await settleHeroLayout(held, "staged");
+    await expect(held.locator(".scene-staged")).not.toHaveAttribute("data-visual-ready", "");
+    // Subpixel text widths round differently between the two pages (WebKit on Linux: 376 vs 377px); a move is more.
+    const loading = await heroGeometry(held);
+    for (const [selector, box] of Object.entries(ready)) {
+      box.forEach((value, index) => expect(Math.abs(loading[selector][index] - value), `${selector} moved`).toBeLessThanOrEqual(1));
+    }
+  } finally {
+    await held.close();
+  }
+});
 
 /*
  * Hero text blocks must never sit on top of each other. The bug this pins: in portrait windows between 761px
@@ -1082,6 +1176,7 @@ for (const locale of ["en", "it"] as const) {
     test(`hero text blocks never overlap, 761–1080px, both orientations (${locale}, ${layout} layout)`, async ({ page }) => {
       test.setTimeout(90_000);
       if (layout === "fallback") await page.route(/ExperienceCanvas-.*\.js/, (route) => route.abort());
+      await holdStagedLayout(page, layout);
       await bypassEntry(page);
       await page.setViewportSize({ width: 800, height: 900 });
       await page.goto(locale === "it" ? "/?lang=it" : "/");
@@ -1140,6 +1235,7 @@ for (const locale of ["en", "it"] as const) {
     test(`hero contract fits the first viewport: name, role, promise and CTA (${locale}, ${layout} layout)`, async ({ page }) => {
       test.setTimeout(90_000);
       if (layout === "fallback") await page.route(/ExperienceCanvas-.*\.js/, (route) => route.abort());
+      await holdStagedLayout(page, layout);
       await bypassEntry(page);
       await page.setViewportSize(FIRST_VIEWPORTS[0]);
       await page.goto(locale === "it" ? "/?lang=it" : "/");
@@ -1227,6 +1323,7 @@ for (const locale of ["en", "it"] as const) {
         // Every resize re-renders the scene behind; on CI's software WebGL a full sweep needs more than the default.
         test.setTimeout(90_000);
         if (layout === "fallback") await page.route(/ExperienceCanvas-.*\.js/, (route) => route.abort());
+        await holdStagedLayout(page, layout);
         await bypassEntry(page);
         await page.setViewportSize({ width: 500, height: 900 });
         await page.goto(locale === "it" ? "/?lang=it" : "/");
