@@ -478,7 +478,7 @@ const en: PortfolioContent = {
       outcome:
         "In field test with the owner. Row-level security is tested in SQL, and every change passes lint, typecheck, tests and build in CI.",
       links: [],
-      evidence: "Evidence boundary: the app holds real customer data, so it is not publicly linked; the screenshots show only the public showcase site.",
+      evidence: "Evidence boundary: the app holds real customer data, so it is not publicly linked; the screenshots show only the showcase site, which is not online yet.",
       media: [
         {
           src: "/case-media/la-fetuseria/home-hero-1440.webp",
@@ -490,7 +490,7 @@ const en: PortfolioContent = {
           caption:
             "The guest-facing site: house-shaped photo frames, a headline you can drag, an events banner. Visitors can only send requests; the agenda behind it is a separate app.",
           provenance:
-            "Real screenshot of the public showcase site, captured on 9 November 2026 from a local build of the repository (commit d5c38cb, which added the dogs, reviews and Instagram sections). The Vercel preview is behind a login and was not used. The management app is not shown.",
+            "Real screenshot of the showcase site (not online yet), captured on 9 November 2026 from a local build of the repository (commit d5c38cb, which added the dogs, reviews and Instagram sections). The Vercel preview is behind a login and was not used. The management app is not shown.",
         },
         {
           src: "/case-media/la-fetuseria/kitchen-1440.webp",
@@ -502,7 +502,7 @@ const en: PortfolioContent = {
           caption:
             "The kitchen section: handmade pasta from Basilicata and the menu of the day on a card.",
           provenance:
-            "Real screenshot of the public showcase site, captured on 9 November 2026 from a local build of the repository (commit d5c38cb, which added the dogs, reviews and Instagram sections). The Vercel preview is behind a login and was not used. The management app is not shown.",
+            "Real screenshot of the showcase site (not online yet), captured on 9 November 2026 from a local build of the repository (commit d5c38cb, which added the dogs, reviews and Instagram sections). The Vercel preview is behind a login and was not used. The management app is not shown.",
         },
         {
           src: "/case-media/la-fetuseria/garden-1440.webp",
@@ -514,7 +514,7 @@ const en: PortfolioContent = {
           caption:
             "Garden, pool and the list of events, in the same hand-made visual language as the rest of the site.",
           provenance:
-            "Real screenshot of the public showcase site, captured on 9 November 2026 from a local build of the repository (commit d5c38cb, which added the dogs, reviews and Instagram sections). The Vercel preview is behind a login and was not used. The management app is not shown.",
+            "Real screenshot of the showcase site (not online yet), captured on 9 November 2026 from a local build of the repository (commit d5c38cb, which added the dogs, reviews and Instagram sections). The Vercel preview is behind a login and was not used. The management app is not shown.",
         },
       ],
     },
@@ -963,7 +963,7 @@ const it: PortfolioContent = {
       outcome:
         "In prova sul campo con la titolare. La row-level security è testata in SQL e ogni modifica passa lint, typecheck, test e build in CI.",
       links: [],
-      evidence: "Limite delle prove: l'app contiene dati reali dei clienti, quindi non ha un link pubblico; gli screenshot mostrano solo il sito vetrina pubblico.",
+      evidence: "Limite delle prove: l'app contiene dati reali dei clienti, quindi non ha un link pubblico; gli screenshot mostrano solo il sito vetrina, che non è ancora online.",
       media: [
         {
           src: "/case-media/la-fetuseria/home-hero-1440.webp",
@@ -975,7 +975,7 @@ const it: PortfolioContent = {
           caption:
             "Il sito per gli ospiti: cornici fotografiche a forma di casa, un titolo che si trascina, un banner degli eventi. I visitatori possono solo inviare richieste; l'agenda dietro è un'app separata.",
           provenance:
-            "Screenshot reale del sito vetrina pubblico, catturato il 9 novembre 2026 da una build locale del repository (commit d5c38cb, che ha aggiunto le sezioni cani, recensioni e Instagram). La preview Vercel è protetta da login e non è stata usata. Il gestionale non è mostrato.",
+            "Screenshot reale del sito vetrina (non ancora online), catturato il 9 novembre 2026 da una build locale del repository (commit d5c38cb, che ha aggiunto le sezioni cani, recensioni e Instagram). La preview Vercel è protetta da login e non è stata usata. Il gestionale non è mostrato.",
         },
         {
           src: "/case-media/la-fetuseria/kitchen-1440.webp",
@@ -987,7 +987,7 @@ const it: PortfolioContent = {
           caption:
             "La sezione cucina: pasta fatta a mano dalla Basilicata e il menù del giorno su una scheda.",
           provenance:
-            "Screenshot reale del sito vetrina pubblico, catturato il 9 novembre 2026 da una build locale del repository (commit d5c38cb, che ha aggiunto le sezioni cani, recensioni e Instagram). La preview Vercel è protetta da login e non è stata usata. Il gestionale non è mostrato.",
+            "Screenshot reale del sito vetrina (non ancora online), catturato il 9 novembre 2026 da una build locale del repository (commit d5c38cb, che ha aggiunto le sezioni cani, recensioni e Instagram). La preview Vercel è protetta da login e non è stata usata. Il gestionale non è mostrato.",
         },
         {
           src: "/case-media/la-fetuseria/garden-1440.webp",
@@ -999,7 +999,7 @@ const it: PortfolioContent = {
           caption:
             "Giardino, piscina ed elenco degli eventi, nello stesso linguaggio visivo fatto a mano del resto del sito.",
           provenance:
-            "Screenshot reale del sito vetrina pubblico, catturato il 9 novembre 2026 da una build locale del repository (commit d5c38cb, che ha aggiunto le sezioni cani, recensioni e Instagram). La preview Vercel è protetta da login e non è stata usata. Il gestionale non è mostrato.",
+            "Screenshot reale del sito vetrina (non ancora online), catturato il 9 novembre 2026 da una build locale del repository (commit d5c38cb, che ha aggiunto le sezioni cani, recensioni e Instagram). La preview Vercel è protetta da login e non è stata usata. Il gestionale non è mostrato.",
         },
       ],
     },
