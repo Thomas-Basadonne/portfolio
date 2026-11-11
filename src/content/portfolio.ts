@@ -107,7 +107,6 @@ export type PortfolioContent = {
     hudNav: string;
     hudDepth: string;
     instrument: string;
-    scrollCue: string;
     heroWork: string;
     heroEmail: string;
     visualLoading: string;
@@ -215,7 +214,6 @@ const en: PortfolioContent = {
     hudNav: "Portfolio sections",
     hudDepth: "Inspection depth",
     instrument: "Instrument TB–001",
-    scrollCue: "Turn to inspect",
     heroWork: "See selected work",
     heroEmail: "Email me",
     visualLoading: "Calibrating optional visual layer…",
@@ -702,7 +700,6 @@ const it: PortfolioContent = {
     hudNav: "Sezioni del portfolio",
     hudDepth: "Profondità di ispezione",
     instrument: "Strumento TB–001",
-    scrollCue: "Scorri per ispezionare",
     heroWork: "Guarda i progetti",
     heroEmail: "Scrivimi",
     visualLoading: "Calibrazione del livello visivo opzionale…",
