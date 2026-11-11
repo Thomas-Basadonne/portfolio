@@ -1014,23 +1014,61 @@ test("a case without approved media keeps its text-only drawer", async ({ page }
 });
 
 /*
- * Waits until the hero shows the requested layout for good. "staged" waits for the scene to be ready: the staged
- * attribute is already set while it loads, and a scene that then fails would silently swap the layout mid-test.
- * Engines that cannot start WebGL here (headless Firefox on CI) skip the staged variant; fallback still runs.
+ * The staged hero layout is plain CSS and applies as soon as the scene starts loading (`data-scene-layout`); once the
+ * scene is ready only the canvas fades in. Its geometry tests therefore hold the scene chunk forever and let only the
+ * WebGL detection see a context: deterministic on every engine, including Firefox headless in CI, which has no WebGL
+ * and used to skip the staged variants in silence (#60). Must run before navigation. That the layout does not move
+ * when the scene becomes ready is its own test below.
  */
+async function holdStagedLayout(page: Page, layout: "staged" | "fallback") {
+  if (layout !== "staged") return;
+  await page.route(/ExperienceCanvas-.*\.js/, () => {});
+  await page.addInitScript(() => {
+    const original = HTMLCanvasElement.prototype.getContext;
+    Reflect.set(HTMLCanvasElement.prototype, "getContext", function (this: HTMLCanvasElement, type: string, ...rest: unknown[]) {
+      return Reflect.apply(original, this, [type, ...rest]) ?? (type.startsWith("webgl") ? {} : null);
+    });
+  });
+}
+
 async function settleHeroLayout(page: Page, layout: "staged" | "fallback") {
   const shell = page.locator(".scene-staged");
-  if (layout === "fallback") {
-    await expect(shell).not.toHaveAttribute("data-scene-layout", "");
-    return;
-  }
-  const phase = () =>
-    shell.evaluate((node) =>
-      node.hasAttribute("data-visual-ready") ? "ready" : node.hasAttribute("data-scene-layout") ? "loading" : "failed",
-    );
-  await expect.poll(phase, { timeout: 20_000 }).not.toBe("loading");
-  test.skip((await phase()) === "failed", "WebGL did not start in this engine, so there is no staged layout to measure.");
+  if (layout === "fallback") await expect(shell).not.toHaveAttribute("data-scene-layout", "");
+  else await expect(shell).toHaveAttribute("data-scene-layout", "");
 }
+
+const heroGeometry = (page: Page) => page.evaluate(() => Object.fromEntries([".hero-spec", ".hero-title", ".hero-thesis", ".hero-actions", ".hud__identity"]
+  .map((selector) => {
+    const box = document.querySelector(selector)!.getBoundingClientRect();
+    return [selector, [box.top, box.left, box.width, box.height]];
+  })));
+
+test("the staged hero layout does not move when the scene becomes ready", async ({ page }) => {
+  await bypassEntry(page);
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+  await requireWebGL(page);
+  await expect(page.locator(".scene-staged")).toHaveAttribute("data-visual-ready", "", { timeout: SCENE_TIMEOUT });
+  await page.evaluate(() => document.fonts.ready);
+  const ready = await heroGeometry(page);
+  const held = await page.context().newPage();
+  try {
+    await holdStagedLayout(held, "staged");
+    await bypassEntry(held);
+    await held.setViewportSize({ width: 1440, height: 900 });
+    await held.goto("/");
+    await held.evaluate(() => document.fonts.ready);
+    await settleHeroLayout(held, "staged");
+    await expect(held.locator(".scene-staged")).not.toHaveAttribute("data-visual-ready", "");
+    // Subpixel text widths round differently between the two pages (WebKit on Linux: 376 vs 377px); a move is more.
+    const loading = await heroGeometry(held);
+    for (const [selector, box] of Object.entries(ready)) {
+      box.forEach((value, index) => expect(Math.abs(loading[selector][index] - value), `${selector} moved`).toBeLessThanOrEqual(1));
+    }
+  } finally {
+    await held.close();
+  }
+});
 
 /*
  * Hero text blocks must never sit on top of each other. The bug this pins: in portrait windows between 761px
@@ -1082,6 +1120,7 @@ for (const locale of ["en", "it"] as const) {
     test(`hero text blocks never overlap, 761–1080px, both orientations (${locale}, ${layout} layout)`, async ({ page }) => {
       test.setTimeout(90_000);
       if (layout === "fallback") await page.route(/ExperienceCanvas-.*\.js/, (route) => route.abort());
+      await holdStagedLayout(page, layout);
       await bypassEntry(page);
       await page.setViewportSize({ width: 800, height: 900 });
       await page.goto(locale === "it" ? "/?lang=it" : "/");
@@ -1140,6 +1179,7 @@ for (const locale of ["en", "it"] as const) {
     test(`hero contract fits the first viewport: name, role, promise and CTA (${locale}, ${layout} layout)`, async ({ page }) => {
       test.setTimeout(90_000);
       if (layout === "fallback") await page.route(/ExperienceCanvas-.*\.js/, (route) => route.abort());
+      await holdStagedLayout(page, layout);
       await bypassEntry(page);
       await page.setViewportSize(FIRST_VIEWPORTS[0]);
       await page.goto(locale === "it" ? "/?lang=it" : "/");
@@ -1227,6 +1267,7 @@ for (const locale of ["en", "it"] as const) {
         // Every resize re-renders the scene behind; on CI's software WebGL a full sweep needs more than the default.
         test.setTimeout(90_000);
         if (layout === "fallback") await page.route(/ExperienceCanvas-.*\.js/, (route) => route.abort());
+        await holdStagedLayout(page, layout);
         await bypassEntry(page);
         await page.setViewportSize({ width: 500, height: 900 });
         await page.goto(locale === "it" ? "/?lang=it" : "/");
