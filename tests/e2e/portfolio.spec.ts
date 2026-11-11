@@ -183,6 +183,15 @@ test("readability visible control labels are included in accessible names", asyn
   await expect(page.locator(".hud__identity")).toHaveAccessibleName(/TB.*Thomas Basadonne.*Commerce & AI tools/);
   await expect(page.locator(".hud button[lang='en']")).toHaveAccessibleName(/^EN.*English$/);
   await expect(page.locator(".hud button[lang='it']")).toHaveAccessibleName(/^IT.*Italiano$/);
+});
+
+// Separate page on purpose: in Playwright's Firefox 159 (1.65) the page crashes when axe's
+// label-content-name-mismatch runs after toHaveAccessibleName on an aria-labelledby link. Reproduced on a
+// five-line static page, without the site's code; Firefox 1.61 ran both in one page (#59).
+test("readability no control has a visible label missing from its accessible name", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: /calibrate/i }).click();
+  await expect(page.locator(".hud__identity")).toBeVisible();
   const results = await new AxeBuilder({ page }).withRules(["label-content-name-mismatch"]).analyze();
   expect(results.violations).toEqual([]);
 });
