@@ -1252,7 +1252,13 @@ for (const height of [700, 1180]) {
     await page.setViewportSize({ width: 500, height });
     await page.goto("/");
     await settleHeroLayout(page, "fallback");
-    expect(await page.evaluate(() => document.fonts.check('570 16px "Manrope Variable"'))).toBe(false);
+    // Not document.fonts.check(): per spec it is true once no face is still loading, so an aborted (errored)
+    // Manrope also passes it; WebKit 27 (Playwright 1.65) follows that. Assert on the faces themselves.
+    const manrope = await page.evaluate(() => [...document.fonts]
+      .filter((face) => face.family.replaceAll('"', "") === "Manrope Variable")
+      .map((face) => face.status));
+    expect(manrope.length, "the Manrope face is declared").toBeGreaterThan(0);
+    expect(manrope).not.toContain("loaded");
 
     const failures: string[] = [];
     for (const width of NAME_WIDTHS) {
