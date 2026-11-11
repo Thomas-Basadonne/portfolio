@@ -26,8 +26,8 @@ export class AppErrorBoundary extends Component<
         <p className="mono-label">TB / resilient mode</p>
         <h1>Thomas Basadonne</h1>
         <p>
-          Frontend and creative developer working across resilient commerce systems,
-          intelligent products and unusual interfaces.
+          Frontend developer building enterprise B2B commerce, and local-first AI tools that
+          run on your own machine.
         </p>
         <a href="https://it.linkedin.com/in/thomasbasadonne">Continue on LinkedIn</a>
       </main>
