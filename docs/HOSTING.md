@@ -72,10 +72,10 @@ WebKit is only meaningful over real HTTPS: locally, `upgrade-insecure-requests` 
 The e2e suite is green in CI (Linux); local macOS runs have known failures on every host, so compare sets of
 failing tests in the same environment, not counts.
 
-Against any host that serves the real CSP, the 16 composited-contrast tests (`tests/e2e/hud-contrast.ts`) fail on
-every browser: they inject an inline `<style>` to hide the glyphs before capturing the background, `style-src 'self'`
-blocks it, and the text is measured against itself. They pass on `vite preview` (no CSP) and in CI. Exclude them
-with `--grep-invert "composited|HUD contact|HUD fallback"` when testing a live host, or treat them as expected.
+The composited-contrast tests (`tests/e2e/hud-contrast.ts`) also run against a live host: the glyph mask is a
+constructable stylesheet, which `style-src 'self'` does not block. Until 11 November 2026 it was an inline `<style>`,
+so on every host with the real CSP the 16 tests measured the text against itself and failed (#62). If the mask ever
+stops applying, the helper throws `the glyph mask did not apply` instead of reporting contrast ratios.
 
 ## Cut-over verification — 10 November 2026 (version `80cd8b54`, commit `87ba88f`)
 

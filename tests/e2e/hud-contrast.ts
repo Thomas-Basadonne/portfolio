@@ -3,16 +3,29 @@ import { expect, type Page, type TestInfo } from "@playwright/test";
 /** Measure resolved text colors against pixels actually composited under each text run.
  * Hide glyphs only for the background capture: translucent surfaces still composite
  * over the real chapter/WebGL, and antialiasing cannot masquerade as the background.
+ *
+ * The mask is a constructable stylesheet (CSSOM), not an injected <style>: the production CSP
+ * (`style-src 'self'`) blocks inline sheets, which left the text visible and measured against itself
+ * on every real host (#62). A mask that does not apply fails loudly instead of measuring nothing.
+ * It also stops transitions: `color` animates over 0.25s on nav links, and a transition outranks
+ * `!important`, so two frames later the glyphs would still be mostly painted.
  */
+const MASK_KEY = "__contrastProbeMask";
+
+async function setMask(page: Page, css: string | null) {
+  await page.evaluate(({ css, key }) => {
+    const store = window as unknown as Record<string, CSSStyleSheet | undefined>;
+    const sheet = store[key] ?? (store[key] = new CSSStyleSheet());
+    sheet.replaceSync(css ?? "");
+    const others = document.adoptedStyleSheets.filter((adopted) => adopted !== sheet);
+    document.adoptedStyleSheets = css ? [...others, sheet] : others;
+  }, { css, key: MASK_KEY });
+}
 export async function expectHudContrast(page: Page, info: TestInfo, label: string, selector = ".hud", minimumRuns = 10) {
   // Focus-induced scrolling can update the active chapter on the next frame.
   await page.evaluate(() => new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))));
-  // Instrumentation must not leak between measurements: WebKit keeps a detached <style> applied,
-  // so the mask is one persistent sheet that is disabled instead of removed.
-  await page.evaluate(() => {
-    const sheet = document.getElementById("contrast-probe-mask") as HTMLStyleElement | null;
-    if (sheet) { sheet.disabled = true; sheet.textContent = ""; }
-  });
+  // Instrumentation must not leak between measurements.
+  await setMask(page, null);
   const runs = await page.locator(selector).evaluate((hud, visibleOnly) => {
     const walker = document.createTreeWalker(hud, NodeFilter.SHOW_TEXT);
     const result = [];
@@ -66,25 +79,20 @@ export async function expectHudContrast(page: Page, info: TestInfo, label: strin
   }, selector !== ".hud");
   expect(runs.length).toBeGreaterThan(minimumRuns);
   await info.attach(`${label}-visual`, { body: await page.screenshot({ scale: "css" }), contentType: "image/png" });
-  await page.evaluate((css) => {
-    let sheet = document.getElementById("contrast-probe-mask") as HTMLStyleElement | null;
-    if (!sheet) {
-      sheet = document.createElement("style");
-      sheet.id = "contrast-probe-mask";
-      document.head.append(sheet);
-    }
-    sheet.textContent = css;
-    sheet.disabled = false;
-  }, `:is(${selector}), :is(${selector}) * { color: transparent !important; -webkit-text-fill-color: transparent !important; text-shadow: none !important; }`);
   let background: Awaited<ReturnType<Page["screenshot"]>>;
   try {
+    await setMask(page, `:is(${selector}), :is(${selector}) * { color: transparent !important; -webkit-text-fill-color: transparent !important; text-shadow: none !important; transition: none !important; }`);
+    const unmasked = await page.locator(selector).first().evaluate((root) => {
+      const probe = [root, ...root.querySelectorAll("*")].find((element) => element.textContent?.trim());
+      return probe && getComputedStyle(probe).color !== "rgba(0, 0, 0, 0)" ? getComputedStyle(probe).color : null;
+    });
+    if (unmasked) {
+      throw new Error(`${label}: the glyph mask did not apply (text still ${unmasked}); the background capture would measure the text against itself.`);
+    }
     await page.evaluate(() => new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))));
     background = await page.screenshot({ scale: "css" });
   } finally {
-    await page.evaluate(() => {
-      const sheet = document.getElementById("contrast-probe-mask") as HTMLStyleElement | null;
-      if (sheet) { sheet.disabled = true; sheet.textContent = ""; }
-    });
+    await setMask(page, null);
   }
   const measurements = await page.evaluate(async ({ image, textRuns }) => {
     const bytes = Uint8Array.from(atob(image), (character) => character.charCodeAt(0));
