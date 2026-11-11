@@ -3,17 +3,33 @@ import { expect, type Page, type TestInfo } from "@playwright/test";
 /** Measure resolved text colors against pixels actually composited under each text run.
  * Hide glyphs only for the background capture: translucent surfaces still composite
  * over the real chapter/WebGL, and antialiasing cannot masquerade as the background.
+ *
+ * The mask is a constructable stylesheet (CSSOM), not an injected <style>: the production CSP
+ * (`style-src 'self'`) blocks inline sheets, which left the text visible and measured against itself
+ * on every real host (#62). A mask that does not apply fails loudly instead of measuring nothing.
+ * It also stops transitions: `color` animates over 0.25s on nav links, and a transition outranks
+ * `!important`, so two frames later the glyphs would still be mostly painted.
  */
+const MASK_KEY = "__contrastProbeMask";
+
+async function setMask(page: Page, css: string | null) {
+  await page.evaluate(({ css, key }) => {
+    const store = window as unknown as Record<string, CSSStyleSheet | undefined>;
+    const sheet = store[key] ?? (store[key] = new CSSStyleSheet());
+    sheet.replaceSync(css ?? "");
+    const others = document.adoptedStyleSheets.filter((adopted) => adopted !== sheet);
+    document.adoptedStyleSheets = css ? [...others, sheet] : others;
+    // Flush styles now, so the next change starts from this state.
+    void document.documentElement.offsetHeight;
+  }, { css, key: MASK_KEY });
+}
+
 export async function expectHudContrast(page: Page, info: TestInfo, label: string, selector = ".hud", minimumRuns = 10) {
   // Focus-induced scrolling can update the active chapter on the next frame.
   await page.evaluate(() => new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))));
-  // Instrumentation must not leak between measurements: WebKit keeps a detached <style> applied,
-  // so the mask is one persistent sheet that is disabled instead of removed.
-  await page.evaluate(() => {
-    const sheet = document.getElementById("contrast-probe-mask") as HTMLStyleElement | null;
-    if (sheet) { sheet.disabled = true; sheet.textContent = ""; }
-  });
-  const runs = await page.locator(selector).evaluate((hud, visibleOnly) => {
+  // Instrumentation must not leak between measurements.
+  await setMask(page, null);
+  const readRuns = () => page.locator(selector).evaluate((hud, visibleOnly) => {
     const walker = document.createTreeWalker(hud, NodeFilter.SHOW_TEXT);
     const result = [];
     while (walker.nextNode()) {
@@ -64,29 +80,55 @@ export async function expectHudContrast(page: Page, info: TestInfo, label: strin
     }
     return result;
   }, selector !== ".hud");
-  expect(runs.length).toBeGreaterThan(minimumRuns);
-  await info.attach(`${label}-visual`, { body: await page.screenshot({ scale: "css" }), contentType: "image/png" });
-  await page.evaluate((css) => {
-    let sheet = document.getElementById("contrast-probe-mask") as HTMLStyleElement | null;
-    if (!sheet) {
-      sheet = document.createElement("style");
-      sheet.id = "contrast-probe-mask";
-      document.head.append(sheet);
-    }
-    sheet.textContent = css;
-    sheet.disabled = false;
-  }, `:is(${selector}), :is(${selector}) * { color: transparent !important; -webkit-text-fill-color: transparent !important; text-shadow: none !important; }`);
+  // Colors are read first and the background is shot afterwards, so both must come from one state. The HUD
+  // retones asynchronously after a scroll (light chapters invert it); under load that lands between the two
+  // and the text of one tone was compared with the chips of the other (#62). Re-read after the shots and
+  // measure only a state that held still.
+  let runs: Awaited<ReturnType<typeof readRuns>>;
+  let visual: Awaited<ReturnType<Page["screenshot"]>>;
   let background: Awaited<ReturnType<Page["screenshot"]>>;
-  try {
+  for (let attempt = 1; ; attempt += 1) {
+    runs = await readRuns();
+    visual = await page.screenshot({ scale: "css" });
+    background = await captureBackground(page, selector, label);
+    if (JSON.stringify(await readRuns()) === JSON.stringify(runs)) break;
+    if (attempt === 5) throw new Error(`${label}: the measured text kept changing across 5 attempts; nothing stable to measure.`);
     await page.evaluate(() => new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))));
-    background = await page.screenshot({ scale: "css" });
-  } finally {
-    await page.evaluate(() => {
-      const sheet = document.getElementById("contrast-probe-mask") as HTMLStyleElement | null;
-      if (sheet) { sheet.disabled = true; sheet.textContent = ""; }
-    });
   }
-  const measurements = await page.evaluate(async ({ image, textRuns }) => {
+  expect(runs.length).toBeGreaterThan(minimumRuns);
+  await info.attach(`${label}-visual`, { body: visual, contentType: "image/png" });
+  const measurements = await measure(page, background, runs);
+  await info.attach(`${label}-contrast`, { body: JSON.stringify(measurements, null, 2), contentType: "application/json" });
+  for (const run of measurements) {
+    expect.soft(run.minimum, `${label}: ${run.text} (${run.color}) against composited pixels`).toBeGreaterThanOrEqual(run.required);
+  }
+}
+
+async function captureBackground(page: Page, selector: string, label: string) {
+  try {
+    await setMask(page, `:is(${selector}), :is(${selector}) * { color: transparent !important; -webkit-text-fill-color: transparent !important; text-shadow: none !important; transition: none !important; }`);
+    const unmasked = await page.locator(selector).first().evaluate((root) => {
+      const probe = [root, ...root.querySelectorAll("*")].find((element) => element.textContent?.trim());
+      return probe && getComputedStyle(probe).color !== "rgba(0, 0, 0, 0)" ? getComputedStyle(probe).color : null;
+    });
+    if (unmasked) {
+      throw new Error(`${label}: the glyph mask did not apply (text still ${unmasked}); the background capture would measure the text against itself.`);
+    }
+    await page.evaluate(() => new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))));
+    return await page.screenshot({ scale: "css" });
+  } finally {
+    // Restore the colors while transitions are still off, then the transitions: removed together, WebKit
+    // animates the text back in from transparent and the next read sees an in-between color.
+    await setMask(page, `:is(${selector}), :is(${selector}) * { transition: none !important; }`);
+    await setMask(page, null);
+  }
+}
+
+type TextRun = { text: string; color: string; opacity: number; fontSize: number; fontWeight: number;
+  rect: { x: number; y: number; width: number; height: number } };
+
+function measure(page: Page, background: Awaited<ReturnType<Page["screenshot"]>>, runs: TextRun[]) {
+  return page.evaluate(async ({ image, textRuns }) => {
     const bytes = Uint8Array.from(atob(image), (character) => character.charCodeAt(0));
     const bitmap = await createImageBitmap(new Blob([bytes], { type: "image/png" }));
     const canvas = document.createElement("canvas");
@@ -116,10 +158,6 @@ export async function expectHudContrast(page: Page, info: TestInfo, label: strin
       return { ...run, samples, minimum: Math.min(...samples.map((sample) => sample.ratio)), required: large ? 3 : 4.5 };
     });
   }, { image: background.toString("base64"), textRuns: runs });
-  await info.attach(`${label}-contrast`, { body: JSON.stringify(measurements, null, 2), contentType: "application/json" });
-  for (const run of measurements) {
-    expect.soft(run.minimum, `${label}: ${run.text} (${run.color}) against composited pixels`).toBeGreaterThanOrEqual(run.required);
-  }
 }
 
 export async function expectHudGeometry(page: Page) {
