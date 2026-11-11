@@ -905,7 +905,7 @@ for (const entry of mediaCases) {
   const lead = items[0];
 
   test.describe(`case media: ${entry.id}`, () => {
-    test("requests nothing before the drawer opens, then reserves every box and lazy-loads", async ({ page }) => {
+    test("requests nothing before the drawer opens, then reserves every box; the lead loads first", async ({ page }) => {
       const requested: string[] = [];
       page.on("request", (request) => {
         if (request.url().includes("/case-media/")) requested.push(request.url());
@@ -931,7 +931,9 @@ for (const entry of mediaCases) {
       await expect(images).toHaveCount(items.length);
       for (const [index, media] of items.entries()) {
         const image = images.nth(index);
-        await expect(image).toHaveAttribute("loading", "lazy");
+        await expect(image).toHaveAttribute("loading", index === 0 ? "eager" : "lazy");
+        if (index === 0) await expect(image).toHaveAttribute("fetchpriority", "high");
+        else await expect(image).not.toHaveAttribute("fetchpriority");
         await expect(image).toHaveAttribute("width", String(media.width));
         await expect(image).toHaveAttribute("height", String(media.height));
         await expect(image).toHaveAttribute("alt", media.alt);
@@ -1003,6 +1005,60 @@ for (const entry of mediaCases) {
       for (let step = 0; step < expectedStops; step += 1) await page.keyboard.press("Tab");
       await expect(dialog.getByRole("button", { name: /close/i })).toBeFocused();
     });
+
+    test("an image that fails while its link has focus hands focus to the close button", async ({ page }) => {
+      // Hold the lead file until its link has focus, then fail it: the figure (and the link) disappear.
+      let release!: () => void;
+      const gate = new Promise<void>((resolve) => {
+        release = resolve;
+      });
+      for (const src of [lead.src, ...(lead.variants ?? []).map((variant) => variant.src)]) {
+        await page.route(`**${src}`, async (route) => {
+          await gate;
+          await route.fulfill({ status: 404, body: "not found" });
+        });
+      }
+      const dialog = await openCase(page, "en", entry.title);
+      const leadLink = dialog.locator("figure").first().locator("a");
+      await leadLink.focus();
+      await expect(leadLink).toBeFocused();
+      release();
+      await expect(dialog.locator("figure")).toHaveCount(items.length - 1);
+      await expect(dialog.getByRole("button", { name: /close/i })).toBeFocused();
+    });
+  });
+}
+
+/*
+ * `sizes` must describe the drawer column the images really get, or the browser downloads the 1440 rendition where
+ * the 720 is enough (#60: 52rem was declared for a lead that renders 502-778px, tiles assumed two per row from 761px).
+ * Expected pick: the smallest rendition at least as wide as the rendered width times the device pixel ratio.
+ */
+const srcsetCase = mediaCases.find((entry) => entry.media!.some((media) => media.variants?.length));
+for (const [width, height, scale] of [[761, 900, 1], [900, 900, 1], [1024, 768, 1], [1440, 900, 1], [1920, 1080, 1], [390, 844, 2], [1024, 768, 2]] as const) {
+  test(`case media picks the smallest rendition that covers its box at ${width}x${height}@${scale}x`, async ({ browser }) => {
+    test.skip(!srcsetCase, "no case ships responsive variants");
+    const context = await browser.newContext({ viewport: { width, height }, deviceScaleFactor: scale });
+    const page = await context.newPage();
+    try {
+      await page.route(/ExperienceCanvas-.*\.js/, (route) => route.abort());
+      const dialog = await openCase(page, "en", srcsetCase!.title);
+      const images = dialog.locator("img.case-media__image");
+      const misses: string[] = [];
+      for (const [index, media] of srcsetCase!.media!.entries()) {
+        const image = images.nth(index);
+        await image.scrollIntoViewIfNeeded();
+        await expect.poll(() => image.evaluate((node: HTMLImageElement) => node.naturalWidth), { timeout: 20_000 }).toBeGreaterThan(0);
+        const rendered = (await image.boundingBox())!.width * scale;
+        const renditions = [...(media.variants ?? []), { src: media.src, width: media.width }].sort((a, b) => a.width - b.width);
+        const expected = (renditions.find((rendition) => rendition.width >= rendered) ?? renditions.at(-1)!).src;
+        const picked = new URL(await image.evaluate((node: HTMLImageElement) => node.currentSrc)).pathname;
+        if (picked !== expected) misses.push(`${index}: ${Math.round(rendered)}px wants ${expected}, got ${picked}`);
+      }
+      expect(misses).toEqual([]);
+    } finally {
+      await context.close();
+    }
   });
 }
 
