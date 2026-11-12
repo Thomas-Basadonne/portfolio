@@ -360,6 +360,26 @@ test("case drawer traps focus and restores it", async ({ page }) => {
   await expect(trigger).toBeFocused();
 });
 
+test("the depth readout follows the scroll again after the case drawer closes", async ({ page }) => {
+  await bypassEntry(page);
+  await page.goto("/#work");
+  await expect(page.locator(".hud__readout")).toBeVisible();
+  const depth = page.locator(".hud__readout strong");
+  const bottom = () => page.evaluate(() => window.scrollTo({ top: document.documentElement.scrollHeight, behavior: "instant" }));
+
+  // A deliberate pause (the drawer) on a visible tab: the readout must follow the scroll once the drawer closes.
+  await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
+  await expect.poll(async () => depth.innerText(), { timeout: 20_000 }).toBe("000");
+  await page.getByRole("button", { name: /project twin/i }).click();
+  await expect(page.getByRole("dialog", { name: "Project Twin" })).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("dialog", { name: "Project Twin" })).toBeHidden();
+  // Closing returns focus to the trigger, which scrolls it back into view: wait for that before the scroll to the end.
+  await expect(page.getByRole("button", { name: /project twin/i })).toBeFocused();
+  await bottom();
+  await expect.poll(async () => depth.innerText(), { timeout: 20_000 }).toBe("100");
+});
+
 for (const viewport of [
   { width: 320, height: 568 },
   { width: 667, height: 375 },
