@@ -108,14 +108,16 @@ export function CaseStudyDrawer({ caseStudy, ui, onClose }: CaseStudyDrawerProps
               </ol>
             </dd>
           </div>
-          <div className="case-field">
-            <dt className="mono-label">{ui.drawerTechnologies}</dt>
-            <dd className="case-drawer__tags">
-              {caseStudy.technologies.map((technology) => (
-                <span key={technology}>{technology}</span>
-              ))}
-            </dd>
-          </div>
+          {caseStudy.technologies.length > 0 && (
+            <div className="case-field">
+              <dt className="mono-label">{ui.drawerTechnologies}</dt>
+              <dd className="case-drawer__tags">
+                {caseStudy.technologies.map((technology) => (
+                  <span key={technology}>{technology}</span>
+                ))}
+              </dd>
+            </div>
+          )}
           <DataField label={ui.drawerOutcome} value={caseStudy.outcome} />
           {caseStudy.links.length > 0 && (
             <div className="case-field">
