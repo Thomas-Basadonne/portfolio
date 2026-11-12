@@ -40,17 +40,21 @@ async function scrollToSection(page: Page, id: string, offset = 120) {
   }, [id, offset] as const);
 }
 
-/** Waits until the band's cut stops changing (the spring settles; reduced motion settles at once). */
+/**
+ * Waits until the band's cut stops changing (the spring settles; reduced motion settles at once). Six equal readings
+ * in a row make a stable state; if the cut never settles the measurement is refused, not taken on a moving band.
+ */
 async function settleBand(page: Page) {
   let last = "";
   let stable = 0;
-  for (let attempt = 0; attempt < 80 && stable < 6; attempt += 1) {
+  for (let attempt = 0; attempt < 120 && stable < 6; attempt += 1) {
     const value = await page.evaluate(() => new Promise<string>((resolve) => requestAnimationFrame(() =>
       resolve(getComputedStyle(document.querySelector<HTMLElement>("[data-scene-stage]")!).getPropertyValue("--band-cut")))));
     stable = value === last ? stable + 1 : 0;
     last = value;
     await page.waitForTimeout(50);
   }
+  if (stable < 6) throw new Error(`band cut kept changing (last ${JSON.stringify(last)}): not a stable state`);
   return last;
 }
 
@@ -165,11 +169,16 @@ async function scrollToEnd(page: Page) {
 }
 
 /*
- * Finale (direction A). At max scroll the contact block (kicker, title, paragraph, links) would have to sit between the
- * band's visible bottom and the dock top. Measured on f2e2193 (EN, PR #74 table) the block is 557–675 px tall and the
- * footer stack under the last link takes another 135–185 px, while the room above the dock is 395–536 px even with the
- * band at its reading minimum. So the links (the actions) clear the band on every tested phone; the title and the
- * paragraph do not fit on any of them. The stop is measured, never above the reading band (readingBand.ts).
+ * Finale (direction A), the contract approved by Thomas on 12/11 (PR #74). On portrait phones the whole contact block
+ * (kicker, title, paragraph, links, footer) does not fit between the header and the dock, so the contract is:
+ * (a) at max scroll every contact link sits fully between the band's visible bottom and the dock top;
+ * (b) the kicker, the title and the paragraph are each fully readable at SOME step of the scroll into the finale:
+ *     fully below the visible band bottom and fully above the dock top;
+ * (c) they are never under the WIDENED band: at every step where the band is wider than the reading band, no rect of
+ *     kicker, title, paragraph or links meets the widened zone (between the reading band bottom and the visible band
+ *     bottom). Text passing under the reading band is normal reading and allowed.
+ * (b) and (c) are swept from the Work→Contact boundary to max scroll in steps of at most 1/8 viewport, every step
+ * settled. The band stop is measured, never above the reading band (readingBand.ts).
  */
 const FINALE = [
   { width: 320, height: 568 },
@@ -180,38 +189,80 @@ const FINALE = [
   { width: 430, height: 932 },
 ] as const;
 
-/** Declared divergence (PR #74): the block does not fit above the dock, so the test is an expected failure until a layout decision. */
-const FINALE_DIVERGENCE = "contact block + footer taller than the room above the dock: kicker, title and paragraph stay under the band (PR #74 table)";
-
 async function openFinale(page: Page, viewport: { width: number; height: number }, lang: "en" | "it") {
   await open(page, viewport, false, lang);
   await scrollToEnd(page);
   await settleBand(page);
 }
 
-/** Visible band bottom, dock top, and the rects of the contact block at max scroll. */
-const finaleGeometry = (page: Page) => page.evaluate(() => {
+type Box = { top: number; bottom: number };
+type FinaleStep = {
+  scroll: number;
+  full: number;
+  read: number;
+  /** Visible bottom of the band (its clip removed). */
+  bandBottom: number;
+  /** Bottom of the reading band (the part that is always visible). */
+  readingBottom: number;
+  dockTop: number;
+  kicker: Box;
+  title: Box;
+  paragraph: Box;
+  links: Box[];
+};
+
+/** Visible band bottom, reading band bottom, dock top and the rects of the contact block, at the current scroll. */
+const finaleStep = (page: Page) => page.evaluate(() => {
   const stage = document.querySelector<HTMLElement>("[data-scene-stage]")!;
+  const box = stage.getBoundingClientRect();
   const cut = parseFloat(getComputedStyle(stage).getPropertyValue("--band-cut")) || 0;
-  const read = parseFloat(getComputedStyle(stage, "::before").height) || 0;
+  const read = Math.min(box.height, parseFloat(getComputedStyle(stage, "::before").height) || 0);
   const rect = (selector: string) => {
-    const box = document.querySelector(selector)!.getBoundingClientRect();
-    return { top: box.top, bottom: box.bottom };
+    const element = document.querySelector(selector)!.getBoundingClientRect();
+    return { top: element.top, bottom: element.bottom };
   };
   return {
-    bandBottom: stage.getBoundingClientRect().bottom - cut,
-    readingBottom: stage.getBoundingClientRect().top + Math.min(stage.getBoundingClientRect().height, read),
+    scroll: window.scrollY,
+    full: box.height,
+    read,
+    bandBottom: box.bottom - cut,
+    readingBottom: box.top + read,
     dockTop: rect(".chapter-nav").top,
     kicker: rect("#contact .chapter-kicker"),
     title: rect("#contact h2"),
     paragraph: rect("#contact .story-section__content > p"),
     links: Array.from(document.querySelectorAll(".contact-link")).map((link) => {
-      const box = link.getBoundingClientRect();
-      return { top: box.top, bottom: box.bottom };
+      const element = link.getBoundingClientRect();
+      return { top: element.top, bottom: element.bottom };
     }),
-    footerBottom: rect(".site-footer").bottom,
-  };
+  } satisfies FinaleStep;
 });
+
+/** Sweeps from the Work→Contact boundary to max scroll in steps of at most 1/8 viewport; every step is settled. */
+async function sweepFinale(page: Page, viewport: { height: number }) {
+  const step = Math.floor(viewport.height / 8);
+  const start = await page.evaluate(() => Math.max(0, document.getElementById("contact")!.getBoundingClientRect().top + window.scrollY - window.innerHeight));
+  const max = await page.evaluate(() => Math.max(0, document.documentElement.scrollHeight - window.innerHeight));
+  const positions: number[] = [];
+  for (let y = start; y < max; y += step) positions.push(y);
+  const samples: FinaleStep[] = [];
+  for (const y of positions) {
+    await page.evaluate((top) => window.scrollTo({ top, behavior: "instant" }), y);
+    await settleBand(page);
+    samples.push(await finaleStep(page));
+  }
+  await scrollToEnd(page);
+  await settleBand(page);
+  samples.push(await finaleStep(page));
+  return samples;
+}
+
+/** Fully between the visible band bottom and the dock top. */
+const fullyReadable = (box: Box, step: FinaleStep) => box.top >= step.bandBottom - 0.5 && box.bottom <= step.dockTop + 0.5;
+
+/** Px of a box inside the widened zone: from the reading band bottom down to the visible band bottom. */
+const widenedOverlap = (box: Box, step: FinaleStep) =>
+  Math.max(0, Math.min(box.bottom, step.bandBottom) - Math.max(box.top, step.readingBottom));
 
 for (const lang of ["en", "it"] as const) {
   for (const viewport of FINALE) {
@@ -219,26 +270,49 @@ for (const lang of ["en", "it"] as const) {
 
     test(`finale ${label}: every contact link sits between the band and the dock`, async ({ page }) => {
       await openFinale(page, viewport, lang);
-      const geometry = await finaleGeometry(page);
+      const geometry = await finaleStep(page);
       expect(geometry.links.length, `${label} contact links`).toBe(3);
       geometry.links.forEach((link, index) => {
         expect(link.top, `${label} link ${index + 1} under the band`).toBeGreaterThanOrEqual(geometry.bandBottom - 0.5);
         expect(link.bottom, `${label} link ${index + 1} under the dock`).toBeLessThanOrEqual(geometry.dockTop + 0.5);
       });
-      expect(geometry.footerBottom, `${label} footer under the dock`).toBeLessThanOrEqual(geometry.dockTop + 0.5);
+      const footerBottom = await page.evaluate(() => document.querySelector(".site-footer")!.getBoundingClientRect().bottom);
+      expect(footerBottom, `${label} footer under the dock`).toBeLessThanOrEqual(geometry.dockTop + 0.5);
     });
 
-    // The whole block, as the finale requires. It fails on every phone in the matrix (see FINALE_DIVERGENCE): expected
-    // failure, so the suite stays green and the measured failure is kept. Remove test.fail when the layout fits.
-    test(`finale ${label}: kicker, title, paragraph and links fit between the band and the dock`, async ({ page }) => {
-      test.fail(true, FINALE_DIVERGENCE);
-      await openFinale(page, viewport, lang);
-      const geometry = await finaleGeometry(page);
-      const inside = (box: { top: number; bottom: number }) => box.top >= geometry.bandBottom - 0.5 && box.bottom <= geometry.dockTop + 0.5;
-      expect(inside(geometry.kicker), `${label} kicker`).toBe(true);
-      expect(inside(geometry.title), `${label} title`).toBe(true);
-      expect(inside(geometry.paragraph), `${label} paragraph`).toBe(true);
-      geometry.links.forEach((link, index) => expect(inside(link), `${label} link ${index + 1}`).toBe(true));
+    test(`finale ${label}: kicker, title and paragraph each readable at some step (b); no contact text under the widened band (c)`, async ({ page }) => {
+      await open(page, viewport, false, lang);
+      const samples = await sweepFinale(page, viewport);
+      const first = (key: "kicker" | "title" | "paragraph") => samples.findIndex((step) => fullyReadable(step[key], step));
+      const widened = samples.filter((step) => step.bandBottom > step.readingBottom + 0.5);
+      const worst = samples.flatMap((step) => [step.kicker, step.title, step.paragraph, ...step.links]
+        .map((box) => ({ scroll: step.scroll, px: widenedOverlap(box, step) })))
+        .reduce((a, b) => (b.px > a.px ? b : a));
+      const at = (key: "kicker" | "title" | "paragraph") => {
+        const index = first(key);
+        return index < 0 ? null : { scroll: samples[index].scroll, step: index };
+      };
+      console.log("finale-evidence", JSON.stringify({
+        label,
+        steps: samples.length,
+        fullyVisible: { kicker: at("kicker"), title: at("title"), paragraph: at("paragraph") },
+        widenedSteps: widened.length,
+        bandFull: Math.round(samples[0].full),
+        bandRead: Math.round(samples[0].read),
+        maxCutPx: Math.round(Math.max(...samples.map((step) => step.bandBottom - step.readingBottom))),
+        maxWidenedOverlapPx: Number(worst.px.toFixed(2)),
+        worstScroll: worst.scroll,
+        maxScroll: samples[samples.length - 1].scroll,
+      }));
+
+      for (const key of ["kicker", "title", "paragraph"] as const) {
+        expect(first(key), `${label} ${key} never fully between the band and the dock in ${samples.length} steps`).toBeGreaterThanOrEqual(0);
+      }
+      // A widened step must exist wherever the reading band is shorter than the full band, or (c) would pass vacuously.
+      if (samples.some((step) => step.full > step.read + 0.5)) {
+        expect(widened.length, `${label} the sweep never saw the band widened at the finale`).toBeGreaterThan(0);
+      }
+      expect(worst.px, `${label} contact text under the widened band at scroll ${worst.scroll}`).toBeLessThanOrEqual(0.5);
     });
   }
 }
@@ -246,7 +320,7 @@ for (const lang of ["en", "it"] as const) {
 test("the finale paragraph clears the band on a tall phone, where the band stops at the reading band", async ({ page }) => {
   for (const lang of ["en", "it"] as const) {
     await openFinale(page, { width: 430, height: 932 }, lang);
-    const geometry = await finaleGeometry(page);
+    const geometry = await finaleStep(page);
     const label = `${lang} 430x932`;
     expect(geometry.bandBottom, `${label} band above the paragraph`).toBeLessThanOrEqual(geometry.paragraph.top + 0.5);
     expect(geometry.paragraph.bottom, `${label} paragraph above the dock`).toBeLessThanOrEqual(geometry.dockTop + 0.5);
