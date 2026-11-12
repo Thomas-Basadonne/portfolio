@@ -602,7 +602,7 @@ const en: PortfolioContent = {
           caption:
             "The studio's logo, version 2. Identity only: no product or client work is shown.",
           provenance:
-            "Rendered from the approved vector source (logo v2, approved 5 November 2026). It is not a screenshot of any product.",
+            "Rendered from the approved vector source (logo v2). It is not a screenshot of any product.",
         },
       ],
     },
@@ -1126,7 +1126,7 @@ const it: PortfolioContent = {
           caption:
             "Il logo dello studio, versione 2. Solo identità: nessun prodotto né lavoro per clienti è mostrato.",
           provenance:
-            "Reso dalla sorgente vettoriale approvata (logo v2, approvato il 5 novembre 2026). Non è lo screenshot di alcun prodotto.",
+            "Reso dalla sorgente vettoriale approvata (logo v2). Non è lo screenshot di alcun prodotto.",
         },
       ],
     },

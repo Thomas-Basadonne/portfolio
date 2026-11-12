@@ -14,7 +14,7 @@ const sideHustle = (locale: Locale) => {
   return entry;
 };
 
-// Everything a visitor reads as a claim. Media provenance is excluded: it cites the logo version and its approval date.
+// Everything a visitor reads as a claim. Media text is checked on its own below: it cites the logo version ("v2").
 const claims = (entry: CaseStudy) =>
   [entry.summary, entry.context, entry.role, ...entry.decisions, entry.outcome, entry.evidence].join("\n");
 
@@ -47,6 +47,14 @@ describe("SGAGGIO side-hustle card", () => {
 
       it("does not name a client or the people it was never tied to", () => {
         expect(claims(get())).not.toMatch(/fetuseria|travel means|giulia|mapei|asterion|hermes/i);
+      });
+
+      // Media text is read in the drawer too. It may name the logo version ("v2"), never a date.
+      it("dates nothing in the media text either", () => {
+        const media = (get().media ?? []).flatMap((item) => [item.alt, item.caption, item.provenance]).join("\n");
+        expect(media).not.toMatch(/\b(19|20)\d\d\b|\b\d{1,2}[./]\d{1,2}\b/);
+        expect(media).not.toMatch(/\b(january|february|march|april|may|june|july|august|september|october|november|december)\b/i);
+        expect(media).not.toMatch(/\b(gennaio|febbraio|marzo|aprile|maggio|giugno|luglio|agosto|settembre|ottobre|novembre|dicembre)\b/i);
       });
 
       it("ships the logo as its only media, with real alt, caption and provenance", () => {
