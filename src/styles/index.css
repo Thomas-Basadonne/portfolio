@@ -1925,6 +1925,11 @@ a.contact-link:focus-visible {
     grid-template-columns: 1fr auto;
   }
 
+  /* The address on one line on every phone: sized to the column (~13.2em wide in Manrope, more in the fallback). */
+  .contact-link[href^="mailto:"] strong {
+    font-size: min(1.6rem, calc(7.2vw - 7px));
+  }
+
   .contact-link small {
     display: none;
   }

@@ -1335,6 +1335,32 @@ test("evidence links are at least 24px tall on a phone, in the index and in the 
   expect(drawer.filter((link) => link.height < 24)).toEqual([]);
 });
 
+/*
+ * The e-mail address broke mid-word on every phone (inherited watchpoint, MOB-01 #49 audit). It stays on one line from
+ * 320px up, with the web font and with the fallback (`font-display: optional` can keep the fallback for the visit).
+ */
+for (const font of ["web font", "fallback font"] as const) {
+  test(`the e-mail address stays on one line on phones (${font})`, async ({ page }) => {
+    if (font === "fallback font") await page.route(/manrope-.*\.woff2/, (route) => route.abort());
+    await bypassEntry(page);
+    await page.setViewportSize({ width: 320, height: 568 });
+    await page.goto("/#contact");
+    await expect(page.locator(".hud__readout")).toBeVisible();
+    await page.evaluate(() => document.fonts.ready);
+    const failures: string[] = [];
+    for (const width of [320, 360, 375, 390, 414, 430, 760]) {
+      await page.setViewportSize({ width, height: 800 });
+      const lines = await page.locator(".contact-link[href^='mailto:'] strong").evaluate((element) => {
+        const range = document.createRange();
+        range.selectNodeContents(element);
+        return new Set([...range.getClientRects()].map((rect) => Math.round(rect.top))).size;
+      });
+      if (lines !== 1) failures.push(`${width}px: ${lines} lines`);
+    }
+    expect(failures).toEqual([]);
+  });
+}
+
 test("the promise breaks after its lead, never leaving one word behind", async ({ page }) => {
   await bypassEntry(page);
   await page.setViewportSize({ width: 1440, height: 900 });
