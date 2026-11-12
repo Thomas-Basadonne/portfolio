@@ -137,12 +137,8 @@
   }
 }
 @media (max-width: 760px) and (orientation: portrait) and (max-height: 600px) {
-  .scene-staged[data-scene-layout] { --band-height: calc(var(--band-header) + 14svh); }
   .scene-staged[data-scene-layout] .identity-section { padding-top: 0.75rem; }
   .scene-staged[data-scene-layout] .hero-spec { display: none; }
-  @supports selector(:has(*)) {
-    :root:has(.scene-staged[data-scene-layout]) { --band-height: calc(var(--band-header) + 14svh); }
-  }
 }
 
 /* Portrait phones reserve the bottom dock; short landscape phones reserve the numeric rail. */
