@@ -390,8 +390,8 @@ test("the depth readout follows the scroll again after the case drawer closes", 
   await expect(page.getByRole("dialog", { name: "Project Twin" })).toBeHidden();
   // Closing returns focus to the trigger, which scrolls it back into view: wait for that before the scroll to the end.
   await expect(page.getByRole("button", { name: /project twin/i })).toBeFocused();
-  await bottom();
-  await expect.poll(async () => depth.innerText(), { timeout: 20_000 }).toBe("100");
+  // One scroll to the end is not atomic while the page settles (it can stop at 095): scroll again on every poll.
+  await expect.poll(async () => { await bottom(); return depth.innerText(); }, { timeout: 20_000 }).toBe("100");
 });
 
 for (const viewport of [
