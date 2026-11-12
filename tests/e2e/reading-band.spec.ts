@@ -20,6 +20,14 @@ async function bypassEntry(page: Page) {
 async function holdScene(page: Page) {
   await page.route(/ExperienceCanvas-.*\.js/, (route) =>
     route.fulfill({ contentType: "text/javascript", body: "await new Promise(() => {});" }));
+  // As holdStagedLayout (portfolio.spec.ts): only the WebGL probe gets a context, so an engine without WebGL (Firefox
+  // on CI) still takes the staged layout instead of the fallback; the renderer never starts, the chunk is held.
+  await page.addInitScript(() => {
+    const original = HTMLCanvasElement.prototype.getContext;
+    Reflect.set(HTMLCanvasElement.prototype, "getContext", function (this: HTMLCanvasElement, type: string, ...rest: unknown[]) {
+      return Reflect.apply(original, this, [type, ...rest]) ?? (type.startsWith("webgl") ? {} : null);
+    });
+  });
 }
 
 async function open(page: Page, viewport: { width: number; height: number }, reduced = false, lang?: "en" | "it") {
