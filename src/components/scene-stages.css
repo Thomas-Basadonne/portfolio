@@ -90,6 +90,10 @@
   .scene-staged[data-scene-layout] {
     --band-header: calc(max(0.75rem, env(safe-area-inset-top)) + 4.25rem);
     --band-height: calc(var(--band-header) + 32svh);
+    /* Reading band (#49): the layout keeps --band-height; the band is only clipped to this height while reading. */
+    --band-read: calc(var(--band-header) + 18svh);
+    /* The empty band between two chapters must hold the closed part, so a change of chapter never crosses text. */
+    --band-gap: max(0px, calc(var(--band-height) - var(--band-read)));
   }
   .scene-staged[data-scene-layout] .scene-rail { display: contents; }
   .scene-staged[data-scene-layout] .scene-stage {
@@ -97,11 +101,20 @@
     top: 0;
     height: var(--band-height);
     background: var(--graphite);
+    clip-path: inset(0 0 var(--band-cut, 0px) 0);
+  }
+  /* Probe for the script: the reading band's height, measured in the layout it is drawn with. */
+  .scene-staged[data-scene-layout] .scene-stage::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    height: var(--band-read);
   }
   .scene-staged[data-scene-layout] .scene-stage .webgl-shell { top: var(--band-header); }
+  .scene-staged[data-scene-layout] .motion-control { bottom: calc(var(--nav-clearance) + var(--band-cut, 0px)); }
   .scene-staged[data-scene-layout] .story-section {
     min-height: auto;
-    padding-top: clamp(1.5rem, 4svh, 2.5rem);
+    padding-top: calc(clamp(1.5rem, 4svh, 2.5rem) + var(--band-gap));
     padding-bottom: clamp(1.5rem, 4svh, 2.5rem);
     /* Anchor and section scrolling clears the band in every engine. */
     scroll-margin-top: var(--band-height);
@@ -147,7 +160,8 @@
     padding-bottom: var(--nav-clearance);
   }
   .scene-stage { --stage-bottom: var(--nav-clearance); }
-  .scene-staged[data-scene-layout] .motion-control { bottom: var(--nav-clearance); }
+  /* The control rides the lower edge of the visible band (the clip hides what is below it). */
+  .scene-staged[data-scene-layout] .motion-control { bottom: calc(var(--nav-clearance) + var(--band-cut, 0px)); }
 }
 
 @media (max-width: 760px) and (orientation: landscape) and (max-height: 500px) {
