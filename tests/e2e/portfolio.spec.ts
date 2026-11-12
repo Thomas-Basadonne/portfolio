@@ -1131,7 +1131,11 @@ test("a case without approved media keeps its text-only drawer", async ({ page }
  */
 async function holdStagedLayout(page: Page, layout: "staged" | "fallback") {
   if (layout !== "staged") return;
-  await page.route(/ExperienceCanvas-.*\.js/, () => {});
+  // The chunk is answered with a module that never finishes evaluating: the request completes and the dynamic import
+  // stays pending, so the renderer never starts. A request left pending instead could hold Firefox's load event and
+  // time page.goto out (3 of 48 staged hero runs under load).
+  await page.route(/ExperienceCanvas-.*\.js/, (route) =>
+    route.fulfill({ contentType: "text/javascript", body: "await new Promise(() => {});" }));
   await page.addInitScript(() => {
     const original = HTMLCanvasElement.prototype.getContext;
     Reflect.set(HTMLCanvasElement.prototype, "getContext", function (this: HTMLCanvasElement, type: string, ...rest: unknown[]) {
@@ -1251,12 +1255,16 @@ for (const locale of ["en", "it"] as const) {
 
 /*
  * HOME-01 contract (#50), applied in #23: in the first viewport the visitor reads who (name), what (role), the
- * promise, and reaches the primary CTA, without scrolling and without fixed chrome on top of them. Landscape phones
- * of 375px and less are left out on purpose: ~290px of height cannot hold the hero, mobile direction is MOB-01 (#49).
+ * promise, and reaches the primary CTA, without scrolling and without fixed chrome on top of them. Short portrait
+ * phones are in the contract (MOB-01 #49), as full screens and as Safari shows them with its bars at first load
+ * (375x548 SE, 375x635 X/11 Pro, 390x664 12-15, 414x622 8 Plus). Left out on purpose, the hero cannot fit them:
+ * landscape phones of 375px and less (~290px of height) and a 320px iPhone in Safari (320x460).
  */
 const FIRST_VIEWPORTS = [
   { width: 1440, height: 900 }, { width: 1366, height: 768 }, { width: 1280, height: 720 }, { width: 1024, height: 500 },
   { width: 2560, height: 1080 }, { width: 375, height: 812 }, { width: 390, height: 844 }, { width: 412, height: 915 },
+  { width: 414, height: 736 }, { width: 375, height: 667 }, { width: 360, height: 640 }, { width: 320, height: 568 },
+  { width: 375, height: 548 }, { width: 375, height: 635 }, { width: 390, height: 664 }, { width: 414, height: 622 },
 ];
 
 async function firstViewProblems(page: Page) {
@@ -1305,6 +1313,54 @@ for (const locale of ["en", "it"] as const) {
       expect(failures, `hero contract broken:\n${failures.join("\n")}`).toEqual([]);
     });
   }
+}
+
+/*
+ * MOB-01 (#49) audit: the evidence links (Work index and drawer) rendered 18px tall, as blocks, under the 24px target
+ * of WCAG 2.5.8; the inline-link exception does not apply to them.
+ */
+test("evidence links are at least 24px tall on a phone, in the index and in the drawer", async ({ page }) => {
+  await bypassEntry(page);
+  await page.setViewportSize({ width: 375, height: 667 });
+  await page.goto("/#work");
+  await expect(page.locator(".hud__readout")).toBeVisible();
+  const heights = (scope: string) => page.locator(`${scope} .item-link`).evaluateAll((links) =>
+    links.map((link) => ({ text: link.textContent!.trim().slice(0, 24), height: link.getBoundingClientRect().height })));
+  const index = await heights("main");
+  expect(index.length).toBeGreaterThan(0);
+  expect(index.filter((link) => link.height < 24)).toEqual([]);
+  await page.getByRole("button", { name: /project twin/i }).click();
+  // evaluateAll does not wait: without the dialog on screen the drawer scope would be empty, not short.
+  await expect(page.getByRole("dialog", { name: /project twin/i })).toBeVisible();
+  const drawer = await heights("[role=dialog]");
+  expect(drawer.length).toBeGreaterThan(0);
+  expect(drawer.filter((link) => link.height < 24)).toEqual([]);
+});
+
+/*
+ * The e-mail address broke mid-word on every phone (inherited watchpoint, MOB-01 #49 audit). It stays on one line from
+ * 320px up, with the web font and with the fallback (`font-display: optional` can keep the fallback for the visit).
+ */
+for (const font of ["web font", "fallback font"] as const) {
+  test(`the e-mail address stays on one line on phones (${font})`, async ({ page }) => {
+    if (font === "fallback font") await page.route(/manrope-.*\.woff2/, (route) => route.abort());
+    await bypassEntry(page);
+    await page.setViewportSize({ width: 320, height: 568 });
+    await page.goto("/#contact");
+    await expect(page.locator(".hud__readout")).toBeVisible();
+    await page.evaluate(() => document.fonts.ready);
+    const failures: string[] = [];
+    for (const width of [320, 360, 375, 390, 414, 430, 760]) {
+      await page.setViewportSize({ width, height: 800 });
+      const lines = await page.locator(".contact-link[href^='mailto:'] strong").evaluate((element) => {
+        const range = document.createRange();
+        range.selectNodeContents(element);
+        return new Set([...range.getClientRects()].map((rect) => Math.round(rect.top))).size;
+      });
+      if (lines !== 1) failures.push(`${width}px: ${lines} lines`);
+    }
+    expect(failures).toEqual([]);
+  });
 }
 
 test("the promise breaks after its lead, never leaving one word behind", async ({ page }) => {
