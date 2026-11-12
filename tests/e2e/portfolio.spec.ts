@@ -1,6 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 import { expectHudContrast, expectHudGeometry } from "./hud-contrast";
+import { requireWebGL } from "./webgl";
 import { portfolioContent } from "../../src/content/portfolio";
 import { MOTION_RATES } from "../../src/lib/motionPolicy";
 import { chapterRailFit, controlInventory, focusVisibility, midWordBreaks, typeInventory } from "./readability";
@@ -427,19 +428,6 @@ test("visual chunk failure leaves the complete portfolio usable", async ({ page 
   await expect(page.getByRole("heading", { level: 1, name: /thomas basadonne/i })).toBeVisible();
   await expect(page.getByRole("navigation", { name: "Portfolio sections" })).toBeVisible();
 });
-
-/**
- * The visual-layer tests need a browser profile that exposes WebGL (headless Firefox on CI does not): the app then
- * takes its fallback path, which has its own tests. Same probe as `supportsWebGL()`; a profile WITH WebGL whose
- * visual layer still fails is not skipped and fails the test.
- */
-async function requireWebGL(page: Page) {
-  const available = await page.evaluate(() => {
-    const canvas = document.createElement("canvas");
-    return Boolean(canvas.getContext("webgl2") || canvas.getContext("webgl"));
-  });
-  test.skip(!available, "This browser profile exposes no WebGL; the fallback path is covered separately.");
-}
 
 test("motion pause remains explicit across drawer and language changes", async ({ page }) => {
   await bypassEntry(page);

@@ -52,7 +52,8 @@ export function useExperienceController(entered: boolean, options: ControllerOpt
     let starts: number[] = [];
     let crossings: number[] = [];
     // Band geometry in document coordinates (the band itself is sticky at the top of the viewport).
-    let band = { full: 0, read: 0, contactTop: Number.POSITIVE_INFINITY, gaps: [] as BandGap[] };
+    let band = { layout: false, full: 0, read: 0, contactTop: Number.POSITIVE_INFINITY, gaps: [] as BandGap[] };
+    let bandNarrowable = false;
     let bandTarget = 1;
     let bandCut = 0;
     let sideTarget: number = MODEL_SIDE[0];
@@ -113,14 +114,23 @@ export function useExperienceController(entered: boolean, options: ControllerOpt
       };
       crossings = sections.map((section, index) =>
         index === 0 ? 0 : (extent(sections[index - 1])[1] + extent(section)[0]) / 2);
-      // The empty band between two chapters' text: the reading band may widen only while it sits under the full band.
-      band.gaps = sections.slice(1).map((section, index) => ({
-        top: extent(sections[index])[1], bottom: extent(section)[0],
-      }));
-      band.full = stage?.getBoundingClientRect().height ?? 0;
-      const firstLink = document.querySelector<HTMLElement>(".contact-link");
-      band.contactTop = firstLink ? firstLink.getBoundingClientRect().top + scrollY : Number.POSITIVE_INFINITY;
-      band.read = stage ? parseFloat(getComputedStyle(stage, "::before").height) || 0 : 0;
+      // The band exists only in the staged layout: without it there is nothing to narrow, so nothing is measured.
+      band.layout = Boolean(document.querySelector("[data-scene-layout]"));
+      band.gaps = [];
+      band.full = 0;
+      band.read = 0;
+      band.contactTop = Number.POSITIVE_INFINITY;
+      if (band.layout) {
+        // The empty band between two chapters' text: the reading band may widen only while it sits under the full band.
+        band.gaps = sections.slice(1).map((section, index) => ({
+          top: extent(sections[index])[1], bottom: extent(section)[0],
+        }));
+        band.full = stage?.getBoundingClientRect().height ?? 0;
+        // The contact block starts at its kicker (or title): the finale band stops above the whole block, not a link.
+        const blockStart = document.querySelector<HTMLElement>(".contact-section .chapter-kicker, .contact-section h2");
+        band.contactTop = blockStart ? blockStart.getBoundingClientRect().top + scrollY : Number.POSITIVE_INFINITY;
+        band.read = stage ? parseFloat(getComputedStyle(stage, "::before").height) || 0 : 0;
+      }
       layoutDirty = false;
     };
     const readStory = () => {
@@ -131,13 +141,15 @@ export function useExperienceController(entered: boolean, options: ControllerOpt
       const from = starts[chapter] ?? 0;
       const to = Math.max(from + 1, Math.min(end, starts[chapter + 1] ?? end));
       storyTarget = Math.min(starts.length - 0.0001, chapter + clamp01((scrollY - from) / (to - from)));
+      bandNarrowable = portraitQuery.matches && band.layout;
       bandTarget = bandOpenTarget({
         chapter: Math.floor(storyTarget),
-        narrowable: portraitQuery.matches,
+        narrowable: bandNarrowable,
         zoneTop: Math.min(band.full, band.read),
         zoneBottom: band.full,
-        gaps: band.gaps.map((gap) => ({ top: gap.top - scrollY, bottom: gap.bottom - scrollY })),
-        contactTop: band.contactTop - scrollY,
+        gaps: band.gaps,
+        contactTop: band.contactTop,
+        scroll: scrollY,
       });
       const travel = innerHeight * CROSSING_TRAVEL;
       const middle = scrollY + innerHeight / 2;

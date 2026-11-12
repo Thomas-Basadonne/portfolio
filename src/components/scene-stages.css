@@ -147,9 +147,10 @@
   }
 }
 @media (max-width: 760px) and (orientation: portrait) and (max-height: 680px) {
-  .scene-staged[data-scene-layout] { --band-height: calc(var(--band-header) + 14svh); }
+  /* Here the layout band is the reading band: nothing to narrow, so the probe reports the band height itself. */
+  .scene-staged[data-scene-layout] { --band-height: calc(var(--band-header) + 14svh); --band-read: var(--band-height); }
   @supports selector(:has(*)) {
-    :root:has(.scene-staged[data-scene-layout]) { --band-height: calc(var(--band-header) + 14svh); }
+    :root:has(.scene-staged[data-scene-layout]) { --band-height: calc(var(--band-header) + 14svh); --band-read: var(--band-height); }
   }
 }
 @media (max-width: 760px) and (orientation: portrait) and (max-height: 600px) {

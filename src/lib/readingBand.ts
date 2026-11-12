@@ -17,29 +17,32 @@ export type BandTarget = {
   zoneTop: number;
   /** Viewport y where the full band ends. */
   zoneBottom: number;
-  /** Empty bands between two chapters' text, in viewport coordinates. */
+  /** Empty bands between two chapters' text, in document coordinates. */
   gaps: readonly BandGap[];
-  /** Viewport y of the first contact link (Infinity when absent): the finale band ends above it. */
+  /** Document y of the contact block's first line (its kicker or title; Infinity when absent). */
   contactTop: number;
+  /** Document scroll offset: `gaps` and `contactTop` are read in document coordinates (default 0). */
+  scroll?: number;
 };
 
 /**
  * 1 = full band, 0 = reading band, in between = a measured stop (the finale). The band is full in the hero, and in
  * every change of chapter: the empty band between two chapters has to sit under the widened part, so the model never
- * crosses a paragraph. The gap before a chapter's heading counts too, so Work is full only in the empty space before
- * its heading and narrows before any part of its intro reaches the full band. The finale keeps the full band while
- * the first contact link clears it, and otherwise ends the band just above that link, never above the reading band.
+ * crosses a paragraph. A gap counts for any chapter it is in, so Work is full in the empty space before its heading
+ * and in the empty space after it (both clear of its text). The finale stops the band at the top of its contact
+ * block, never above the reading band: it keeps the full band only while the whole block clears it.
  */
 export function bandOpenTarget(input: BandTarget): number {
   if (!input.narrowable || input.chapter <= 0) return 1;
-  if (input.chapter >= 5) return finaleOpen(input);
-  return input.gaps.some((gap) => gap.top <= input.zoneTop && gap.bottom >= input.zoneBottom) ? 1 : 0;
+  const scroll = input.scroll ?? 0;
+  if (input.chapter >= 5) return finaleOpen(input.zoneTop, input.zoneBottom, input.contactTop - scroll);
+  return input.gaps.some((gap) => gap.top - scroll <= input.zoneTop && gap.bottom - scroll >= input.zoneBottom) ? 1 : 0;
 }
 
-function finaleOpen({ zoneTop, zoneBottom, contactTop }: Pick<BandTarget, "zoneTop" | "zoneBottom" | "contactTop">) {
+function finaleOpen(zoneTop: number, zoneBottom: number, blockTop: number) {
   const span = zoneBottom - zoneTop;
   if (span <= 0) return 1;
-  const visibleBottom = Math.min(zoneBottom, Math.max(zoneTop, contactTop));
+  const visibleBottom = Math.min(zoneBottom, Math.max(zoneTop, blockTop));
   return 1 - (zoneBottom - visibleBottom) / span;
 }
 

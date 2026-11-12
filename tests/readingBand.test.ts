@@ -41,6 +41,13 @@ describe("reading band target", () => {
     expect(bandOpenTarget({ ...base, chapter: 3, gaps: [{ top: 250, bottom: 380 }] })).toBe(0);
   });
 
+  it("reads the gaps and the contact block in document coordinates when given the scroll", () => {
+    // Document y 1150..1380 at scroll 1000 is viewport 150..380: the zone 232..350 sits in it.
+    expect(bandOpenTarget({ ...base, gaps: [{ top: 1150, bottom: 1380 }], scroll: 1000 })).toBe(1);
+    expect(bandOpenTarget({ ...base, gaps: [{ top: 1250, bottom: 1380 }], scroll: 1000 })).toBe(0);
+    expect(bandOpenTarget({ ...base, chapter: 5, contactTop: 1400, scroll: 1000 })).toBe(1);
+  });
+
   it("keeps the finale full while the first contact link clears the full band", () => {
     expect(bandOpenTarget({ ...base, chapter: 5, contactTop: 400 })).toBe(1);
     expect(bandOpenTarget({ ...base, chapter: 5 })).toBe(1);

@@ -1,11 +1,13 @@
 import { expect, test, type Page } from "@playwright/test";
+import { requireWebGL } from "./webgl";
 
 /*
  * MOB-01 (#49), direction A «strumento in tasca». Portrait phones: the stage band keeps its layout height (the text
  * never moves) and narrows to the reading band while a reading chapter is read (--band-cut, a clip from the bottom).
- * The band is full in the hero, in the finale and in every change of chapter; Work is full at its start and narrows
- * over the case index. Everything here is geometry, not vision. The scene chunk is held (as in the hero tests), so
- * the layout is the same on engines without WebGL.
+ * The band is full in the hero and in every change of chapter; at the finale it stops above the contact block, never
+ * above the reading band. Work is full over the empty spaces around its heading and narrows over the case index.
+ * Everything here is geometry, not vision. The scene chunk is held (as in the hero tests), so the layout is the same
+ * on engines without WebGL.
  */
 
 const PORTRAIT = [{ width: 375, height: 667 }, { width: 390, height: 844 }];
@@ -80,15 +82,6 @@ test("reading chapters leave at least 60% of the screen to the text at 375x667 a
 
 test("the reading band narrows the stage without moving the text or resizing the canvas", async ({ page }) => {
   await open(page, { width: 390, height: 844 });
-  await page.evaluate(() => {
-    const shift: number[] = [];
-    Reflect.set(window, "__shifts", shift);
-    if (PerformanceObserver.supportedEntryTypes?.includes("layout-shift")) {
-      new PerformanceObserver((list) => {
-        for (const entry of list.getEntries()) if (!(entry as PerformanceEntry & { hadRecentInput: boolean }).hadRecentInput) shift.push(entry.startTime);
-      }).observe({ type: "layout-shift", buffered: true });
-    }
-  });
   const textTops = () => page.evaluate(() => Array.from(document.querySelectorAll("main p, main h2, main h3, main li"))
     .map((element) => Math.round(element.getBoundingClientRect().top + window.scrollY)));
 
@@ -104,7 +97,28 @@ test("the reading band narrows the stage without moving the text or resizing the
   expect(full.cut).toBe(0);
   expect(await textTops()).toEqual(closedText);
   expect(full.stageHeight).toBe(closed.stageHeight);
+});
 
+/*
+ * Layout-shift entries exist only in Chromium: elsewhere this check would pass without measuring anything. The
+ * geometry test above (text tops and stage height unchanged) is the proof that runs on every engine.
+ */
+test("the band change causes no layout shift", async ({ page, browserName }) => {
+  test.skip(browserName !== "chromium", "layout-shift entries are Chromium-only; the geometry test covers the other engines");
+  await open(page, { width: 390, height: 844 });
+  await page.evaluate(() => {
+    const shift: number[] = [];
+    Reflect.set(window, "__shifts", shift);
+    new PerformanceObserver((list) => {
+      for (const entry of list.getEntries()) if (!(entry as PerformanceEntry & { hadRecentInput: boolean }).hadRecentInput) shift.push(entry.startTime);
+    }).observe({ type: "layout-shift", buffered: true });
+  });
+  await scrollToSection(page, "about");
+  await settleBand(page);
+  expect((await bandGeometry(page)).cut).toBeGreaterThan(0);
+  await scrollToSection(page, "identity", 0);
+  await settleBand(page);
+  expect((await bandGeometry(page)).cut).toBe(0);
   const shifts = await page.evaluate(() => (Reflect.get(window, "__shifts") as number[]).length);
   expect(shifts, "layout shifts during the band change").toBe(0);
 });
@@ -117,11 +131,7 @@ test("the canvas keeps its size while the band narrows and widens", async ({ pag
   await bypassEntry(page);
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/");
-  const available = await page.evaluate(() => {
-    const canvas = document.createElement("canvas");
-    return Boolean(canvas.getContext("webgl2") || canvas.getContext("webgl"));
-  });
-  test.skip(!available, "This browser profile exposes no WebGL; the fallback path is covered separately.");
+  await requireWebGL(page);
   await expect(page.locator(".scene-staged")).toHaveAttribute("data-visual-ready", "", { timeout: 20_000 });
   const canvasSize = () => page.evaluate(() => {
     const shell = document.querySelector(".scene-stage .webgl-shell")!.getBoundingClientRect();
@@ -155,10 +165,11 @@ async function scrollToEnd(page: Page) {
 }
 
 /*
- * Finale (direction A): at the end of the page every contact link is fully visible between the band's visible bottom
- * and the dock top, EN and IT, on the short and mid portrait phones where the layout is measured. The band narrows
- * to the first link when the links would sit under the full band (see readingBand.ts); on the short phones the
- * contact block is compacted so the links clear the band at all.
+ * Finale (direction A). At max scroll the contact block (kicker, title, paragraph, links) would have to sit between the
+ * band's visible bottom and the dock top. Measured on f2e2193 (EN, PR #74 table) the block is 557–675 px tall and the
+ * footer stack under the last link takes another 135–185 px, while the room above the dock is 395–536 px even with the
+ * band at its reading minimum. So the links (the actions) clear the band on every tested phone; the title and the
+ * paragraph do not fit on any of them. The stop is measured, never above the reading band (readingBand.ts).
  */
 const FINALE = [
   { width: 320, height: 568 },
@@ -166,43 +177,81 @@ const FINALE = [
   { width: 375, height: 667 },
   { width: 390, height: 844 },
   { width: 414, height: 736 },
+  { width: 430, height: 932 },
 ] as const;
 
-test("at the end of the page every contact link sits between the band and the dock", async ({ page }) => {
-  test.setTimeout(180_000);
-  for (const lang of ["en", "it"] as const) {
-    for (const viewport of FINALE) {
-      await open(page, viewport, false, lang);
-      await scrollToEnd(page);
-      await settleBand(page);
-      const geometry = await page.evaluate(() => {
-        const stage = document.querySelector<HTMLElement>("[data-scene-stage]")!;
-        const box = stage.getBoundingClientRect();
-        const cut = parseFloat(getComputedStyle(stage).getPropertyValue("--band-cut")) || 0;
-        const rect = (element: Element) => element.getBoundingClientRect();
-        return {
-          bandBottom: box.bottom - cut,
-          dockTop: rect(document.querySelector(".chapter-nav")!).top,
-          links: Array.from(document.querySelectorAll(".contact-link")).map((link) => ({ top: rect(link).top, bottom: rect(link).bottom })),
-          footerBottom: rect(document.querySelector(".site-footer")!).bottom,
-        };
-      });
-      const label = `${lang} ${viewport.width}x${viewport.height}`;
+/** Declared divergence (PR #74): the block does not fit above the dock, so the test is an expected failure until a layout decision. */
+const FINALE_DIVERGENCE = "contact block + footer taller than the room above the dock: kicker, title and paragraph stay under the band (PR #74 table)";
+
+async function openFinale(page: Page, viewport: { width: number; height: number }, lang: "en" | "it") {
+  await open(page, viewport, false, lang);
+  await scrollToEnd(page);
+  await settleBand(page);
+}
+
+/** Visible band bottom, dock top, and the rects of the contact block at max scroll. */
+const finaleGeometry = (page: Page) => page.evaluate(() => {
+  const stage = document.querySelector<HTMLElement>("[data-scene-stage]")!;
+  const cut = parseFloat(getComputedStyle(stage).getPropertyValue("--band-cut")) || 0;
+  const read = parseFloat(getComputedStyle(stage, "::before").height) || 0;
+  const rect = (selector: string) => {
+    const box = document.querySelector(selector)!.getBoundingClientRect();
+    return { top: box.top, bottom: box.bottom };
+  };
+  return {
+    bandBottom: stage.getBoundingClientRect().bottom - cut,
+    readingBottom: stage.getBoundingClientRect().top + Math.min(stage.getBoundingClientRect().height, read),
+    dockTop: rect(".chapter-nav").top,
+    kicker: rect("#contact .chapter-kicker"),
+    title: rect("#contact h2"),
+    paragraph: rect("#contact .story-section__content > p"),
+    links: Array.from(document.querySelectorAll(".contact-link")).map((link) => {
+      const box = link.getBoundingClientRect();
+      return { top: box.top, bottom: box.bottom };
+    }),
+    footerBottom: rect(".site-footer").bottom,
+  };
+});
+
+for (const lang of ["en", "it"] as const) {
+  for (const viewport of FINALE) {
+    const label = `${lang} ${viewport.width}x${viewport.height}`;
+
+    test(`finale ${label}: every contact link sits between the band and the dock`, async ({ page }) => {
+      await openFinale(page, viewport, lang);
+      const geometry = await finaleGeometry(page);
       expect(geometry.links.length, `${label} contact links`).toBe(3);
       geometry.links.forEach((link, index) => {
         expect(link.top, `${label} link ${index + 1} under the band`).toBeGreaterThanOrEqual(geometry.bandBottom - 0.5);
         expect(link.bottom, `${label} link ${index + 1} under the dock`).toBeLessThanOrEqual(geometry.dockTop + 0.5);
       });
       expect(geometry.footerBottom, `${label} footer under the dock`).toBeLessThanOrEqual(geometry.dockTop + 0.5);
-    }
-  }
-});
+    });
 
-test("the finale keeps the full band on a tall phone, where the contact links clear it", async ({ page }) => {
-  await open(page, { width: 430, height: 932 });
-  await scrollToEnd(page);
-  await settleBand(page);
-  expect((await bandGeometry(page)).cut).toBe(0);
+    // The whole block, as the finale requires. It fails on every phone in the matrix (see FINALE_DIVERGENCE): expected
+    // failure, so the suite stays green and the measured failure is kept. Remove test.fail when the layout fits.
+    test(`finale ${label}: kicker, title, paragraph and links fit between the band and the dock`, async ({ page }) => {
+      test.fail(true, FINALE_DIVERGENCE);
+      await openFinale(page, viewport, lang);
+      const geometry = await finaleGeometry(page);
+      const inside = (box: { top: number; bottom: number }) => box.top >= geometry.bandBottom - 0.5 && box.bottom <= geometry.dockTop + 0.5;
+      expect(inside(geometry.kicker), `${label} kicker`).toBe(true);
+      expect(inside(geometry.title), `${label} title`).toBe(true);
+      expect(inside(geometry.paragraph), `${label} paragraph`).toBe(true);
+      geometry.links.forEach((link, index) => expect(inside(link), `${label} link ${index + 1}`).toBe(true));
+    });
+  }
+}
+
+test("the finale paragraph clears the band on a tall phone, where the band stops at the reading band", async ({ page }) => {
+  for (const lang of ["en", "it"] as const) {
+    await openFinale(page, { width: 430, height: 932 }, lang);
+    const geometry = await finaleGeometry(page);
+    const label = `${lang} 430x932`;
+    expect(geometry.bandBottom, `${label} band above the paragraph`).toBeLessThanOrEqual(geometry.paragraph.top + 0.5);
+    expect(geometry.paragraph.bottom, `${label} paragraph above the dock`).toBeLessThanOrEqual(geometry.dockTop + 0.5);
+    expect(geometry.bandBottom, `${label} band never above the reading band`).toBeGreaterThanOrEqual(geometry.readingBottom - 0.5);
+  }
 });
 
 /*
@@ -252,10 +301,11 @@ test("Work narrows over the case index", async ({ page }) => {
 test("a change of chapter widens the band only over the empty band between two chapters", async ({ page }) => {
   await open(page, { width: 390, height: 844 });
   const gap = await page.evaluate(() => {
-    const boxes = (id: string) => Array.from(document.getElementById(id)!.children)
-      .map((child) => child.getBoundingClientRect()).filter((box) => box.height > 0);
-    const bottom = Math.max(...boxes("about").map((box) => box.bottom + window.scrollY));
-    const top = Math.min(...boxes("capabilities").map((box) => box.top + window.scrollY));
+    // Text boxes, not section children: a container's padding must not widen the empty band the test places itself in.
+    const textBoxes = (id: string) => Array.from(document.getElementById(id)!.querySelectorAll("p, h2, h3, li, small, strong, .chapter-kicker"))
+      .map((element) => element.getBoundingClientRect()).filter((box) => box.height > 0);
+    const bottom = Math.max(...textBoxes("about").map((box) => box.bottom + window.scrollY));
+    const top = Math.min(...textBoxes("capabilities").map((box) => box.top + window.scrollY));
     return { top: bottom, bottom: top };
   });
   const geometry = await page.evaluate(() => {
