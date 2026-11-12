@@ -299,7 +299,7 @@ const en: PortfolioContent = {
     kicker: "03 / Selected work",
     title: "Work, opened to the decisions inside.",
     intro:
-      "Five projects with their context, my role and the decisions that shaped them. Co-developed work is labelled as such; client metrics stay with the client.",
+      "Five projects and a side hustle just getting started, with their context, my role and the decisions that shaped them. Co-developed work is labelled as such; client metrics stay with the client.",
     openSourceTitle: "Open source",
     labTitle: "Lab",
   },
@@ -567,6 +567,45 @@ const en: PortfolioContent = {
         },
       ],
     },
+    {
+      id: "sgaggio",
+      code: "SH–01",
+      title: "SGAGGIO",
+      kind: "Side hustle",
+      period: "2026",
+      status: "Starting",
+      summary:
+        "A small digital studio I'm building on the side, for restaurants and hospitality businesses in the Marche region. It has a name and an identity; it has no clients yet.",
+      context:
+        "In the Marche dialect, sgaggio is a shout: something that makes itself heard. The idea is a small studio that builds websites for trattorie, restaurants, B&Bs and farm stays, starting close to home. It is a side hustle, separate from my work at CØDESTORM, which is described in Experience.",
+      role: "I'm building it on my own, on the side: name, identity and positioning.",
+      decisionsLabel: "Direction",
+      decisions: [
+        "Begin with one kind of client: restaurants and hospitality businesses in the Marche.",
+        "Keep the promise small. No client, figure, price or date is claimed until there is something public to point to.",
+        "Say what it is: a side hustle at an early stage, not a studio with a portfolio.",
+      ],
+      technologies: [],
+      outcome:
+        "Nothing to report yet: no clients, no public website, no launch date. This card changes when that changes.",
+      links: [],
+      evidence:
+        "Evidence boundary: only the logo, the origin of the name and the current stage are stated. The studio's repositories are private and none of their content is shown here.",
+      media: [
+        {
+          src: "/case-media/sgaggio/logo-1440.webp",
+          width: 1440,
+          height: 584,
+          variants: [{ src: "/case-media/sgaggio/logo-720.webp", width: 720 }],
+          alt:
+            "SGAGGIO logo on a dark panel: the word «sgaggio» in lowercase cream letters followed by three red sound waves, with a red dash and the tagline DIGITAL STUDIO underneath.",
+          caption:
+            "The studio's logo, version 2. Identity only: no product or client work is shown.",
+          provenance:
+            "Rendered from the approved vector source (logo v2). It is not a screenshot of any product.",
+        },
+      ],
+    },
   ],
   openSource: [
     {
@@ -785,7 +824,7 @@ const it: PortfolioContent = {
     kicker: "03 / Progetti",
     title: "Progetti, aperti fino alle decisioni.",
     intro:
-      "Cinque progetti con contesto, il mio ruolo e le decisioni che li hanno definiti. Il lavoro co-sviluppato è indicato come tale; le metriche dei clienti restano ai clienti.",
+      "Cinque progetti e un'attività in parallelo appena avviata, con contesto, il mio ruolo e le decisioni che li hanno definiti. Il lavoro co-sviluppato è indicato come tale; le metriche dei clienti restano ai clienti.",
     openSourceTitle: "Open source",
     labTitle: "Lab",
   },
@@ -1049,6 +1088,45 @@ const it: PortfolioContent = {
             "I preset sono il cuore dell'estensione: tre sono integrati (generale, immagini, codice) e se ne possono creare di propri o importare da JSON.",
           provenance:
             "Screenshot reale dell'estensione in esecuzione in Raycast, dai metadata dello store nel repository. Solo testo di esempio.",
+        },
+      ],
+    },
+    {
+      id: "sgaggio",
+      code: "SH–01",
+      title: "SGAGGIO",
+      kind: "Side hustle",
+      period: "2026",
+      status: "In avvio",
+      summary:
+        "Un piccolo studio digitale che sto costruendo in parallelo al lavoro, per ristoranti e strutture ricettive delle Marche. Ha un nome e un'identità; non ha ancora clienti.",
+      context:
+        "Nel dialetto marchigiano sgaggio è un urlo: qualcosa che si fa sentire. L'idea è un piccolo studio che realizza siti per trattorie, ristoranti, B&B e agriturismi, partendo da vicino a casa. È un'attività in parallelo, separata dal mio lavoro in CØDESTORM, descritto in Esperienza.",
+      role: "Lo sto costruendo da solo, in parallelo al lavoro: nome, identità e posizionamento.",
+      decisionsLabel: "Direzione",
+      decisions: [
+        "Partire da un solo tipo di cliente: ristoranti e strutture ricettive delle Marche.",
+        "Tenere piccola la promessa. Nessun cliente, cifra, prezzo o data viene dichiarato finché non c'è qualcosa di pubblico a cui puntare.",
+        "Dire cosa è: un'attività in parallelo, agli inizi, non uno studio con un portfolio.",
+      ],
+      technologies: [],
+      outcome:
+        "Niente da riportare per ora: nessun cliente, nessun sito pubblico, nessuna data di lancio. Questa scheda cambia quando cambia questo.",
+      links: [],
+      evidence:
+        "Limite delle prove: sono dichiarati solo il logo, l'origine del nome e lo stato attuale. I repository dello studio sono privati e nessun loro contenuto è mostrato qui.",
+      media: [
+        {
+          src: "/case-media/sgaggio/logo-1440.webp",
+          width: 1440,
+          height: 584,
+          variants: [{ src: "/case-media/sgaggio/logo-720.webp", width: 720 }],
+          alt:
+            "Logo di SGAGGIO su un pannello scuro: la parola «sgaggio» in minuscolo color crema seguita da tre onde sonore rosse, con un trattino rosso e la scritta DIGITAL STUDIO sotto.",
+          caption:
+            "Il logo dello studio, versione 2. Solo identità: nessun prodotto né lavoro per clienti è mostrato.",
+          provenance:
+            "Reso dalla sorgente vettoriale approvata (logo v2). Non è lo screenshot di alcun prodotto.",
         },
       ],
     },
