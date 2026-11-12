@@ -1255,12 +1255,16 @@ for (const locale of ["en", "it"] as const) {
 
 /*
  * HOME-01 contract (#50), applied in #23: in the first viewport the visitor reads who (name), what (role), the
- * promise, and reaches the primary CTA, without scrolling and without fixed chrome on top of them. Landscape phones
- * of 375px and less are left out on purpose: ~290px of height cannot hold the hero, mobile direction is MOB-01 (#49).
+ * promise, and reaches the primary CTA, without scrolling and without fixed chrome on top of them. Short portrait
+ * phones are in the contract (MOB-01 #49), as full screens and as Safari shows them with its bars at first load
+ * (375x548 SE, 375x635 X/11 Pro, 390x664 12-15, 414x622 8 Plus). Left out on purpose, the hero cannot fit them:
+ * landscape phones of 375px and less (~290px of height) and a 320px iPhone in Safari (320x460).
  */
 const FIRST_VIEWPORTS = [
   { width: 1440, height: 900 }, { width: 1366, height: 768 }, { width: 1280, height: 720 }, { width: 1024, height: 500 },
   { width: 2560, height: 1080 }, { width: 375, height: 812 }, { width: 390, height: 844 }, { width: 412, height: 915 },
+  { width: 414, height: 736 }, { width: 375, height: 667 }, { width: 360, height: 640 }, { width: 320, height: 568 },
+  { width: 375, height: 548 }, { width: 375, height: 635 }, { width: 390, height: 664 }, { width: 414, height: 622 },
 ];
 
 async function firstViewProblems(page: Page) {
