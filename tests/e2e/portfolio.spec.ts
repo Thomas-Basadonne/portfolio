@@ -1330,6 +1330,8 @@ test("evidence links are at least 24px tall on a phone, in the index and in the 
   expect(index.length).toBeGreaterThan(0);
   expect(index.filter((link) => link.height < 24)).toEqual([]);
   await page.getByRole("button", { name: /project twin/i }).click();
+  // evaluateAll does not wait: without the dialog on screen the drawer scope would be empty, not short.
+  await expect(page.getByRole("dialog", { name: /project twin/i })).toBeVisible();
   const drawer = await heights("[role=dialog]");
   expect(drawer.length).toBeGreaterThan(0);
   expect(drawer.filter((link) => link.height < 24)).toEqual([]);
