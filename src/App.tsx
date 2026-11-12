@@ -28,6 +28,9 @@ const ExperienceCanvas = lazy(() =>
   import("./experience/ExperienceCanvas").then((module) => ({ default: module.ExperienceCanvas })),
 );
 
+// How far the page must move from a deep-link landing before it counts as the reader scrolling away.
+const READER_SCROLL = 48;
+
 export default function App() {
   const [phase, dispatch] = useReducer(
     experienceReducer,
@@ -77,6 +80,14 @@ export default function App() {
 
 
 
+  /*
+   * A deep link lands on its chapter, and the landing is redone when the scene changes phase, because the staged and
+   * fallback layouts put the chapter elsewhere. Only while the reader is still there: once they scroll away, a redo
+   * pulled them back to the chapter start (on production: /#work, scroll to 5515px, scene ready, back at 4069px).
+   * Browser scroll anchoring stays off until then: on the layout change it moves the page by hundreds of pixels
+   * (WebKit: 820-900px when the scene fails), which would read as the reader leaving and skip the redo.
+   */
+  const deepLink = useRef<{ top: number; done: boolean } | null>(null);
   useEffect(() => {
     if (!entered || window.location.hash.length < 2) return;
     const requestedId = decodeURIComponent(window.location.hash.slice(1));
@@ -86,10 +97,33 @@ export default function App() {
       url.hash = targetId;
       window.history.replaceState(window.history.state, "", url);
     }
-    window.requestAnimationFrame(() => {
-      document.getElementById(targetId)?.scrollIntoView({ behavior: "auto" });
+    if (deepLink.current?.done) return;
+    const root = document.documentElement;
+    root.style.setProperty("overflow-anchor", "none");
+    const frame = window.requestAnimationFrame(() => {
+      if (deepLink.current?.done) return;
+      // Instant, like the browser's own landing on a hash: a smooth scroll would still be moving when recorded.
+      document.getElementById(targetId)?.scrollIntoView({ behavior: "instant" });
+      // Once the scene has settled this layout is the last one to follow, and anchoring can come back.
+      const settled = phase !== "loading";
+      deepLink.current = { top: window.scrollY, done: settled };
+      if (settled) root.style.removeProperty("overflow-anchor");
     });
+    return () => window.cancelAnimationFrame(frame);
   }, [entered, phase]);
+
+  useEffect(() => {
+    if (!entered) return;
+    const onScroll = () => {
+      const landing = deepLink.current;
+      // Engines still nudge the landing by a few pixels on their own (Firefox: 10px while the scene loads).
+      if (!landing || landing.done || Math.abs(window.scrollY - landing.top) <= READER_SCROLL) return;
+      landing.done = true;
+      document.documentElement.style.removeProperty("overflow-anchor");
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [entered]);
 
   useEffect(() => {
     if (!entered || phase === "failed" || mountCanvas) return;

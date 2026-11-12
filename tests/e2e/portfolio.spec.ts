@@ -753,6 +753,59 @@ test("legacy section links land on the renamed chapter", async ({ page }) => {
   await expect(page.locator("#work")).toBeInViewport();
 });
 
+/*
+ * A deep link lands on its chapter, and the landing is redone when the scene changes phase (the staged layout moves
+ * the chapter). Once the reader has scrolled away, that redo pulled them back to the anchor with a smooth scroll: on
+ * production, /#work, scroll to 5515px, scene ready, back at 4069px. Under load it also swallowed e2e clicks that
+ * landed mid-scroll. The scene chunk is held until the reader has scrolled, then released or failed.
+ */
+for (const outcome of ["becomes ready", "fails"] as const) for (const reader of ["scrolls away", "stays"] as const) {
+  const title = reader === "stays" ? `a deep link keeps its chapter in place when the scene ${outcome}` : `a deep link does not pull the reader back when the scene ${outcome}`;
+  test(title, async ({ page }) => {
+    let release!: () => void;
+    const gate = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    await page.route(/ExperienceCanvas-.*\.js/, async (route) => {
+      await gate;
+      if (outcome === "fails") await route.abort();
+      else await route.continue();
+    });
+    if (outcome === "fails") {
+      // Let the detection see WebGL on every engine, so the scene starts loading and its failure comes later.
+      await page.addInitScript(() => {
+        const original = HTMLCanvasElement.prototype.getContext;
+        Reflect.set(HTMLCanvasElement.prototype, "getContext", function (this: HTMLCanvasElement, type: string, ...rest: unknown[]) {
+          return Reflect.apply(original, this, [type, ...rest]) ?? (type.startsWith("webgl") ? {} : null);
+        });
+      });
+    }
+    await bypassEntry(page);
+    await page.setViewportSize({ width: 1440, height: 900 });
+    // The held scene chunk can start before the load event, and Firefox then waits for it: do not wait for load.
+    await page.goto("/#work", { waitUntil: "domcontentloaded" });
+    if (outcome === "becomes ready") await requireWebGL(page);
+    await expect(page.locator(".hud__readout")).toBeVisible();
+    await expect(page.locator("#work")).toBeInViewport();
+    await expect(page.locator(".scene-staged")).toHaveAttribute("data-scene-layout", "");
+
+    if (reader === "scrolls away") await page.evaluate(() => window.scrollTo({ top: window.scrollY + 1200, behavior: "instant" }));
+    release();
+    if (outcome === "fails") await expect(page.locator(".visual-status--failed")).toBeVisible({ timeout: SCENE_TIMEOUT });
+    else await expect(page.locator(".scene-staged")).toHaveAttribute("data-visual-ready", "", { timeout: SCENE_TIMEOUT });
+    // A smooth scroll back takes well under this. The layout may still shift a little when the phase changes (the
+    // fallback is shorter), so the check is the distance from the anchor: the chapter start stays far above.
+    await page.waitForTimeout(1200);
+    const chapterTop = await page.locator("#work").evaluate((element) => element.getBoundingClientRect().top);
+    if (reader === "scrolls away") expect(chapterTop, "the reader was pulled back to the deep-link anchor").toBeLessThan(-800);
+    // Still on the anchor: the chapter sits at the reading line of the layout it ended in (the fallback's is lower).
+    else {
+      const readingLine = await page.evaluate(() => parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop));
+      expect(Math.abs(chapterTop - readingLine), "the chapter is not on the deep-link landing").toBeLessThanOrEqual(2);
+    }
+  });
+}
+
 for (const locale of ["en", "it"]) {
   test(`HUD composited contrast through contact and reverse scroll (${locale})`, async ({ page }, info) => {
     test.setTimeout(60_000);
