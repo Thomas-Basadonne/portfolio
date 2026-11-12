@@ -360,6 +360,59 @@ test("case drawer traps focus and restores it", async ({ page }) => {
   await expect(trigger).toBeFocused();
 });
 
+test("arrows say where a control goes: → stays in the page, ↗ leaves it", async ({ page }) => {
+  // #26, decided by Thomas (12/11): → for the entry and the case index (internal), ↗ only for links that leave
+  // the site, the e-mail link included.
+  await page.goto("/");
+  const glyphs = await page.evaluate(() => {
+    const arrow = (root: Element) => [...root.querySelectorAll("[aria-hidden='true']")].map((node) => node.textContent!.trim()).find((text) => /[→↗]/.test(text));
+    return {
+      entry: [...document.querySelectorAll(".calibrate-button")].map(arrow),
+      cases: [...document.querySelectorAll(".case-index button")].map(arrow),
+      leaving: [...document.querySelectorAll("a[target='_blank'], a[href^='mailto:']")].map(arrow).filter(Boolean),
+    };
+  });
+  expect(glyphs.entry.length).toBeGreaterThan(0);
+  expect(glyphs.cases.length).toBeGreaterThan(0);
+  expect(glyphs.leaving.length).toBeGreaterThan(0);
+  expect([...new Set([...glyphs.entry, ...glyphs.cases])]).toEqual(["→"]);
+  expect([...new Set(glyphs.leaving)]).toEqual(["↗"]);
+});
+
+test("case drawer returns focus to the trigger after a mouse click", async ({ page }) => {
+  await bypassEntry(page);
+  await page.goto("/#work");
+  await expect(page.locator(".hud__readout")).toBeVisible();
+  const trigger = page.getByRole("button", { name: /project twin/i });
+  // A mouse click does not focus a button in Safari (WebKit): the drawer must remember the clicked trigger itself.
+  await trigger.click();
+  const dialog = page.getByRole("dialog", { name: "Project Twin" });
+  await expect(dialog).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(dialog).toBeHidden();
+  await expect(trigger).toBeFocused();
+});
+
+test("the depth readout follows the scroll again after the case drawer closes", async ({ page }) => {
+  await bypassEntry(page);
+  await page.goto("/#work");
+  await expect(page.locator(".hud__readout")).toBeVisible();
+  const depth = page.locator(".hud__readout strong");
+  const bottom = () => page.evaluate(() => window.scrollTo({ top: document.documentElement.scrollHeight, behavior: "instant" }));
+
+  // A deliberate pause (the drawer) on a visible tab: the readout must follow the scroll once the drawer closes.
+  await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
+  await expect.poll(async () => depth.innerText(), { timeout: 20_000 }).toBe("000");
+  await page.getByRole("button", { name: /project twin/i }).click();
+  await expect(page.getByRole("dialog", { name: "Project Twin" })).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("dialog", { name: "Project Twin" })).toBeHidden();
+  // Closing returns focus to the trigger, which scrolls it back into view: wait for that before the scroll to the end.
+  await expect(page.getByRole("button", { name: /project twin/i })).toBeFocused();
+  // One scroll to the end is not atomic while the page settles (it can stop at 095): scroll again on every poll.
+  await expect.poll(async () => { await bottom(); return depth.innerText(); }, { timeout: 20_000 }).toBe("100");
+});
+
 for (const viewport of [
   { width: 320, height: 568 },
   { width: 667, height: 375 },

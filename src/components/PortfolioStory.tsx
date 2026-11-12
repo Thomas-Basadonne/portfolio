@@ -4,7 +4,7 @@ import { SceneStage } from "./SceneStage";
 
 type PortfolioStoryProps = {
   content: PortfolioContent;
-  onSelectCase: (caseStudy: CaseStudy) => void;
+  onSelectCase: (caseStudy: CaseStudy, trigger: HTMLElement) => void;
   stageRef?: Ref<HTMLDivElement>;
 };
 
@@ -125,7 +125,7 @@ export function PortfolioStory({ content, onSelectCase, stageRef }: PortfolioSto
                 key={caseStudy.id}
                 type="button"
                 className="case-index__item"
-                onClick={() => onSelectCase(caseStudy)}
+                onClick={(event) => onSelectCase(caseStudy, event.currentTarget)}
                 data-cursor="inspect"
               >
                 <span className="case-index__code mono-label">{caseStudy.code}</span>
@@ -138,7 +138,7 @@ export function PortfolioStory({ content, onSelectCase, stageRef }: PortfolioSto
                 </span>
                 <span className="case-index__status mono-label">{caseStudy.status}</span>
                 <span className="case-index__arrow" aria-hidden="true">
-                  ↗
+                  →
                 </span>
               </button>
             ))}

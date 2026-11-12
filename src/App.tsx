@@ -50,9 +50,10 @@ export default function App() {
   const { activeChapter, progressPercent, reducedMotion, motionAvailable } = useExperienceController(entered, {
     ready: phase === "ready", drawerOpen: selectedCase !== null, userPaused, layoutKey: locale,
   });
-  const selectCase = useCallback((caseStudy: CaseStudy) => {
-    caseTriggerRef.current =
-      document.activeElement instanceof HTMLElement ? document.activeElement : null;
+  // The trigger is the element that was clicked, not document.activeElement: Safari (WebKit) does not focus
+  // a button on mouse click, so the active element would be <body> and focus would be lost on close.
+  const selectCase = useCallback((caseStudy: CaseStudy, trigger: HTMLElement) => {
+    caseTriggerRef.current = trigger;
     setSelectedCaseId(caseStudy.id);
   }, []);
   const closeCase = useCallback(() => {
