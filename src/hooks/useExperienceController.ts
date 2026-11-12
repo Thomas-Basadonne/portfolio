@@ -206,7 +206,9 @@ export function useExperienceController(entered: boolean, options: ControllerOpt
       const sideMoving = Math.abs(sideTarget - experienceStore.side) > SETTLED;
       if (!sideMoving) experienceStore.side = sideTarget;
       const open = experienceStore.bandOpen;
-      experienceStore.bandOpen = experienceStore.reducedMotion || !Number.isFinite(open)
+      // Reduced motion, a layout without a narrowable band (landscape, desktop) and the first frame take the target at
+      // once: a spring would leave a cut that the camera frames and the clip no longer shows.
+      experienceStore.bandOpen = experienceStore.reducedMotion || !bandNarrowable || !Number.isFinite(open)
         ? bandTarget
         : open + (bandTarget - open) * (1 - Math.exp(-STORY_RATE * delta));
       if (Math.abs(bandTarget - experienceStore.bandOpen) <= SETTLED) experienceStore.bandOpen = bandTarget;
@@ -265,6 +267,7 @@ export function useExperienceController(entered: boolean, options: ControllerOpt
     mobileQuery.addEventListener("change", applyCapabilities);
     forcedQuery.addEventListener("change", applyCapabilities);
     sideQuery.addEventListener("change", invalidate);
+    portraitQuery.addEventListener("change", invalidate);
     window.addEventListener("scroll", readScroll, { passive: true });
     window.addEventListener("resize", invalidate, { passive: true });
     window.addEventListener("pointermove", readPointer, { passive: true });
@@ -281,6 +284,7 @@ export function useExperienceController(entered: boolean, options: ControllerOpt
       mobileQuery.removeEventListener("change", applyCapabilities);
       forcedQuery.removeEventListener("change", applyCapabilities);
       sideQuery.removeEventListener("change", invalidate);
+      portraitQuery.removeEventListener("change", invalidate);
       window.removeEventListener("scroll", readScroll);
       window.removeEventListener("resize", invalidate);
       window.removeEventListener("pointermove", readPointer);

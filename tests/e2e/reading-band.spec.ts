@@ -352,3 +352,18 @@ test("the landscape layout keeps the band as it is", async ({ page }) => {
   await settleBand(page);
   expect((await bandGeometry(page)).cut).toBe(0);
 });
+
+/*
+ * Rotating from portrait to landscape: the clip goes away at once (no spring), so the camera never frames the model in
+ * a visible height that no longer has a clip. Two frames after the resize the cut must already be 0.
+ */
+test("rotating to landscape drops the band cut at once", async ({ page }) => {
+  await open(page, { width: 390, height: 844 });
+  await scrollToSection(page, "about");
+  await settleBand(page);
+  expect((await bandGeometry(page)).cut).toBeGreaterThan(0);
+  await page.setViewportSize({ width: 844, height: 390 });
+  await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+  const cut = await page.evaluate(() => parseFloat(getComputedStyle(document.querySelector<HTMLElement>("[data-scene-stage]")!).getPropertyValue("--band-cut")) || 0);
+  expect(cut, "band cut two frames after the rotation").toBe(0);
+});
