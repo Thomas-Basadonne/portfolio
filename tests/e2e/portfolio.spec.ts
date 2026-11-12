@@ -360,6 +360,25 @@ test("case drawer traps focus and restores it", async ({ page }) => {
   await expect(trigger).toBeFocused();
 });
 
+test("arrows say where a control goes: → stays in the page, ↗ leaves it", async ({ page }) => {
+  // #26, decided by Thomas (12/11): → for the entry and the case index (internal), ↗ only for links that leave
+  // the site, the e-mail link included.
+  await page.goto("/");
+  const glyphs = await page.evaluate(() => {
+    const arrow = (root: Element) => [...root.querySelectorAll("[aria-hidden='true']")].map((node) => node.textContent!.trim()).find((text) => /[→↗]/.test(text));
+    return {
+      entry: [...document.querySelectorAll(".calibrate-button")].map(arrow),
+      cases: [...document.querySelectorAll(".case-index button")].map(arrow),
+      leaving: [...document.querySelectorAll("a[target='_blank'], a[href^='mailto:']")].map(arrow).filter(Boolean),
+    };
+  });
+  expect(glyphs.entry.length).toBeGreaterThan(0);
+  expect(glyphs.cases.length).toBeGreaterThan(0);
+  expect(glyphs.leaving.length).toBeGreaterThan(0);
+  expect([...new Set([...glyphs.entry, ...glyphs.cases])]).toEqual(["→"]);
+  expect([...new Set(glyphs.leaving)]).toEqual(["↗"]);
+});
+
 test("case drawer returns focus to the trigger after a mouse click", async ({ page }) => {
   await bypassEntry(page);
   await page.goto("/#work");

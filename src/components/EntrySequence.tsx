@@ -64,7 +64,7 @@ export function EntrySequence({
 
       <button className="calibrate-button" type="button" onClick={onEnter} data-cursor="engage">
         <span>{ui.entryButton}</span>
-        <span aria-hidden="true">↗</span>
+        <span aria-hidden="true">→</span>
       </button>
 
       <p className="entry-sequence__note mono-label">

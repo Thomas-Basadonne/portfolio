@@ -138,7 +138,7 @@ export function PortfolioStory({ content, onSelectCase, stageRef }: PortfolioSto
                 </span>
                 <span className="case-index__status mono-label">{caseStudy.status}</span>
                 <span className="case-index__arrow" aria-hidden="true">
-                  ↗
+                  →
                 </span>
               </button>
             ))}
