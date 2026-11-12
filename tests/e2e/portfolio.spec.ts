@@ -360,6 +360,20 @@ test("case drawer traps focus and restores it", async ({ page }) => {
   await expect(trigger).toBeFocused();
 });
 
+test("case drawer returns focus to the trigger after a mouse click", async ({ page }) => {
+  await bypassEntry(page);
+  await page.goto("/#work");
+  await expect(page.locator(".hud__readout")).toBeVisible();
+  const trigger = page.getByRole("button", { name: /project twin/i });
+  // A mouse click does not focus a button in Safari (WebKit): the drawer must remember the clicked trigger itself.
+  await trigger.click();
+  const dialog = page.getByRole("dialog", { name: "Project Twin" });
+  await expect(dialog).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(dialog).toBeHidden();
+  await expect(trigger).toBeFocused();
+});
+
 test("the depth readout follows the scroll again after the case drawer closes", async ({ page }) => {
   await bypassEntry(page);
   await page.goto("/#work");
