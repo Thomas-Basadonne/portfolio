@@ -1299,7 +1299,10 @@ a.contact-link:focus-visible {
 }
 
 .item-link {
-  display: inline-block;
+  /* 24px target (WCAG 2.5.8): these links stand alone, the inline exception does not apply. */
+  display: inline-flex;
+  min-height: 1.5rem;
+  align-items: center;
   margin-top: 0.5rem;
   color: var(--signal-ink);
   text-decoration: underline;

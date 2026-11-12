@@ -1315,6 +1315,26 @@ for (const locale of ["en", "it"] as const) {
   }
 }
 
+/*
+ * MOB-01 (#49) audit: the evidence links (Work index and drawer) rendered 18px tall, as blocks, under the 24px target
+ * of WCAG 2.5.8; the inline-link exception does not apply to them.
+ */
+test("evidence links are at least 24px tall on a phone, in the index and in the drawer", async ({ page }) => {
+  await bypassEntry(page);
+  await page.setViewportSize({ width: 375, height: 667 });
+  await page.goto("/#work");
+  await expect(page.locator(".hud__readout")).toBeVisible();
+  const heights = (scope: string) => page.locator(`${scope} .item-link`).evaluateAll((links) =>
+    links.map((link) => ({ text: link.textContent!.trim().slice(0, 24), height: link.getBoundingClientRect().height })));
+  const index = await heights("main");
+  expect(index.length).toBeGreaterThan(0);
+  expect(index.filter((link) => link.height < 24)).toEqual([]);
+  await page.getByRole("button", { name: /project twin/i }).click();
+  const drawer = await heights("[role=dialog]");
+  expect(drawer.length).toBeGreaterThan(0);
+  expect(drawer.filter((link) => link.height < 24)).toEqual([]);
+});
+
 test("the promise breaks after its lead, never leaving one word behind", async ({ page }) => {
   await bypassEntry(page);
   await page.setViewportSize({ width: 1440, height: 900 });
