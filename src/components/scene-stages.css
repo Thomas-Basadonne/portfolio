@@ -118,6 +118,29 @@
   }
 }
 
+/*
+ * Short portrait phones (MOB-01 #49): the band gives height back so the hero contract (name, role, promise, CTA)
+ * clears the dock, Safari's bars included (iPhone SE: 375x548). Below 600px of height the instrument line goes: it is
+ * repeated in the About facts.
+ */
+@media (max-width: 760px) and (orientation: portrait) and (max-height: 740px) {
+  .scene-staged[data-scene-layout] { --band-height: calc(var(--band-header) + 18svh); }
+  .scene-staged[data-scene-layout] .identity-section { padding-top: 1rem; }
+  @supports selector(:has(*)) {
+    :root:has(.scene-staged[data-scene-layout]) { --band-height: calc(var(--band-header) + 18svh); }
+  }
+}
+@media (max-width: 760px) and (orientation: portrait) and (max-height: 680px) {
+  .scene-staged[data-scene-layout] { --band-height: calc(var(--band-header) + 14svh); }
+  @supports selector(:has(*)) {
+    :root:has(.scene-staged[data-scene-layout]) { --band-height: calc(var(--band-header) + 14svh); }
+  }
+}
+@media (max-width: 760px) and (orientation: portrait) and (max-height: 600px) {
+  .scene-staged[data-scene-layout] .identity-section { padding-top: 0.75rem; }
+  .scene-staged[data-scene-layout] .hero-spec { display: none; }
+}
+
 /* Portrait phones reserve the bottom dock; short landscape phones reserve the numeric rail. */
 @media (max-width: 760px) {
   .scene-staged[data-scene-layout] main {

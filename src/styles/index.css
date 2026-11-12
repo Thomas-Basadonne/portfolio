@@ -1299,7 +1299,10 @@ a.contact-link:focus-visible {
 }
 
 .item-link {
-  display: inline-block;
+  /* 24px target (WCAG 2.5.8): these links stand alone, the inline exception does not apply. */
+  display: inline-flex;
+  min-height: 1.5rem;
+  align-items: center;
   margin-top: 0.5rem;
   color: var(--signal-ink);
   text-decoration: underline;
@@ -1824,10 +1827,11 @@ a.contact-link:focus-visible {
     width: 100%;
   }
 
-  /* Phones: a smaller two-line name and a tighter rhythm keep the CTA above the dock down to 375x812. */
+  /* Phones: a smaller two-line name and a tighter rhythm keep the CTA above the dock. The height cap only bites on
+     short screens (Safari with its bars: 375x548, 414x622), where the width alone no longer holds the name back. */
   .hero-title {
     margin-top: 0.5rem;
-    font-size: clamp(2.4rem, 11.5vw, 3.6rem);
+    font-size: clamp(2.2rem, min(11.5vw, 6.5svh), 3.6rem);
   }
 
   .hero-thesis {
@@ -1919,6 +1923,11 @@ a.contact-link:focus-visible {
 
   .contact-link {
     grid-template-columns: 1fr auto;
+  }
+
+  /* The address on one line on every phone: sized to the column (~13.2em wide in Manrope, more in the fallback). */
+  .contact-link[href^="mailto:"] strong {
+    font-size: min(1.6rem, calc(7.2vw - 7px));
   }
 
   .contact-link small {
