@@ -86,14 +86,16 @@ export function CompilerMachine({ quality }: { quality: RenderQuality }) {
     input.pointerX = experienceStore.pointerX;
     input.pointerY = experienceStore.pointerY;
     // The model is framed in its region (a column or the whole band) and the projection is shifted off-axis so
-    // the region sits where the layout puts it: the canvas never resizes and the model never distorts.
+    // the region sits where the layout puts it: the canvas never resizes and the model never distorts. A narrowed
+    // reading band hides the bottom of the canvas (clip on the stage): the model is framed in what stays visible.
     const width = Math.max(1, size.width), height = Math.max(1, size.height);
+    const visible = Math.max(1, height - experienceStore.bandCut);
     const regionWidth = width * experienceStore.region;
     const centre = regionWidth / 2 + (width - regionWidth) * experienceStore.side;
     const lens = camera as PerspectiveCamera;
-    lens.aspect = regionWidth / height;
-    lens.setViewOffset(regionWidth, height, regionWidth / 2 - centre, 0, width, height);
-    input.aspect = regionWidth / height;
+    lens.aspect = regionWidth / visible;
+    lens.setViewOffset(regionWidth, visible, regionWidth / 2 - centre, 0, width, height);
+    input.aspect = regionWidth / visible;
     input.time = experienceStore.motionTime;
     writePresentation(placement, input);
     writePose(target, placement.cycle, placement.explode, experienceStore.motionTime);

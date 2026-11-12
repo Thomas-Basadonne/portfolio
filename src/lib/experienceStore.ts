@@ -16,6 +16,10 @@ export const experienceStore = {
   side: 0.5,
   /** Share of the stage width the model is framed in: one column (0.5) beside the text, or the whole band. */
   region: 1,
+  /** Portrait reading band: 1 = full band, 0 = reading band (spring-smoothed, instant under reduced motion). */
+  bandOpen: 1,
+  /** Pixels of the band hidden from its bottom edge; the camera frames the model in what stays visible. */
+  bandCut: 0,
   chapter: 0,
   stageProgress: 0,
   stageVisible: true,

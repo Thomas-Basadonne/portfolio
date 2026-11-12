@@ -90,6 +90,10 @@
   .scene-staged[data-scene-layout] {
     --band-header: calc(max(0.75rem, env(safe-area-inset-top)) + 4.25rem);
     --band-height: calc(var(--band-header) + 32svh);
+    /* Reading band (#49): the layout keeps --band-height; the band is only clipped to this height while reading. */
+    --band-read: calc(var(--band-header) + 18svh);
+    /* The empty band between two chapters must hold the closed part, so a change of chapter never crosses text. */
+    --band-gap: max(0px, calc(var(--band-height) - var(--band-read)));
   }
   .scene-staged[data-scene-layout] .scene-rail { display: contents; }
   .scene-staged[data-scene-layout] .scene-stage {
@@ -97,11 +101,20 @@
     top: 0;
     height: var(--band-height);
     background: var(--graphite);
+    clip-path: inset(0 0 var(--band-cut, 0px) 0);
+  }
+  /* Probe for the script: the reading band's height, measured in the layout it is drawn with. */
+  .scene-staged[data-scene-layout] .scene-stage::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    height: var(--band-read);
   }
   .scene-staged[data-scene-layout] .scene-stage .webgl-shell { top: var(--band-header); }
+  .scene-staged[data-scene-layout] .motion-control { bottom: calc(var(--nav-clearance) + var(--band-cut, 0px)); }
   .scene-staged[data-scene-layout] .story-section {
     min-height: auto;
-    padding-top: clamp(1.5rem, 4svh, 2.5rem);
+    padding-top: calc(clamp(1.5rem, 4svh, 2.5rem) + var(--band-gap));
     padding-bottom: clamp(1.5rem, 4svh, 2.5rem);
     /* Anchor and section scrolling clears the band in every engine. */
     scroll-margin-top: var(--band-height);
@@ -126,14 +139,18 @@
 @media (max-width: 760px) and (orientation: portrait) and (max-height: 740px) {
   .scene-staged[data-scene-layout] { --band-height: calc(var(--band-header) + 18svh); }
   .scene-staged[data-scene-layout] .identity-section { padding-top: 1rem; }
+  /* The finale's links clear the band on these phones: compact rows and a tighter footer (measured in the PR). */
+  .scene-staged[data-scene-layout] .contact-link { min-height: 3.5rem; padding-block: 0.5rem; }
+  .scene-staged[data-scene-layout] .site-footer { margin-top: 1.5rem; }
   @supports selector(:has(*)) {
     :root:has(.scene-staged[data-scene-layout]) { --band-height: calc(var(--band-header) + 18svh); }
   }
 }
 @media (max-width: 760px) and (orientation: portrait) and (max-height: 680px) {
-  .scene-staged[data-scene-layout] { --band-height: calc(var(--band-header) + 14svh); }
+  /* Here the layout band is the reading band: nothing to narrow, so the probe reports the band height itself. */
+  .scene-staged[data-scene-layout] { --band-height: calc(var(--band-header) + 14svh); --band-read: var(--band-height); }
   @supports selector(:has(*)) {
-    :root:has(.scene-staged[data-scene-layout]) { --band-height: calc(var(--band-header) + 14svh); }
+    :root:has(.scene-staged[data-scene-layout]) { --band-height: calc(var(--band-header) + 14svh); --band-read: var(--band-height); }
   }
 }
 @media (max-width: 760px) and (orientation: portrait) and (max-height: 600px) {
@@ -147,7 +164,16 @@
     padding-bottom: var(--nav-clearance);
   }
   .scene-stage { --stage-bottom: var(--nav-clearance); }
-  .scene-staged[data-scene-layout] .motion-control { bottom: var(--nav-clearance); }
+  /* The control rides the lower edge of the visible band (the clip hides what is below it). */
+  .scene-staged[data-scene-layout] .motion-control { bottom: calc(var(--nav-clearance) + var(--band-cut, 0px)); }
+}
+
+/*
+ * Portrait phones: the page ends on the footer, which only has to stand above the dock (64px, raised by the bottom
+ * inset) with the section and content padding already under it. The full nav clearance left about 80px of dead space.
+ */
+@media (max-width: 760px) and (orientation: portrait) {
+  .scene-staged[data-scene-layout] main { padding-bottom: calc(1.5rem + env(safe-area-inset-bottom)); }
 }
 
 @media (max-width: 760px) and (orientation: landscape) and (max-height: 500px) {

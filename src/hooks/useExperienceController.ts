@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { clamp01, experienceStore } from "../lib/experienceStore";
 import { motionCadence } from "../lib/motionPolicy";
+import { bandCutPx, bandOpenTarget, type BandGap } from "../lib/readingBand";
 
 type ControllerOptions = { ready: boolean; drawerOpen: boolean; userPaused: boolean; layoutKey: string };
 type ExperienceController = {
@@ -17,6 +18,8 @@ const STORY_RATE = 4.2;
 const SETTLED = 0.0004;
 /** Layout with the model beside the text (must match scene-stages.css). */
 export const SIDE_BY_SIDE_QUERY = "(min-width: 1081px), (orientation: landscape) and (min-width: 600px)";
+/** Portrait layout with the stage band over the reading flow: the only one where the band narrows. */
+export const PORTRAIT_BAND_QUERY = "(max-width: 1080px) and (orientation: portrait)";
 /** Column the model takes in each chapter (0 = left, 1 = right); the text takes the other one. */
 export const MODEL_SIDE = [1, 0, 1, 0, 1, 0] as const;
 /**
@@ -44,8 +47,15 @@ export function useExperienceController(entered: boolean, options: ControllerOpt
     const mobileQuery = window.matchMedia("(max-width: 760px)");
     const forcedQuery = window.matchMedia("(forced-colors: active)");
     const sideQuery = window.matchMedia(SIDE_BY_SIDE_QUERY);
+    const portraitQuery = window.matchMedia(PORTRAIT_BAND_QUERY);
+    const stage = document.querySelector<HTMLElement>("[data-scene-stage]");
     let starts: number[] = [];
     let crossings: number[] = [];
+    // Band geometry in document coordinates (the band itself is sticky at the top of the viewport).
+    let band = { layout: false, full: 0, read: 0, contactTop: Number.POSITIVE_INFINITY, gaps: [] as BandGap[] };
+    let bandNarrowable = false;
+    let bandTarget = 1;
+    let bandCut = 0;
     let sideTarget: number = MODEL_SIDE[0];
     let layoutDirty = true;
     let storyTarget = 0;
@@ -104,6 +114,23 @@ export function useExperienceController(entered: boolean, options: ControllerOpt
       };
       crossings = sections.map((section, index) =>
         index === 0 ? 0 : (extent(sections[index - 1])[1] + extent(section)[0]) / 2);
+      // The band exists only in the staged layout: without it there is nothing to narrow, so nothing is measured.
+      band.layout = Boolean(document.querySelector("[data-scene-layout]"));
+      band.gaps = [];
+      band.full = 0;
+      band.read = 0;
+      band.contactTop = Number.POSITIVE_INFINITY;
+      if (band.layout) {
+        // The empty band between two chapters' text: the reading band may widen only while it sits under the full band.
+        band.gaps = sections.slice(1).map((section, index) => ({
+          top: extent(sections[index])[1], bottom: extent(section)[0],
+        }));
+        band.full = stage?.getBoundingClientRect().height ?? 0;
+        // The contact block starts at its kicker (or title): the finale band stops above the whole block, not a link.
+        const blockStart = document.querySelector<HTMLElement>(".contact-section .chapter-kicker, .contact-section h2");
+        band.contactTop = blockStart ? blockStart.getBoundingClientRect().top + scrollY : Number.POSITIVE_INFINITY;
+        band.read = stage ? parseFloat(getComputedStyle(stage, "::before").height) || 0 : 0;
+      }
       layoutDirty = false;
     };
     const readStory = () => {
@@ -114,6 +141,16 @@ export function useExperienceController(entered: boolean, options: ControllerOpt
       const from = starts[chapter] ?? 0;
       const to = Math.max(from + 1, Math.min(end, starts[chapter + 1] ?? end));
       storyTarget = Math.min(starts.length - 0.0001, chapter + clamp01((scrollY - from) / (to - from)));
+      bandNarrowable = portraitQuery.matches && band.layout;
+      bandTarget = bandOpenTarget({
+        chapter: Math.floor(storyTarget),
+        narrowable: bandNarrowable,
+        zoneTop: Math.min(band.full, band.read),
+        zoneBottom: band.full,
+        gaps: band.gaps,
+        contactTop: band.contactTop,
+        scroll: scrollY,
+      });
       const travel = innerHeight * CROSSING_TRAVEL;
       const middle = scrollY + innerHeight / 2;
       sideTarget = MODEL_SIDE[0];
@@ -168,7 +205,21 @@ export function useExperienceController(entered: boolean, options: ControllerOpt
         : side + (sideTarget - side) * (1 - Math.exp(-STORY_RATE * delta));
       const sideMoving = Math.abs(sideTarget - experienceStore.side) > SETTLED;
       if (!sideMoving) experienceStore.side = sideTarget;
-      const moving = Math.abs(storyTarget - experienceStore.story) > SETTLED || sideMoving;
+      const open = experienceStore.bandOpen;
+      // Reduced motion, a layout without a narrowable band (landscape, desktop) and the first frame take the target at
+      // once: a spring would leave a cut that the camera frames and the clip no longer shows.
+      experienceStore.bandOpen = experienceStore.reducedMotion || !bandNarrowable || !Number.isFinite(open)
+        ? bandTarget
+        : open + (bandTarget - open) * (1 - Math.exp(-STORY_RATE * delta));
+      if (Math.abs(bandTarget - experienceStore.bandOpen) <= SETTLED) experienceStore.bandOpen = bandTarget;
+      const bandMoving = experienceStore.bandOpen !== bandTarget;
+      const cut = bandCutPx({ open: experienceStore.bandOpen, full: band.full, reading: band.read });
+      if (cut !== bandCut && stage) {
+        bandCut = cut;
+        experienceStore.bandCut = cut;
+        stage.style.setProperty("--band-cut", `${cut}px`);
+      }
+      const moving = Math.abs(storyTarget - experienceStore.story) > SETTLED || sideMoving || bandMoving;
       if (Math.abs(storyTarget - experienceStore.story) <= SETTLED) experienceStore.story = storyTarget;
       experienceStore.chapter = Math.floor(experienceStore.story);
       experienceStore.stageProgress = experienceStore.story - experienceStore.chapter;
@@ -193,7 +244,6 @@ export function useExperienceController(entered: boolean, options: ControllerOpt
       if (unsettled || now < activityUntil || cadence > 0) frame = window.requestAnimationFrame(tick);
     }
 
-    const stage = document.querySelector<HTMLElement>("[data-scene-stage]");
     const visibility = new IntersectionObserver(([entry]) => {
       experienceStore.stageVisible = Boolean(entry?.isIntersecting);
       schedule();
@@ -217,6 +267,7 @@ export function useExperienceController(entered: boolean, options: ControllerOpt
     mobileQuery.addEventListener("change", applyCapabilities);
     forcedQuery.addEventListener("change", applyCapabilities);
     sideQuery.addEventListener("change", invalidate);
+    portraitQuery.addEventListener("change", invalidate);
     window.addEventListener("scroll", readScroll, { passive: true });
     window.addEventListener("resize", invalidate, { passive: true });
     window.addEventListener("pointermove", readPointer, { passive: true });
@@ -233,6 +284,7 @@ export function useExperienceController(entered: boolean, options: ControllerOpt
       mobileQuery.removeEventListener("change", applyCapabilities);
       forcedQuery.removeEventListener("change", applyCapabilities);
       sideQuery.removeEventListener("change", invalidate);
+      portraitQuery.removeEventListener("change", invalidate);
       window.removeEventListener("scroll", readScroll);
       window.removeEventListener("resize", invalidate);
       window.removeEventListener("pointermove", readPointer);
