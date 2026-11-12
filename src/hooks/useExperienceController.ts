@@ -52,7 +52,7 @@ export function useExperienceController(entered: boolean, options: ControllerOpt
     let starts: number[] = [];
     let crossings: number[] = [];
     // Band geometry in document coordinates (the band itself is sticky at the top of the viewport).
-    let band = { full: 0, read: 0, caseTop: Number.POSITIVE_INFINITY, gaps: [] as BandGap[] };
+    let band = { full: 0, read: 0, gaps: [] as BandGap[] };
     let bandTarget = 1;
     let bandCut = 0;
     let sideTarget: number = MODEL_SIDE[0];
@@ -117,8 +117,6 @@ export function useExperienceController(entered: boolean, options: ControllerOpt
       band.gaps = sections.slice(1).map((section, index) => ({
         top: extent(sections[index])[1], bottom: extent(section)[0],
       }));
-      const caseIndex = document.querySelector<HTMLElement>(".case-index");
-      band.caseTop = caseIndex ? caseIndex.getBoundingClientRect().top + scrollY : Number.POSITIVE_INFINITY;
       band.full = stage?.getBoundingClientRect().height ?? 0;
       band.read = stage ? parseFloat(getComputedStyle(stage, "::before").height) || 0 : 0;
       layoutDirty = false;
@@ -137,7 +135,6 @@ export function useExperienceController(entered: boolean, options: ControllerOpt
         zoneTop: Math.min(band.full, band.read),
         zoneBottom: band.full,
         gaps: band.gaps.map((gap) => ({ top: gap.top - scrollY, bottom: gap.bottom - scrollY })),
-        caseIndexTop: band.caseTop - scrollY,
       });
       const travel = innerHeight * CROSSING_TRAVEL;
       const middle = scrollY + innerHeight / 2;

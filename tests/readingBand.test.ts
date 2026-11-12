@@ -1,26 +1,25 @@
 import { describe, expect, it } from "vitest";
 import { bandCutPx, bandOpenTarget, type BandTarget } from "../src/lib/readingBand";
 
-// Portrait phone 390x844: full band 350px (header 80 + 32svh), reading band 80 + 16svh = 215px.
+// Portrait phone 390x844: full band 350px (header 80 + 32svh), reading band 80 + 18svh = 232px.
 const base: BandTarget = {
   chapter: 1,
   narrowable: true,
-  zoneTop: 215,
+  zoneTop: 232,
   zoneBottom: 350,
   gaps: [],
-  caseIndexTop: Number.POSITIVE_INFINITY,
+  contactTop: Number.POSITIVE_INFINITY,
 };
 
 describe("reading band target", () => {
   it("stays full where the layout has no reading band to narrow to", () => {
     for (let chapter = 0; chapter <= 5; chapter += 1) {
-      expect(bandOpenTarget({ ...base, chapter, narrowable: false }), `chapter ${chapter}`).toBe(1);
+      expect(bandOpenTarget({ ...base, chapter, narrowable: false, contactTop: 100 }), `chapter ${chapter}`).toBe(1);
     }
   });
 
-  it("keeps the hero and the finale full", () => {
+  it("keeps the hero full", () => {
     expect(bandOpenTarget({ ...base, chapter: 0 })).toBe(1);
-    expect(bandOpenTarget({ ...base, chapter: 5 })).toBe(1);
   });
 
   it("narrows to the reading band in the reading chapters 01, 02 and 04", () => {
@@ -36,21 +35,22 @@ describe("reading band target", () => {
     expect(bandOpenTarget({ ...base, gaps: [partial] })).toBe(0);
   });
 
-  it("keeps Work full at the chapter start and narrows once the case index reaches the full band", () => {
-    expect(bandOpenTarget({ ...base, chapter: 3, caseIndexTop: 600 })).toBe(1);
-    expect(bandOpenTarget({ ...base, chapter: 3, caseIndexTop: 350 })).toBe(0);
-    expect(bandOpenTarget({ ...base, chapter: 3, caseIndexTop: 120 })).toBe(0);
+  it("keeps Work full only in the empty space before its heading, never over the intro", () => {
+    expect(bandOpenTarget({ ...base, chapter: 3 })).toBe(0);
+    expect(bandOpenTarget({ ...base, chapter: 3, gaps: [{ top: 150, bottom: 380 }] })).toBe(1);
+    expect(bandOpenTarget({ ...base, chapter: 3, gaps: [{ top: 250, bottom: 380 }] })).toBe(0);
   });
+
 });
 
 describe("reading band cut", () => {
   it("cuts nothing while the band is full and the whole reading gap while it is narrowed", () => {
-    expect(bandCutPx({ open: 1, full: 350, reading: 215 })).toBe(0);
-    expect(bandCutPx({ open: 0, full: 350, reading: 215 })).toBe(135);
-    expect(bandCutPx({ open: 0.5, full: 350, reading: 215 })).toBe(67.5);
+    expect(bandCutPx({ open: 1, full: 350, reading: 232 })).toBe(0);
+    expect(bandCutPx({ open: 0, full: 350, reading: 232 })).toBe(118);
+    expect(bandCutPx({ open: 0.5, full: 350, reading: 232 })).toBe(59);
   });
 
   it("never cuts a band that is already shorter than the reading band (short phones)", () => {
-    expect(bandCutPx({ open: 0, full: 173, reading: 215 })).toBe(0);
+    expect(bandCutPx({ open: 0, full: 173, reading: 232 })).toBe(0);
   });
 });

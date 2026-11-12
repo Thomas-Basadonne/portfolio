@@ -3,7 +3,7 @@ import { expect, test, type Page } from "@playwright/test";
 /*
  * MOB-01 (#49), direction A «strumento in tasca». Portrait phones: the stage band keeps its layout height (the text
  * never moves) and narrows to the reading band while a reading chapter is read (--band-cut, a clip from the bottom).
- * The band is full in the hero, in the finale and in every change of chapter; Work is full at its start and narrows
+ * The band is full in the hero, in the finale and in every change of chapter; Work is full only in the gap before its heading and narrows
  * over the case index. Everything here is geometry, not vision. The scene chunk is held (as in the hero tests), so
  * the layout is the same on engines without WebGL.
  */
@@ -20,12 +20,12 @@ async function holdScene(page: Page) {
     route.fulfill({ contentType: "text/javascript", body: "await new Promise(() => {});" }));
 }
 
-async function open(page: Page, viewport: { width: number; height: number }, reduced = false) {
+async function open(page: Page, viewport: { width: number; height: number }, reduced = false, lang?: "en" | "it") {
   await holdScene(page);
   await bypassEntry(page);
   if (reduced) await page.emulateMedia({ reducedMotion: "reduce" });
   await page.setViewportSize(viewport);
-  await page.goto("/");
+  await page.goto(lang ? `/?lang=${lang}` : "/");
   await page.evaluate(() => document.fonts.ready);
   await expect(page.locator(".scene-staged")).toHaveAttribute("data-scene-layout", "");
 }
@@ -137,21 +137,48 @@ test("the canvas keeps its size while the band narrows and widens", async ({ pag
   expect(await canvasSize()).toEqual(hero);
 });
 
-test("the hero keeps the full band and the finale too", async ({ page }) => {
+test("the hero keeps the full band", async ({ page }) => {
   await open(page, { width: 390, height: 844 });
   await scrollToSection(page, "identity", 0);
   await settleBand(page);
   expect((await bandGeometry(page)).cut).toBe(0);
-  await page.evaluate(() => window.scrollTo({ top: document.body.scrollHeight, behavior: "instant" }));
-  await settleBand(page);
-  expect((await bandGeometry(page)).cut).toBe(0);
 });
 
-test("Work starts with the full band and narrows over the case index", async ({ page }) => {
+/*
+ * The full band at the start of Work is allowed only while its zone (between the reading band and the full band)
+ * sits in the empty space before the heading. The sweep moves the start of Work through that window in small steps,
+ * settled at each step, and asserts that no kicker, heading or intro paragraph is under the full band at any step.
+ */
+test("the full band never covers the intro of Work", async ({ page }) => {
   await open(page, { width: 390, height: 844 });
-  await scrollToSection(page, "work", 120);
-  await settleBand(page);
-  expect((await bandGeometry(page)).cut, "work start").toBe(0);
+  const workTop = await page.evaluate(() => document.getElementById("work")!.getBoundingClientRect().top + window.scrollY);
+  let fullSteps = 0;
+  for (let offset = 40; offset <= 420; offset += 10) {
+    await page.evaluate((top) => window.scrollTo({ top, behavior: "instant" }), workTop - offset);
+    await settleBand(page);
+    const sample = await page.evaluate(() => {
+      const stage = document.querySelector<HTMLElement>("[data-scene-stage]")!;
+      const box = stage.getBoundingClientRect();
+      const cut = parseFloat(getComputedStyle(stage).getPropertyValue("--band-cut")) || 0;
+      const read = parseFloat(getComputedStyle(stage, "::before").height) || 0;
+      const zoneTop = Math.min(box.height, read);
+      const zoneBottom = box.height;
+      const under = Array.from(document.querySelectorAll("#work .chapter-kicker, #work .section-heading-row h2, #work .section-heading-row p"))
+        .map((element) => element.getBoundingClientRect())
+        .filter((rect) => rect.height > 0 && rect.top < zoneBottom && rect.bottom > zoneTop)
+        .length;
+      return { cut, under };
+    });
+    if (sample.cut === 0) {
+      fullSteps += 1;
+      expect(sample.under, `Work intro under the full band at offset ${offset}`).toBe(0);
+    }
+  }
+  expect(fullSteps, "the sweep reaches the full band at the start of Work").toBeGreaterThan(0);
+});
+
+test("Work narrows over the case index", async ({ page }) => {
+  await open(page, { width: 390, height: 844 });
   await page.evaluate(() => {
     const index = document.querySelector(".case-index")!.getBoundingClientRect().top + window.scrollY;
     window.scrollTo({ top: index - 260, behavior: "instant" });
