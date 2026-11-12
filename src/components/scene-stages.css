@@ -139,6 +139,9 @@
 @media (max-width: 760px) and (orientation: portrait) and (max-height: 740px) {
   .scene-staged[data-scene-layout] { --band-height: calc(var(--band-header) + 18svh); }
   .scene-staged[data-scene-layout] .identity-section { padding-top: 1rem; }
+  /* The finale's links clear the band on these phones: compact rows and a tighter footer (measured in the PR). */
+  .scene-staged[data-scene-layout] .contact-link { min-height: 3.5rem; padding-block: 0.5rem; }
+  .scene-staged[data-scene-layout] .site-footer { margin-top: 1.5rem; }
   @supports selector(:has(*)) {
     :root:has(.scene-staged[data-scene-layout]) { --band-height: calc(var(--band-header) + 18svh); }
   }
@@ -162,6 +165,14 @@
   .scene-stage { --stage-bottom: var(--nav-clearance); }
   /* The control rides the lower edge of the visible band (the clip hides what is below it). */
   .scene-staged[data-scene-layout] .motion-control { bottom: calc(var(--nav-clearance) + var(--band-cut, 0px)); }
+}
+
+/*
+ * Portrait phones: the page ends on the footer, which only has to stand above the dock (64px, raised by the bottom
+ * inset) with the section and content padding already under it. The full nav clearance left about 80px of dead space.
+ */
+@media (max-width: 760px) and (orientation: portrait) {
+  .scene-staged[data-scene-layout] main { padding-bottom: calc(1.5rem + env(safe-area-inset-bottom)); }
 }
 
 @media (max-width: 760px) and (orientation: landscape) and (max-height: 500px) {

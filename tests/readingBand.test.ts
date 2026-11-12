@@ -41,6 +41,16 @@ describe("reading band target", () => {
     expect(bandOpenTarget({ ...base, chapter: 3, gaps: [{ top: 250, bottom: 380 }] })).toBe(0);
   });
 
+  it("keeps the finale full while the first contact link clears the full band", () => {
+    expect(bandOpenTarget({ ...base, chapter: 5, contactTop: 400 })).toBe(1);
+    expect(bandOpenTarget({ ...base, chapter: 5 })).toBe(1);
+  });
+
+  it("narrows the finale to the first contact link, never past the reading band", () => {
+    // Visible bottom = clamp(contactTop, reading, full): 300 px sits 50 px above the full band's bottom.
+    expect(bandOpenTarget({ ...base, chapter: 5, contactTop: 300 })).toBeCloseTo(1 - 50 / 118, 6);
+    expect(bandOpenTarget({ ...base, chapter: 5, contactTop: 100 })).toBe(0);
+  });
 });
 
 describe("reading band cut", () => {

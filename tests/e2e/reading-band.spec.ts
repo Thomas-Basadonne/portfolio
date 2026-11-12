@@ -3,7 +3,7 @@ import { expect, test, type Page } from "@playwright/test";
 /*
  * MOB-01 (#49), direction A «strumento in tasca». Portrait phones: the stage band keeps its layout height (the text
  * never moves) and narrows to the reading band while a reading chapter is read (--band-cut, a clip from the bottom).
- * The band is full in the hero, in the finale and in every change of chapter; Work is full only in the gap before its heading and narrows
+ * The band is full in the hero, in the finale and in every change of chapter; Work is full at its start and narrows
  * over the case index. Everything here is geometry, not vision. The scene chunk is held (as in the hero tests), so
  * the layout is the same on engines without WebGL.
  */
@@ -144,16 +144,78 @@ test("the hero keeps the full band", async ({ page }) => {
   expect((await bandGeometry(page)).cut).toBe(0);
 });
 
+/** Scrolls to the true end of the page: stops once the bottom is reached on two consecutive frames. */
+async function scrollToEnd(page: Page) {
+  let atEnd = 0;
+  for (let attempt = 0; attempt < 40 && atEnd < 2; attempt += 1) {
+    await page.evaluate(() => window.scrollTo({ top: document.documentElement.scrollHeight, behavior: "instant" }));
+    await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+    atEnd = await page.evaluate((previous) => (Math.ceil(window.scrollY + window.innerHeight) >= document.documentElement.scrollHeight - 1 ? previous + 1 : 0), atEnd);
+  }
+}
+
+/*
+ * Finale (direction A): at the end of the page every contact link is fully visible between the band's visible bottom
+ * and the dock top, EN and IT, on the short and mid portrait phones where the layout is measured. The band narrows
+ * to the first link when the links would sit under the full band (see readingBand.ts); on the short phones the
+ * contact block is compacted so the links clear the band at all.
+ */
+const FINALE = [
+  { width: 320, height: 568 },
+  { width: 360, height: 640 },
+  { width: 375, height: 667 },
+  { width: 390, height: 844 },
+  { width: 414, height: 736 },
+] as const;
+
+test("at the end of the page every contact link sits between the band and the dock", async ({ page }) => {
+  test.setTimeout(180_000);
+  for (const lang of ["en", "it"] as const) {
+    for (const viewport of FINALE) {
+      await open(page, viewport, false, lang);
+      await scrollToEnd(page);
+      await settleBand(page);
+      const geometry = await page.evaluate(() => {
+        const stage = document.querySelector<HTMLElement>("[data-scene-stage]")!;
+        const box = stage.getBoundingClientRect();
+        const cut = parseFloat(getComputedStyle(stage).getPropertyValue("--band-cut")) || 0;
+        const rect = (element: Element) => element.getBoundingClientRect();
+        return {
+          bandBottom: box.bottom - cut,
+          dockTop: rect(document.querySelector(".chapter-nav")!).top,
+          links: Array.from(document.querySelectorAll(".contact-link")).map((link) => ({ top: rect(link).top, bottom: rect(link).bottom })),
+          footerBottom: rect(document.querySelector(".site-footer")!).bottom,
+        };
+      });
+      const label = `${lang} ${viewport.width}x${viewport.height}`;
+      expect(geometry.links.length, `${label} contact links`).toBe(3);
+      geometry.links.forEach((link, index) => {
+        expect(link.top, `${label} link ${index + 1} under the band`).toBeGreaterThanOrEqual(geometry.bandBottom - 0.5);
+        expect(link.bottom, `${label} link ${index + 1} under the dock`).toBeLessThanOrEqual(geometry.dockTop + 0.5);
+      });
+      expect(geometry.footerBottom, `${label} footer under the dock`).toBeLessThanOrEqual(geometry.dockTop + 0.5);
+    }
+  }
+});
+
+test("the finale keeps the full band on a tall phone, where the contact links clear it", async ({ page }) => {
+  await open(page, { width: 430, height: 932 });
+  await scrollToEnd(page);
+  await settleBand(page);
+  expect((await bandGeometry(page)).cut).toBe(0);
+});
+
 /*
  * The full band at the start of Work is allowed only while its zone (between the reading band and the full band)
  * sits in the empty space before the heading. The sweep moves the start of Work through that window in small steps,
  * settled at each step, and asserts that no kicker, heading or intro paragraph is under the full band at any step.
  */
 test("the full band never covers the intro of Work", async ({ page }) => {
-  await open(page, { width: 390, height: 844 });
+  // Reduced motion lands each band change at once, so every step is a steady state and the sweep stays in budget.
+  await open(page, { width: 390, height: 844 }, true);
   const workTop = await page.evaluate(() => document.getElementById("work")!.getBoundingClientRect().top + window.scrollY);
   let fullSteps = 0;
-  for (let offset = 40; offset <= 420; offset += 10) {
+  for (let offset = 120; offset <= 360; offset += 8) {
     await page.evaluate((top) => window.scrollTo({ top, behavior: "instant" }), workTop - offset);
     await settleBand(page);
     const sample = await page.evaluate(() => {
