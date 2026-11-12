@@ -1131,7 +1131,11 @@ test("a case without approved media keeps its text-only drawer", async ({ page }
  */
 async function holdStagedLayout(page: Page, layout: "staged" | "fallback") {
   if (layout !== "staged") return;
-  await page.route(/ExperienceCanvas-.*\.js/, () => {});
+  // The chunk is answered with a module that never finishes evaluating: the request completes and the dynamic import
+  // stays pending, so the renderer never starts. A request left pending instead could hold Firefox's load event and
+  // time page.goto out (3 of 48 staged hero runs under load).
+  await page.route(/ExperienceCanvas-.*\.js/, (route) =>
+    route.fulfill({ contentType: "text/javascript", body: "await new Promise(() => {});" }));
   await page.addInitScript(() => {
     const original = HTMLCanvasElement.prototype.getContext;
     Reflect.set(HTMLCanvasElement.prototype, "getContext", function (this: HTMLCanvasElement, type: string, ...rest: unknown[]) {
