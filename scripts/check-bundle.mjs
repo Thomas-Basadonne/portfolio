@@ -3,7 +3,11 @@ import { readdir, readFile, stat } from "node:fs/promises";
 import { extname, join, relative } from "node:path";
 
 const dist = new URL("../dist", import.meta.url);
-const limits = { entryJs: 90_000, visualJs: 250_000, css: 40_000, totalJs: 330_000 };
+// Runtime dependency baseline approved by Thomas on 2026-11-13 (#77).
+// JS ceilings cover the combined #76 gate + React 19.3.1 / R3F 9.8.2 tree; performance gates are unchanged.
+// CSS stays at its standalone allowance here; retain #76's 42,000-byte allowance when combining the PRs.
+// Measurements, attribution and the explicit trade-off: docs/DEPENDENCY_BUDGETS.md.
+const limits = { entryJs: 98_000, visualJs: 255_000, css: 40_000, totalJs: 350_000 };
 
 async function filesIn(directory) {
   const entries = await readdir(directory, { withFileTypes: true });

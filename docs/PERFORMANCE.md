@@ -5,6 +5,9 @@ What this document records is implemented in `src/lib/qualityPolicy.ts`, `src/ex
 benchmarks and not a promise of 60 fps. Measurements are local samples (Chromium 149, ANGLE Metal, Apple M4 Pro): no
 phone, no weak integrated GPU, no statistics. SwiftShader/headless numbers are never compared with hardware ones.
 
+**Current JS budget decision:** see [Runtime dependency budgets](DEPENDENCY_BUDGETS.md) (#77, approved 2026-11-13).
+The measurements and limits below describe their original feature slices; #77 supersedes the JS ceilings only.
+
 ## Static tiers
 
 | | high | low |
