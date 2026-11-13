@@ -3,7 +3,9 @@ import { readdir, readFile, stat } from "node:fs/promises";
 import { extname, join, relative } from "node:path";
 
 const dist = new URL("../dist", import.meta.url);
-const limits = { entryJs: 90_000, visualJs: 250_000, css: 40_000, totalJs: 330_000 };
+// CSS 40,000 → 42,000 with #17 (boot loader + entry gate, ~3.6 KB of new rules, ~1.6 KB of dead rules removed):
+// a decision recorded in docs/PERFORMANCE.md, to be confirmed by the owner on the PR.
+const limits = { entryJs: 90_000, visualJs: 250_000, css: 42_000, totalJs: 330_000 };
 
 async function filesIn(directory) {
   const entries = await readdir(directory, { withFileTypes: true });

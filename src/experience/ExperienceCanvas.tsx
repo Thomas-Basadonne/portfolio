@@ -28,14 +28,26 @@ function deviceQuality(): RenderQuality {
 
 function RenderBridge() {
   const invalidate = useThree((state) => state.invalidate);
+  const get = useThree((state) => state.get);
 
   useEffect(() => {
     experienceStore.requestRender = invalidate;
+    // The entry gate (#17) moves the canvas between the viewport and its page box. Waiting for the resize observer
+    // would show one frame of the old buffer in the new box: resize and draw now, before the browser paints.
+    const settle = () => {
+      const { gl, setSize, advance } = get();
+      const box = gl.domElement.parentElement?.getBoundingClientRect();
+      if (!box || box.width < 1 || box.height < 1) return;
+      setSize(box.width, box.height, box.top, box.left);
+      advance(performance.now());
+    };
+    experienceStore.settleCanvas = settle;
     invalidate();
     return () => {
       if (experienceStore.requestRender === invalidate) experienceStore.requestRender = null;
+      if (experienceStore.settleCanvas === settle) experienceStore.settleCanvas = null;
     };
-  }, [invalidate]);
+  }, [get, invalidate]);
 
   return null;
 }

@@ -23,6 +23,8 @@ import {
   supportsWebGL,
 } from "./lib/experienceState";
 import { useLocale } from "./lib/locale";
+import { gateMode, type GateMode } from "./lib/gatePolicy";
+import { finishBoot, reachBoot, startBoot } from "./lib/bootLoader";
 
 const ExperienceCanvas = lazy(() =>
   import("./experience/ExperienceCanvas").then((module) => ({ default: module.ExperienceCanvas })),
@@ -30,6 +32,33 @@ const ExperienceCanvas = lazy(() =>
 
 // How far the page must move from a deep-link landing before it counts as the reader scrolling away.
 const READER_SCROLL = 48;
+
+/**
+ * Calls `then` once the gate has been painted: the largest-paint entry for an element of the gate (its h2). Capped at
+ * GATE_PAINT_WAIT_MS, which is also the whole wait where no entry comes: the gate is not the largest paint on phones
+ * (the loader's name is larger), and WebKit has no such entry. Returns a cancel.
+ */
+const GATE_PAINT_WAIT_MS = 500;
+function afterGatePaint(then: () => void) {
+  let observer: PerformanceObserver | undefined;
+  const stop = () => {
+    window.clearTimeout(timer);
+    observer?.disconnect();
+  };
+  const finish = () => {
+    stop();
+    then();
+  };
+  const timer = window.setTimeout(finish, GATE_PAINT_WAIT_MS);
+  if (PerformanceObserver.supportedEntryTypes?.includes("largest-contentful-paint")) {
+    observer = new PerformanceObserver((list) => {
+      if (list.getEntries().some((entry) => (entry as PerformanceEntry & { element?: Element | null }).element
+        ?.closest(".entry-sequence"))) finish();
+    });
+    observer.observe({ type: "largest-contentful-paint", buffered: true });
+  }
+  return stop;
+}
 
 export default function App() {
   const [phase, dispatch] = useReducer(
@@ -47,6 +76,34 @@ export default function App() {
   const siteRef = useRef<HTMLDivElement>(null);
   const caseTriggerRef = useRef<HTMLElement | null>(null);
   const entered = phase !== "entry";
+  // Entry gate (#17): chosen after hydration (gatePolicy). Until then neither the poster nor the scene is requested:
+  // a first render that assumed the poster fetched it on every visit. A visit that starts entered never sees a gate.
+  const [gate, setGate] = useState<GateMode | null>(null);
+  const [gateReady, setGateReady] = useState(false);
+  const earlyReady = useRef(false);
+  const earlyFailed = useRef(false);
+  const arrivedAtGate = useRef(phase === "entry");
+  useEffect(() => {
+    // A visit that skips the gate has nothing to reveal: the boot loader goes at once.
+    if (!arrivedAtGate.current) {
+      finishBoot(true);
+      return;
+    }
+    const capabilities = navigator as Navigator & { deviceMemory?: number; connection?: { saveData?: boolean } };
+    const mode = gateMode({
+      webgl: supportsWebGL(),
+      reducedMotion: window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+      forcedColors: window.matchMedia("(forced-colors: active)").matches,
+      narrowViewport: window.matchMedia("(max-width: 760px)").matches,
+      saveData: capabilities.connection?.saveData === true,
+      deviceMemory: capabilities.deviceMemory,
+      hardwareConcurrency: navigator.hardwareConcurrency,
+    });
+    setGate(mode);
+    startBoot(mode);
+    void document.fonts?.ready.then(() => reachBoot("fonts"));
+    // Chosen once on arrival: since 12/11 it no longer depends on the viewport, so a resize cannot invalidate it.
+  }, []);
   const { activeChapter, progressPercent, reducedMotion, motionAvailable } = useExperienceController(entered, {
     ready: phase === "ready", drawerOpen: selectedCase !== null, userPaused, layoutKey: locale,
   });
@@ -64,12 +121,30 @@ export default function App() {
       caseTriggerRef.current = null;
     });
   }, []);
-  const visualFailed = useCallback(() => dispatch({ type: "CANVAS_FAILED" }), []);
-  const visualReady = useCallback(() => dispatch({ type: "CANVAS_READY" }), []);
+  const visualFailed = useCallback(() => {
+    // Before entry the reducer keeps the gate: remember the failure, fall back to the poster, apply it on entry.
+    earlyFailed.current = true;
+    finishBoot();
+    setGate("poster");
+    setGateReady(false);
+    dispatch({ type: "CANVAS_FAILED" });
+  }, []);
+  const visualReady = useCallback(() => {
+    earlyReady.current = true;
+    reachBoot("scene");
+    setGateReady(true);
+    dispatch({ type: "CANVAS_READY" });
+  }, []);
 
   const enter = useCallback(() => {
     window.sessionStorage.setItem("tb:entry-seen", "1");
+    // Controls that mount on entry arrive with the hero, not on top of the dissolving gate.
+    document.body.classList.add("is-arriving");
+    window.setTimeout(() => document.body.classList.remove("is-arriving"), 1300);
     dispatch({ type: "ENTER" });
+    // A scene preloaded on the gate is already on screen: the story starts ready (or failed) at once.
+    if (earlyFailed.current) dispatch({ type: "CANVAS_FAILED" });
+    else if (earlyReady.current) dispatch({ type: "CANVAS_READY" });
   }, []);
 
   const focusMain = useCallback(() => {
@@ -127,24 +202,35 @@ export default function App() {
   }, [entered]);
 
   useEffect(() => {
-    if (!entered || phase === "failed" || mountCanvas) return;
+    const preload = !entered && gate === "interactive";
+    if ((!entered && !preload) || phase === "failed" || mountCanvas) return;
     if (!supportsWebGL()) {
       visualFailed();
       return;
     }
+    // The gate preloads only once it has been painted, then on idle. Its h2 is the largest paint; a request started
+    // before that paint is on its path in Lighthouse's simulation (mobile LCP 3.5 s in 4 of 6 runs with a start on
+    // `load` + idle: here `load` fires at ~30 ms, before the JS-rendered gate is painted), loader or not.
 
     const requestIdle = Reflect.get(window, "requestIdleCallback") as
       | typeof window.requestIdleCallback
       | undefined;
-    const idleId = requestIdle
-      ? requestIdle(() => setMountCanvas(true), { timeout: 450 })
-      : window.setTimeout(() => setMountCanvas(true), 120);
+    const mount = () => {
+      if (preload) void import("./experience/ExperienceCanvas").then(() => reachBoot("instrument"), () => undefined);
+      setMountCanvas(true);
+    };
+    let idleId = 0;
+    const schedule = () => {
+      idleId = requestIdle ? requestIdle(mount, { timeout: 450 }) : window.setTimeout(mount, 120);
+    };
+    const stopWaiting = preload ? afterGatePaint(schedule) : (schedule(), () => undefined);
 
     return () => {
+      stopWaiting();
       if (requestIdle) window.cancelIdleCallback(idleId);
       else window.clearTimeout(idleId);
     };
-  }, [entered, mountCanvas, phase, visualFailed]);
+  }, [entered, gate, mountCanvas, phase, visualFailed]);
 
   const backgroundBlocked = !entered || selectedCase !== null;
   const { ui } = content;
@@ -161,12 +247,15 @@ export default function App() {
         content={content}
         locale={locale}
         onLocaleChange={setLocale}
+        gate={gate}
+        gateReady={gateReady}
       />
       <div
         ref={siteRef}
         className="site-shell scene-staged"
         data-scene-layout={phase !== "failed" ? "" : undefined}
         data-visual-ready={phase === "ready" ? "" : undefined}
+        data-gate-ready={gateReady && !entered ? "" : undefined}
         inert={backgroundBlocked || undefined}
         aria-hidden={backgroundBlocked}
       >
