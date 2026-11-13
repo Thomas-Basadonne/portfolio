@@ -81,6 +81,56 @@ untouched.
 current shaders (studio dome, seam) were checked and are ordered. NaN/precision/AO-clipping concerns were not
 reproduced and were left untouched.
 
+## Entry gate preload — #17
+
+The entry gate shows the Compiler alive, so wherever WebGL runs (`src/lib/gatePolicy.ts`: not with reduced motion,
+forced colors or `saveData`; phones and low tiers included, owner's decision of 12/11) the visual chunk is loaded and
+the scene built **before** entry, under a full-page boot loader (`index.html` `#boot`, `src/lib/bootLoader.ts`). This
+reverses «canvas only after entry» for those visits. The static poster (`public/gate/*.webp`) is used for the other
+visits and when the loader has to leave before the scene: `BOOT_CAP_MS` = 5 s after hydration (owner, 13/11).
+
+What keeps the first paint and the main thread where they were:
+
+- **The chunk starts after the gate is painted** (`afterGatePaint` in `App.tsx`): the largest-paint entry for the
+  gate, or 500 ms where the gate is not the largest paint (phones), then idle. Started on `load` + idle it was on the
+  path of the gate's h2 in Lighthouse's simulation: mobile LCP 3.5 s in 4 runs of 6.
+- **The poster is not requested by interactive visits**: the gate mode is `null` until the policy runs, so the first
+  render no longer fetches it (−26 KB).
+- **The scene is built in four tasks** (environment, textures, geometry, programs; `TB001Model`). In one go it was a
+  single task of ~200 ms at 4× CPU; the longest is now ~130 ms at 4× on desktop (the program link, not split) and
+  ~100 ms on a phone viewport.
+
+### Measured (13/11, same machine and method as above)
+
+Lighthouse, repo config, per-run reports (`lhci` asserts on the best run, so every run is read):
+
+| | Performance | LCP (ms) | TBT (ms) | CLS | Weight |
+|---|---|---|---|---|---|
+| mobile, `main` before #17 | 99 | 1,974 | 0 | 0 | 160 KB |
+| mobile, gate (12 runs) | 95–99 | 1,980–2,000 | 59–113, one run 213 | 0.002 | 397 KB |
+| desktop, gate (3 runs) | 99–100 | 451–453 | 0 | 0.0006 | 397 KB |
+
+The TBT is the scene build, now during loading instead of after entry; the limit is 200 and one run in twelve
+exceeded it. Boot loader on screen (Playwright, median of 3, Chromium with GPU):
+
+| | fast network | slow 4G + CPU 4× |
+|---|---|---|
+| desktop 1440×900 | 0.99 s | 3.55 s |
+| phone 390×844 | 0.87 s | 3.86 s |
+
+Click → hero readable: 1.20–1.30 s, with the Compiler already in the hero.
+
+### Budgets
+
+CSS raw 40,000 → **42,000** (`scripts/check-bundle.mjs`): the loader and the new gate add ~3.6 KB of rules; ~1.6 KB
+of dead rules (old gate, the pre-#49 shell sizing) were removed. Now 41,886. JS: entry 87,910 gzip (limit 90,000),
+total 329,907 (limit 330,000): 93 bytes left, the JS budget is spent.
+
+### Not verified
+
+No real phone or weak GPU: the cost of 242 KB + the scene build before entry on a mid-range Android or an iPhone on
+cellular is unknown. The 5 s cap bounds the wait, not the work.
+
 ## Still open on #22
 
 - GPU table on an integrated GPU and at least one real phone (limit declared until then); Lighthouse and soak on the
