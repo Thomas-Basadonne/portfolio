@@ -16,6 +16,14 @@ describe("experience state", () => {
     expect(resolveInitialExperiencePhase(input)).toBe("loading");
   });
 
+  it("goes back to the gate on a recalibration, from any phase (#17)", () => {
+    for (const phase of ["loading", "ready", "failed", "entry"] as const) {
+      expect(experienceReducer(phase, { type: "EXIT" })).toBe("entry");
+    }
+    // Entering again runs the usual path: the scene kept on the gate makes it ready at once.
+    expect(experienceReducer(experienceReducer("ready", { type: "EXIT" }), { type: "ENTER" })).toBe("loading");
+  });
+
   it("allows only valid visual-layer transitions", () => {
     expect(experienceReducer("entry", { type: "CANVAS_READY" })).toBe("entry");
     expect(experienceReducer("entry", { type: "ENTER" })).toBe("loading");

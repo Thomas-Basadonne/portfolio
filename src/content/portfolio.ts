@@ -96,16 +96,19 @@ export type PortfolioContent = {
     skipLink: string;
     languageGroup: string;
     languageNames: Record<Locale, string>;
-    entryMeta: string;
     entryResolution: string;
     entryKicker: string;
     entryTitle: { lead: string; emphasis: string };
     entryButton: string;
-    entryNoteMotion: string;
-    entryNoteReduced: string;
+    /** The gate's caption: while the Compiler loads, once it can be turned, and on the still poster. */
+    entryLoading: string;
+    entryDrag: string;
+    entryPoster: string;
+    entryStatus: string;
     hudHome: string;
     hudNav: string;
     hudDepth: string;
+    hudRecalibrate: { label: string; name: string };
     instrument: string;
     heroWork: string;
     heroEmail: string;
@@ -203,16 +206,18 @@ const en: PortfolioContent = {
     skipLink: "Skip to content",
     languageGroup: "Language",
     languageNames: { en: "English", it: "Italiano" },
-    entryMeta: "TB / Personal instrument",
     entryResolution: "Resolution 00.01",
     entryKicker: "A machine for useful deviations",
     entryTitle: { lead: "Measure what", emphasis: " survives complexity." },
     entryButton: "Calibrate / enter",
-    entryNoteMotion: "Scroll controls inspection depth",
-    entryNoteReduced: "Reduced-motion protocol active",
+    entryLoading: "Loading the instrument",
+    entryDrag: "Drag to turn",
+    entryPoster: "Instrument at rest",
+    entryStatus: "Standby",
     hudHome: "Thomas Basadonne, frontend developer — back to start",
     hudNav: "Portfolio sections",
     hudDepth: "Inspection depth",
+    hudRecalibrate: { label: "Recalibrate", name: "Recalibrate: back to the entry gate" },
     instrument: "Instrument TB–001",
     heroWork: "See selected work",
     heroEmail: "Email me",
@@ -728,16 +733,18 @@ const it: PortfolioContent = {
     skipLink: "Vai al contenuto",
     languageGroup: "Lingua",
     languageNames: { en: "English", it: "Italiano" },
-    entryMeta: "TB / Strumento personale",
     entryResolution: "Risoluzione 00.01",
     entryKicker: "Una macchina per deviazioni utili",
     entryTitle: { lead: "Misura ciò che", emphasis: " regge la complessità." },
     entryButton: "Calibra / entra",
-    entryNoteMotion: "Lo scroll controlla la profondità",
-    entryNoteReduced: "Protocollo movimento ridotto attivo",
+    entryLoading: "Caricamento dello strumento",
+    entryDrag: "Trascina per girare",
+    entryPoster: "Strumento a riposo",
+    entryStatus: "Standby",
     hudHome: "Thomas Basadonne, frontend developer — torna all'inizio",
     hudNav: "Sezioni del portfolio",
     hudDepth: "Profondità di ispezione",
+    hudRecalibrate: { label: "Ricalibra", name: "Ricalibra: torna all'ingresso" },
     instrument: "Strumento TB–001",
     heroWork: "Guarda i progetti",
     heroEmail: "Scrivimi",

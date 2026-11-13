@@ -8,7 +8,10 @@ import "./scene-stages.css";
 export function SceneStage({ ref }: { ref?: Ref<HTMLDivElement> }) {
   return (
     <div className="scene-rail">
-      <div ref={ref} className="scene-stage" data-scene-stage="" />
+      <div ref={ref} className="scene-stage" data-scene-stage="">
+        {/* Where the canvas sits in the page, measured while the gate holds it over the viewport. */}
+        <div className="scene-stage__probe" aria-hidden="true" />
+      </div>
     </div>
   );
 }

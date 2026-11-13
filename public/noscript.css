@@ -8,4 +8,4 @@ body { margin: 0; }
 .static-portfolio p, .static-portfolio li { max-width: 62ch; line-height: 1.65; }
 .static-portfolio a { color: #ff6a2b; }
 .static-portfolio nav ul { display: flex; flex-wrap: wrap; gap: 1rem; padding: 0; list-style: none; }
-.prerender-shell { display: none; }
+.prerender-shell, .boot { display: none; }
