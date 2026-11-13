@@ -1,7 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 import { expectHudContrast, expectHudGeometry } from "./hud-contrast";
-import { requireWebGL } from "./webgl";
+import { expectsLiveGate, requireWebGL } from "./webgl";
 import { portfolioContent } from "../../src/content/portfolio";
 import { MOTION_RATES } from "../../src/lib/motionPolicy";
 import { chapterRailFit, controlInventory, focusVisibility, midWordBreaks, typeInventory } from "./readability";
@@ -292,9 +292,14 @@ test("entry isolates the portfolio; the visual bundle waits for the page, then p
     const canvas = document.createElement("canvas");
     return Boolean(canvas.getContext("webgl2") || canvas.getContext("webgl"));
   });
-  // Interactive gate (gatePolicy): the Compiler is loaded while the visitor is still at the gate.
-  if (webglSupported) await expect.poll(() => visualRequests.length).toBeGreaterThan(0);
-  else expect(visualRequests).toHaveLength(0);
+  // Live gate (gatePolicy: hardware WebGL): the Compiler is loaded while the visitor is still at the gate. A software
+  // rasterizer (headless Chromium: SwiftShader) or no WebGL gets the poster, and nothing before entry.
+  if (await expectsLiveGate(page)) {
+    await expect.poll(() => visualRequests.length).toBeGreaterThan(0);
+  } else {
+    await page.waitForTimeout(1_000);
+    expect(visualRequests).toHaveLength(0);
+  }
 
   const skipLink = page.getByRole("link", { name: "Skip to content" });
   await skipLink.focus();
@@ -335,6 +340,7 @@ test("the boot loader leaves by its cap when the scene never arrives, and the po
     route.fulfill({ contentType: "text/javascript", body: "await new Promise(() => {});" }));
   await page.goto("/");
   await requireWebGL(page);
+  test.skip(!(await expectsLiveGate(page)), "Software renderer: the poster gate, covered by the next test.");
   await expect(page.locator(".entry-sequence.is-interactive")).toBeAttached();
   await expect(page.locator("#boot")).toBeVisible();
   const start = Date.now();
@@ -342,6 +348,25 @@ test("the boot loader leaves by its cap when the scene never arrives, and the po
   expect(Date.now() - start).toBeLessThan(7_000);
   await expect(page.locator(".gate-poster")).toBeVisible();
   await expect(page.getByRole("button", { name: /calibrate/i })).toBeEnabled();
+});
+
+test("a software renderer gets the poster gate: no scene before entry, the loader does not wait for one", async ({ page }) => {
+  const visualRequests: string[] = [];
+  page.on("request", (request) => {
+    if (request.url().includes("ExperienceCanvas-")) visualRequests.push(request.url());
+  });
+  await page.goto("/");
+  await requireWebGL(page);
+  test.skip(await expectsLiveGate(page), "Hardware renderer: the live gate, covered above.");
+  // SwiftShader on CI blocked the page for 125 s of TBT with the live gate (Lighthouse, #17).
+  await expect(page.locator(".entry-sequence:not(.is-interactive)")).toBeVisible();
+  await expect(page.locator(".gate-poster")).toBeVisible();
+  await expect(page.locator("#boot")).toHaveCount(0, { timeout: 3_000 });
+  await page.waitForTimeout(1_000);
+  expect(visualRequests).toHaveLength(0);
+  await page.getByRole("button", { name: /calibrate/i }).click();
+  // After entry the scene loads on it, as before #17.
+  await expect.poll(() => visualRequests.length).toBeGreaterThan(0);
 });
 
 test("recalibrate goes back to the gate from the story, focus on the way in", async ({ page }) => {

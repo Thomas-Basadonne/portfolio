@@ -48,11 +48,31 @@ export function resolveInitialExperiencePhase({
   return hasDeepLink || isReload || wasEntered ? "loading" : "entry";
 }
 
-export function supportsWebGL(): boolean {
+/**
+ * The WebGL renderer's name: null without WebGL, "" when the browser hides it. `accelerated` asks for a context
+ * without a major performance caveat: where the browser falls back to a software rasterizer (no GPU, blocklisted GPU)
+ * it refuses at once, instead of starting the rasterizer on the main thread (Chrome on SwiftShader: ~0.7–0.9 s for
+ * the first context). Chromium masks RENDERER ("WebKit WebGL") and names the GPU in the debug extension; Firefox
+ * names it in RENDERER and warns on the extension.
+ */
+export function webglRenderer(accelerated = false): string | null {
   try {
     const canvas = document.createElement("canvas");
-    return Boolean(canvas.getContext("webgl2") || canvas.getContext("webgl"));
+    const attributes: WebGLContextAttributes = { failIfMajorPerformanceCaveat: accelerated };
+    const gl = canvas.getContext("webgl2", attributes) || canvas.getContext("webgl", attributes);
+    if (!gl) return null;
+    let name = String(gl.getParameter(gl.RENDERER) ?? "");
+    if (/^webkit webgl$/i.test(name)) {
+      const info = gl.getExtension("WEBGL_debug_renderer_info");
+      name = info ? String(gl.getParameter(info.UNMASKED_RENDERER_WEBGL)) : "";
+    }
+    return name;
   } catch {
-    return false;
+    return null;
   }
+}
+
+/** Any WebGL, software included: after entry the scene loads on it, as before #17. */
+export function supportsWebGL(): boolean {
+  return webglRenderer() !== null;
 }

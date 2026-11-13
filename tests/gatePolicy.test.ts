@@ -10,6 +10,25 @@ describe("gate mode (#17)", () => {
     expect(gateMode({ ...desktop, deviceMemory: 4, hardwareConcurrency: 4 })).toBe("interactive");
   });
 
+  it("keeps the poster on a software rasterizer: the live gate blocks the page there (CI Lighthouse: TBT 125 s)", () => {
+    for (const renderer of [
+      "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (LLVM 10.0.0) (0x0000C0DE)), SwiftShader driver)",
+      "Google SwiftShader",
+      "llvmpipe (LLVM 15.0.7, 256 bits)",
+      "ANGLE (Microsoft, Microsoft Basic Render Driver Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "Software Rasterizer",
+    ]) expect(gateMode({ ...desktop, renderer }), renderer).toBe("poster");
+    for (const renderer of [
+      "ANGLE (Apple, ANGLE Metal Renderer: Apple M4 Pro, Unspecified Version)",
+      "Apple GPU",
+      "Apple M1, or similar",
+      "Adreno (TM) 640",
+      "Mali-G78 MP14",
+      "ANGLE (Intel, Intel(R) UHD Graphics 620 Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "",
+    ]) expect(gateMode({ ...desktop, renderer }), renderer).toBe("interactive");
+  });
+
   it("falls back to the poster with no preload for no WebGL, reduced motion, forced colors and save-data", () => {
     expect(gateMode({ ...desktop, webgl: false })).toBe("poster");
     expect(gateMode({ ...desktop, reducedMotion: true })).toBe("poster");

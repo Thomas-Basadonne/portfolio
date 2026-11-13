@@ -21,6 +21,7 @@ import {
   experienceReducer,
   getInitialExperiencePhase,
   supportsWebGL,
+  webglRenderer,
 } from "./lib/experienceState";
 import { useLocale } from "./lib/locale";
 import { gateMode, type GateMode } from "./lib/gatePolicy";
@@ -89,9 +90,12 @@ export default function App() {
       finishBoot(true);
       return;
     }
+    // Accelerated WebGL only: a software rasterizer gets the poster (gatePolicy).
+    const renderer = webglRenderer(true);
     const capabilities = navigator as Navigator & { deviceMemory?: number; connection?: { saveData?: boolean } };
     const mode = gateMode({
-      webgl: supportsWebGL(),
+      webgl: renderer !== null,
+      renderer,
       reducedMotion: window.matchMedia("(prefers-reduced-motion: reduce)").matches,
       forcedColors: window.matchMedia("(forced-colors: active)").matches,
       narrowViewport: window.matchMedia("(max-width: 760px)").matches,

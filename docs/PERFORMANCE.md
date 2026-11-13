@@ -89,6 +89,13 @@ the scene built **before** entry, under a full-page boot loader (`index.html` `#
 reverses «canvas only after entry» for those visits. The static poster (`public/gate/*.webp`) is used for the other
 visits and when the loader has to leave before the scene: `BOOT_CAP_MS` = 5 s after hydration (owner, 13/11).
 
+**Software rasterizers get the poster.** On CI (no GPU) Chrome renders WebGL with SwiftShader, and the live gate
+measured performance 0.48–0.65 and TBT 125 s in Lighthouse. The gate's probe is `webglRenderer(true)`: a context with
+`failIfMajorPerformanceCaveat`, which a browser falling back to software refuses at once (1 ms, instead of the
+~0.7–0.9 s Chrome spends starting SwiftShader on the main thread for the first context), plus the renderer's name
+(`isSoftwareRenderer`) for a rasterizer chosen explicitly, where the caveat does not refuse. After entry the scene
+still loads on any WebGL, as before #17.
+
 What keeps the first paint and the main thread where they were:
 
 - **The chunk starts after the gate is painted** (`afterGatePaint` in `App.tsx`): the largest-paint entry for the
@@ -111,7 +118,12 @@ Lighthouse, repo config, per-run reports (`lhci` asserts on the best run, so eve
 | desktop, gate (3 runs) | 99–100 | 451–453 | 0 | 0.0006 | 397 KB |
 
 The TBT is the scene build, now during loading instead of after entry; the limit is 200 and one run in twelve
-exceeded it. Boot loader on screen (Playwright, median of 3, Chromium with GPU):
+exceeded it.
+
+Same Lighthouse config with Chrome falling back to software (`--disable-gpu --enable-unsafe-swiftshader`, the CI
+case): poster gate, no chunk before entry, mobile 99 / LCP 2,104–2,106 / TBT 0, desktop 100 / TBT 0, 186 KB. With
+SwiftShader forced as the GPU (`--use-angle=swiftshader`, which needs the flag) the caveat does not refuse, the name
+check still picks the poster, but the probe itself costs mobile TBT 739–909: not a configuration visitors run. Boot loader on screen (Playwright, median of 3, Chromium with GPU):
 
 | | fast network | slow 4G + CPU 4× |
 |---|---|---|
@@ -123,8 +135,10 @@ Click → hero readable: 1.20–1.30 s, with the Compiler already in the hero.
 ### Budgets
 
 CSS raw 40,000 → **42,000** (`scripts/check-bundle.mjs`): the loader and the new gate add ~3.6 KB of rules; ~1.6 KB
-of dead rules (old gate, the pre-#49 shell sizing) were removed. Now 41,886. JS: entry 87,910 gzip (limit 90,000),
-total 329,907 (limit 330,000): 93 bytes left, the JS budget is spent.
+of dead rules (old gate, the pre-#49 shell sizing) were removed. Now 41,886.
+
+Total JS 330,000 → **331,000** gzip (owner, 13/11): the software-renderer probe took it to 330,116 (entry 88,118,
+limit 90,000; visual chunk 241,998). The +0.3% is spent on #17; the next feature (#47) has to make its own room.
 
 ### Not verified
 

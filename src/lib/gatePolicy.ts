@@ -7,19 +7,28 @@ import type { CapabilitySignals } from "./qualityPolicy";
  * - "poster": a static silhouette of the Compiler; the chunk loads only after entry.
  * Thomas, 12/11/2026: phones get the animated gate too. This revises HOME-01 (#50), which kept the low tier on the
  * poster; the quality tier now decides how the Compiler is drawn, not whether it is. The poster stays for no WebGL,
- * reduced motion, forced colors and save-data (the visitor asked for less).
+ * reduced motion, forced colors and save-data (the visitor asked for less), and for a software rasterizer: the live
+ * gate before entry blocks the page there (Lighthouse on CI, SwiftShader: TBT 125 s). After entry the scene still
+ * loads on it, as before #17.
  */
 export type GateMode = "interactive" | "poster";
 
 export type GateSignals = CapabilitySignals & {
   webgl: boolean;
+  /** The WebGL renderer's name, when the browser tells it. */
+  renderer?: string | null;
   reducedMotion: boolean;
   forcedColors: boolean;
 };
 
+/** A software rasterizer (SwiftShader, llvmpipe, Windows' Basic Render Driver), by the renderer's name. */
+export function isSoftwareRenderer(renderer: string | null | undefined) {
+  return /swiftshader|llvmpipe|softpipe|software|basic render driver/i.test(renderer ?? "");
+}
+
 export function gateMode(signals: GateSignals): GateMode {
   if (!signals.webgl || signals.reducedMotion || signals.forcedColors || signals.saveData) return "poster";
-  return "interactive";
+  return isSoftwareRenderer(signals.renderer) ? "poster" : "interactive";
 }
 
 /** Shortest signed angle from `from` to `to` (radians), so a spun Compiler returns the short way round. */
