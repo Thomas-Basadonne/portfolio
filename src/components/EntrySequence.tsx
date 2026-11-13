@@ -208,6 +208,14 @@ export function EntrySequence({
     return () => document.body.classList.remove("is-calibrating");
   }, [entered]);
 
+  // Back on the gate after a recalibration, focus goes to the way in (the gate is no longer inert at this point).
+  const hadEntered = useRef(entered);
+  const enterButton = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    if (hadEntered.current && !entered) enterButton.current?.focus({ preventScroll: true });
+    hadEntered.current = entered;
+  }, [entered]);
+
   const note = gate === "poster" ? ui.entryPoster : gateReady ? ui.entryDrag : ui.entryLoading;
   // The interactive gate is revealed with its scene ready: the poster only stands in when the loader had to leave
   // first (slow network, BOOT_CAP_MS) or the scene failed. Not fetched otherwise.
@@ -266,7 +274,7 @@ export function EntrySequence({
           </h2>
         </div>
 
-        <button className="calibrate-button" type="button" onClick={onEnter} data-cursor="engage">
+        <button ref={enterButton} className="calibrate-button" type="button" onClick={onEnter} data-cursor="engage">
           <span>{ui.entryButton}</span>
           <span aria-hidden="true">→</span>
         </button>

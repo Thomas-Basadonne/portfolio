@@ -147,6 +147,34 @@ export default function App() {
     else if (earlyReady.current) dispatch({ type: "CANVAS_READY" });
   }, []);
 
+  /** The landing on a deep link (see the effect below); a recalibration closes it. */
+  const deepLink = useRef<{ top: number; done: boolean } | null>(null);
+
+  // Recalibrate: back to the gate from the story. The page rewinds to the top first (the Compiler runs back through
+  // the chapters with it), then the Compiler travels to the centre and the gate fades in over the hero.
+  const recalibrate = useCallback(() => {
+    // Back at the start: the chapter in the address goes, and with it any pending landing on it. Otherwise a scene
+    // that settles during the rewind lands the page back on the chapter (seen under load: the gate over /#work).
+    const url = new URL(window.location.href);
+    url.hash = "";
+    window.history.replaceState(window.history.state, "", url);
+    deepLink.current = { top: 0, done: true };
+    document.documentElement.style.removeProperty("overflow-anchor");
+    const back = () => dispatch({ type: "EXIT" });
+    if (window.scrollY < 2) {
+      back();
+      return;
+    }
+    const instant = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    window.scrollTo({ top: 0, behavior: instant ? "instant" : "smooth" });
+    const started = performance.now();
+    const wait = () => {
+      if (window.scrollY < 2 || performance.now() - started > 1600) back();
+      else window.requestAnimationFrame(wait);
+    };
+    window.requestAnimationFrame(wait);
+  }, []);
+
   const focusMain = useCallback(() => {
     enter();
     window.requestAnimationFrame(() => {
@@ -163,7 +191,6 @@ export default function App() {
    * Browser scroll anchoring stays off until then: on the layout change it moves the page by hundreds of pixels
    * (WebKit: 820-900px when the scene fails), which would read as the reader leaving and skip the redo.
    */
-  const deepLink = useRef<{ top: number; done: boolean } | null>(null);
   useEffect(() => {
     if (!entered || window.location.hash.length < 2) return;
     const requestedId = decodeURIComponent(window.location.hash.slice(1));
@@ -279,6 +306,7 @@ export default function App() {
           content={content}
           locale={locale}
           onLocaleChange={setLocale}
+          onRecalibrate={recalibrate}
         />
         {phase === "ready" && motionAvailable && stageNode && createPortal(
           <MotionControl locale={locale} paused={userPaused} onToggle={() => setUserPaused((paused) => !paused)} />,

@@ -344,6 +344,28 @@ test("the boot loader leaves by its cap when the scene never arrives, and the po
   await expect(page.getByRole("button", { name: /calibrate/i })).toBeEnabled();
 });
 
+test("recalibrate goes back to the gate from the story, focus on the way in", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/");
+  await page.getByRole("button", { name: /calibrate/i }).click();
+  await expect(page.locator(".entry-sequence")).toHaveAttribute("aria-hidden", "true");
+  await page.locator(".chapter-nav a[href='#work']").click();
+  await expect(page.locator("#work")).toBeInViewport();
+
+  await page.getByRole("button", { name: /recalibrate: back to the entry gate/i }).click();
+  await expect(page.locator(".entry-sequence")).not.toHaveAttribute("aria-hidden", "true");
+  await expect(page.locator(".site-shell")).toHaveAttribute("inert", "");
+  await expect(page.getByRole("button", { name: /calibrate \/ enter/i })).toBeFocused();
+  // Back at the start, also once the scene has settled: the chapter left the address.
+  await page.waitForTimeout(1500);
+  expect(await page.evaluate(() => [window.scrollY, window.location.hash])).toEqual([0, ""]);
+
+  await page.keyboard.press("Enter");
+  await expect(page.locator(".entry-sequence")).toHaveAttribute("aria-hidden", "true");
+  await expect(page.getByRole("heading", { level: 1, name: /thomas basadonne/i })).toBeInViewport();
+  expect(await page.evaluate(() => window.scrollY)).toBeLessThan(2);
+});
+
 test("skip link moves focus to main content", async ({ page }) => {
   await page.goto("/");
   await page.getByRole("link", { name: "Skip to content" }).focus();

@@ -108,6 +108,7 @@ export type PortfolioContent = {
     hudHome: string;
     hudNav: string;
     hudDepth: string;
+    hudRecalibrate: { label: string; name: string };
     instrument: string;
     heroWork: string;
     heroEmail: string;
@@ -216,6 +217,7 @@ const en: PortfolioContent = {
     hudHome: "Thomas Basadonne, frontend developer — back to start",
     hudNav: "Portfolio sections",
     hudDepth: "Inspection depth",
+    hudRecalibrate: { label: "Recalibrate", name: "Recalibrate: back to the entry gate" },
     instrument: "Instrument TB–001",
     heroWork: "See selected work",
     heroEmail: "Email me",
@@ -742,6 +744,7 @@ const it: PortfolioContent = {
     hudHome: "Thomas Basadonne, frontend developer — torna all'inizio",
     hudNav: "Sezioni del portfolio",
     hudDepth: "Profondità di ispezione",
+    hudRecalibrate: { label: "Ricalibra", name: "Ricalibra: torna all'ingresso" },
     instrument: "Strumento TB–001",
     heroWork: "Guarda i progetti",
     heroEmail: "Scrivimi",

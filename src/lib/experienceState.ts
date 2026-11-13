@@ -3,7 +3,9 @@ export type ExperiencePhase = "entry" | "loading" | "ready" | "failed";
 export type ExperienceAction =
   | { type: "ENTER" }
   | { type: "CANVAS_READY" }
-  | { type: "CANVAS_FAILED" };
+  | { type: "CANVAS_FAILED" }
+  /** Recalibrate (#17): back to the gate from the story. */
+  | { type: "EXIT" };
 
 export function experienceReducer(
   phase: ExperiencePhase,
@@ -16,6 +18,8 @@ export function experienceReducer(
       return phase === "loading" ? "ready" : phase;
     case "CANVAS_FAILED":
       return phase === "entry" ? phase : "failed";
+    case "EXIT":
+      return "entry";
   }
 }
 
