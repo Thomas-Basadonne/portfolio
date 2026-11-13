@@ -61,12 +61,15 @@ export function webglRenderer(accelerated = false): string | null {
     const attributes: WebGLContextAttributes = { failIfMajorPerformanceCaveat: accelerated };
     const gl = canvas.getContext("webgl2", attributes) || canvas.getContext("webgl", attributes);
     if (!gl) return null;
-    let name = String(gl.getParameter(gl.RENDERER) ?? "");
-    if (/^webkit webgl$/i.test(name)) {
+    // A context whose name cannot be read is still WebGL, of unknown renderer.
+    try {
+      const name = String(gl.getParameter(gl.RENDERER) ?? "");
+      if (!/^webkit webgl$/i.test(name)) return name;
       const info = gl.getExtension("WEBGL_debug_renderer_info");
-      name = info ? String(gl.getParameter(info.UNMASKED_RENDERER_WEBGL)) : "";
+      return info ? String(gl.getParameter(info.UNMASKED_RENDERER_WEBGL)) : "";
+    } catch {
+      return "";
     }
-    return name;
   } catch {
     return null;
   }
