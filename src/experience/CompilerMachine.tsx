@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import { Quaternion, Vector3, type PerspectiveCamera, type Texture } from "three";
 import { experienceStore, type RenderQuality } from "../lib/experienceStore";
@@ -35,12 +35,14 @@ export function TB001Model({ quality, drive, onBuilt, onFailure }: TB001ModelPro
   const model = useRef<Built["machine"] | null>(null);
   const built = useRef<Built | null>(null);
   const announced = useRef(false);
+  const readyFrame = useRef(0);
   const callbacks = useRef({ onBuilt, onFailure });
   callbacks.current = { onBuilt, onFailure };
   const currentPose = useMemo(() => pose(0, 0, 0), []);
 
-  // Unmount: release whatever is on screen.
-  useEffect(() => () => {
+  // Release committed resources on failure as well as unmount: a failed preload can remain on the entry gate.
+  const disposeBuilt = useCallback(() => {
+    window.cancelAnimationFrame(readyFrame.current);
     const current = built.current;
     if (!current) return;
     built.current = null;
@@ -51,6 +53,7 @@ export function TB001Model({ quality, drive, onBuilt, onFailure }: TB001ModelPro
     current.environment.dispose();
     invalidate();
   }, [scene, invalidate]);
+  useEffect(() => disposeBuilt, [disposeBuilt]);
 
   useEffect(() => {
     let cancelled = false;
@@ -90,17 +93,27 @@ export function TB001Model({ quality, drive, onBuilt, onFailure }: TB001ModelPro
       gl.compile(scene, camera);
       invalidate();
     };
+    const disposePending = () => {
+      for (const texture of textures) texture.dispose();
+      textures = [];
+      machine?.dispose();
+      machine = null;
+      environment?.dispose();
+      environment = null;
+    };
     build().catch((error: unknown) => {
-      if (!cancelled) callbacks.current.onFailure?.(error);
+      disposePending();
+      if (!cancelled) {
+        disposeBuilt();
+        callbacks.current.onFailure?.(error);
+      }
     });
     return () => {
       cancelled = true;
       // Parts of a build that never reached the scene.
-      for (const texture of textures) texture.dispose();
-      (machine as Built["machine"] | null)?.dispose();
-      (environment as Built["environment"] | null)?.dispose();
+      disposePending();
     };
-  }, [quality, gl, scene, camera, invalidate, currentPose]);
+  }, [quality, gl, scene, camera, invalidate, currentPose, disposeBuilt]);
 
   useFrame((_, delta) => {
     if (!model.current) return;
@@ -109,7 +122,7 @@ export function TB001Model({ quality, drive, onBuilt, onFailure }: TB001ModelPro
     if (!announced.current) {
       announced.current = true;
       // After this frame is on screen.
-      window.requestAnimationFrame(() => callbacks.current.onBuilt?.());
+      readyFrame.current = window.requestAnimationFrame(() => callbacks.current.onBuilt?.());
     }
   });
   return null;

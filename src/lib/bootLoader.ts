@@ -54,11 +54,12 @@ function paint(target: number, label: string) {
 /** Removes the loader. `immediate` for visits that skip the gate (deep link, reload): nothing to reveal. */
 export function finishBoot(immediate = false) {
   const root = node();
-  if (finished || !root) return;
+  if (finished) return;
   finished = true;
   window.clearTimeout(cap);
   for (const listener of listeners) listener();
   listeners.clear();
+  if (!root) return;
   if (immediate) {
     root.remove();
     return;

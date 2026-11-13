@@ -61,6 +61,21 @@ function afterGatePaint(then: () => void) {
   return stop;
 }
 
+function chooseGate() {
+  const renderer = webglRenderer(true);
+  const capabilities = navigator as Navigator & { deviceMemory?: number; connection?: { saveData?: boolean } };
+  return gateMode({
+    webgl: renderer !== null,
+    renderer,
+    reducedMotion: window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+    forcedColors: window.matchMedia("(forced-colors: active)").matches,
+    narrowViewport: window.matchMedia("(max-width: 760px)").matches,
+    saveData: capabilities.connection?.saveData === true,
+    deviceMemory: capabilities.deviceMemory,
+    hardwareConcurrency: navigator.hardwareConcurrency,
+  });
+}
+
 export default function App() {
   const [phase, dispatch] = useReducer(
     experienceReducer,
@@ -91,18 +106,7 @@ export default function App() {
       return;
     }
     // Accelerated WebGL only: a software rasterizer gets the poster (gatePolicy).
-    const renderer = webglRenderer(true);
-    const capabilities = navigator as Navigator & { deviceMemory?: number; connection?: { saveData?: boolean } };
-    const mode = gateMode({
-      webgl: renderer !== null,
-      renderer,
-      reducedMotion: window.matchMedia("(prefers-reduced-motion: reduce)").matches,
-      forcedColors: window.matchMedia("(forced-colors: active)").matches,
-      narrowViewport: window.matchMedia("(max-width: 760px)").matches,
-      saveData: capabilities.connection?.saveData === true,
-      deviceMemory: capabilities.deviceMemory,
-      hardwareConcurrency: navigator.hardwareConcurrency,
-    });
+    const mode = chooseGate();
     setGate(mode);
     startBoot(mode);
     void document.fonts?.ready.then(() => reachBoot("fonts"));
@@ -164,6 +168,8 @@ export default function App() {
     window.history.replaceState(window.history.state, "", url);
     deepLink.current = { top: 0, done: true };
     document.documentElement.style.removeProperty("overflow-anchor");
+    // A deep link, reload or returning visit has never chosen a gate. Choose it only when requested.
+    if (gate === null) setGate(chooseGate());
     const back = () => dispatch({ type: "EXIT" });
     if (window.scrollY < 2) {
       back();
@@ -177,7 +183,7 @@ export default function App() {
       else window.requestAnimationFrame(wait);
     };
     window.requestAnimationFrame(wait);
-  }, []);
+  }, [gate]);
 
   const focusMain = useCallback(() => {
     enter();

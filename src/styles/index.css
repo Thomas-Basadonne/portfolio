@@ -392,7 +392,7 @@ a {
   transition: opacity 0.6s ease;
 }
 
-.is-gate-ready .gate-poster {
+.is-interactive.is-gate-ready .gate-poster {
   opacity: 0;
 }
 

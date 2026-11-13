@@ -338,9 +338,18 @@ test("the boot loader leaves by its cap when the scene never arrives, and the po
   // The chunk is held: the interactive gate can never be ready (slow network, BOOT_CAP_MS = 5 s, Thomas 13/11).
   await page.route(/ExperienceCanvas-.*\.js/, (route) =>
     route.fulfill({ contentType: "text/javascript", body: "await new Promise(() => {});" }));
+  // Only the capability probe is stubbed: the held module never creates a renderer. This exercises the live-gate
+  // timeout on every CI browser, including Firefox without WebGL and Chromium with SwiftShader.
+  await page.addInitScript(() => {
+    const getContext = HTMLCanvasElement.prototype.getContext;
+    HTMLCanvasElement.prototype.getContext = function (this: HTMLCanvasElement, kind: string, ...args: unknown[]) {
+      if (kind === "webgl2" || kind === "webgl") {
+        return { RENDERER: 0x1f01, getParameter: () => "Test hardware renderer" };
+      }
+      return Reflect.apply(getContext, this, [kind, ...args]);
+    } as typeof getContext;
+  });
   await page.goto("/");
-  await requireWebGL(page);
-  test.skip(!(await expectsLiveGate(page)), "Software renderer: the poster gate, covered by the next test.");
   await expect(page.locator(".entry-sequence.is-interactive")).toBeAttached();
   await expect(page.locator("#boot")).toBeVisible();
   const start = Date.now();
@@ -390,6 +399,35 @@ test("recalibrate goes back to the gate from the story, focus on the way in", as
   await expect(page.getByRole("heading", { level: 1, name: /thomas basadonne/i })).toBeInViewport();
   expect(await page.evaluate(() => window.scrollY)).toBeLessThan(2);
 });
+
+test("recalibrate keeps the still gate visible after the scene is ready", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/");
+  await requireWebGL(page);
+  await page.getByRole("button", { name: /calibrate \/ enter/i }).click();
+  await expect(page.locator(".site-shell")).toHaveAttribute("data-visual-ready", "", { timeout: SCENE_TIMEOUT });
+  await page.getByRole("button", { name: /recalibrate: back to the entry gate/i }).click();
+  await expect(page.locator(".gate-poster")).toBeVisible();
+  await expect(page.locator(".gate-poster")).toHaveCSS("opacity", "1");
+});
+
+for (const arrival of ["deep link", "session", "reload"] as const) {
+  test(`recalibrate chooses a still gate after ${arrival} skipped entry`, async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    if (arrival === "session") await bypassEntry(page);
+    await page.goto(arrival === "deep link" ? "/#work" : "/");
+    if (arrival === "reload") await page.reload();
+    await expect(page.locator(".hud__readout")).toBeVisible();
+    await page.getByRole("button", { name: /recalibrate: back to the entry gate/i }).click();
+    await expect(page.locator(".entry-sequence")).toHaveAttribute("aria-hidden", "false");
+    await expect(page.locator(".gate-poster")).toBeVisible();
+    await expect(page.locator(".gate-poster")).toHaveCSS("opacity", "1");
+    await expect(page.getByRole("button", { name: /calibrate \/ enter/i })).toBeFocused();
+    await page.keyboard.press("Enter");
+    await expect(page.locator(".entry-sequence")).toHaveAttribute("aria-hidden", "true");
+    await expect(page.getByRole("heading", { level: 1, name: /thomas basadonne/i })).toBeInViewport();
+  });
+}
 
 test("skip link moves focus to main content", async ({ page }) => {
   await page.goto("/");
