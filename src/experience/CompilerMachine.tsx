@@ -1,6 +1,6 @@
-import { useLayoutEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
-import { Quaternion, Vector3, type PerspectiveCamera } from "three";
+import { Quaternion, Vector3, type PerspectiveCamera, type Texture } from "three";
 import { experienceStore, type RenderQuality } from "../lib/experienceStore";
 import { createMachine } from "./tb001/machine";
 import { createMachineTextures } from "./tb001/textures";
@@ -12,47 +12,93 @@ type TB001ModelProps = {
   quality: RenderQuality;
   /** Mutates the preallocated pose. Its controller owns motion/pauses and calls invalidate. */
   drive: (target: MachinePose, delta: number) => void;
+  /** Called once, after the first frame drawn with the model. */
+  onBuilt?: () => void;
+  /** A build step that throws: the build runs outside React's render, so the error boundary would not see it. */
+  onFailure?: (error: unknown) => void;
 };
 
-/** Reusable R3F model. Allocates GPU resources only in the committed effect (StrictMode safe). */
-export function TB001Model({ quality, drive }: TB001ModelProps) {
+type Built = { machine: ReturnType<typeof createMachine>; environment: ReturnType<typeof createStudioEnvironment> };
+
+/** One build step per task: the input and the browser get a turn between them. */
+const nextTask = () => new Promise<void>((resolve) => { window.setTimeout(resolve, 0); });
+
+/**
+ * Reusable R3F model. Allocates GPU resources only in committed effects (StrictMode safe).
+ * The build is split into tasks (environment, textures, geometry, programs): done in one go it was a single long task
+ * of ~200 ms at 4x CPU (110 ms of it the geometry), which landed in the first seconds once the gate preloads the scene
+ * (#17) and pushed Lighthouse's mobile TBT to its limit. A rebuild (quality change) keeps the previous model on
+ * screen until the new one is complete.
+ */
+export function TB001Model({ quality, drive, onBuilt, onFailure }: TB001ModelProps) {
   const { gl, scene, camera, invalidate } = useThree();
-  const model = useRef<ReturnType<typeof createMachine> | null>(null);
+  const model = useRef<Built["machine"] | null>(null);
+  const built = useRef<Built | null>(null);
+  const announced = useRef(false);
+  const callbacks = useRef({ onBuilt, onFailure });
+  callbacks.current = { onBuilt, onFailure };
   const currentPose = useMemo(() => pose(0, 0, 0), []);
 
-  useLayoutEffect(() => {
-    const environment = createStudioEnvironment(gl, quality);
-    const previousEnvironment = scene.environment;
-    const previousIntensity = scene.environmentIntensity;
-    let machine: ReturnType<typeof createMachine> | null = null;
-    try {
-      machine = createMachine({ quality, textures: createMachineTextures(quality) });
+  // Unmount: release whatever is on screen.
+  useEffect(() => () => {
+    const current = built.current;
+    if (!current) return;
+    built.current = null;
+    model.current = null;
+    scene.remove(current.machine.root);
+    current.machine.dispose();
+    if (scene.environment === current.environment.texture) scene.environment = null;
+    current.environment.dispose();
+    invalidate();
+  }, [scene, invalidate]);
+
+  useEffect(() => {
+    let cancelled = false;
+    let environment: Built["environment"] | null = null;
+    let textures: Texture[] = [];
+    let machine: Built["machine"] | null = null;
+    const build = async () => {
+      environment = createStudioEnvironment(gl, quality);
+      await nextTask();
+      if (cancelled) return;
+      const set = createMachineTextures(quality);
+      textures = [set.wear, set.panelBump, set.panels, set.oblo].filter((texture): texture is Texture => texture !== null);
+      await nextTask();
+      if (cancelled) return;
+      machine = createMachine({ quality, textures: set });
+      textures = []; // owned by the machine from here on
       machine.root.name = "TB-001";
       machine.update(currentPose);
+      await nextTask();
+      if (cancelled) return;
+      const previous = built.current;
+      if (previous) {
+        scene.remove(previous.machine.root);
+        previous.machine.dispose();
+        previous.environment.dispose();
+      }
       scene.environment = environment.texture;
       scene.environmentIntensity = 1.12;
       scene.add(machine.root);
+      built.current = { machine, environment };
       model.current = machine;
+      environment = null;
+      machine = null;
       // Start linking every program now (hidden parts included: three walks the whole graph) so the driver can
       // build them in parallel instead of one after another on the first draw. `compileAsync` is deliberately
       // not used: its readiness poll cannot be cancelled and throws when the materials are disposed first.
       gl.compile(scene, camera);
       invalidate();
-    } catch (error) {
-      machine?.dispose();
-      environment.dispose();
-      throw error;
-    }
+    };
+    build().catch((error: unknown) => {
+      if (!cancelled) callbacks.current.onFailure?.(error);
+    });
     return () => {
-      model.current = null;
-      scene.remove(machine.root);
-      machine.dispose();
-      if (scene.environment === environment.texture) {
-        scene.environment = previousEnvironment;
-        scene.environmentIntensity = previousIntensity;
-      }
-      environment.dispose();
-      invalidate();
+      cancelled = true;
+      // Parts of a build that never reached the scene.
+      for (const texture of textures) texture.dispose();
+      (machine as Built["machine"] | null)?.dispose();
+      (environment as Built["environment"] | null)?.dispose();
     };
   }, [quality, gl, scene, camera, invalidate, currentPose]);
 
@@ -60,6 +106,11 @@ export function TB001Model({ quality, drive }: TB001ModelProps) {
     if (!model.current) return;
     drive(currentPose, Math.min(delta, 0.05));
     model.current.update(currentPose);
+    if (!announced.current) {
+      announced.current = true;
+      // After this frame is on screen.
+      window.requestAnimationFrame(() => callbacks.current.onBuilt?.());
+    }
   });
   return null;
 }
@@ -73,7 +124,11 @@ const GATE_SCALE = 1.06;
 const spin = new Quaternion();
 
 /** Applies the chapter choreography in the persistent stage; scheduling belongs to the controller. */
-export function CompilerMachine({ quality }: { quality: RenderQuality }) {
+export function CompilerMachine({ quality, onBuilt, onFailure }: {
+  quality: RenderQuality;
+  onBuilt?: () => void;
+  onFailure?: (error: unknown) => void;
+}) {
   const { camera, scene, gl, get } = useThree();
   const placement = useMemo(createPresentation, []);
   const input = useMemo(() => ({
@@ -142,5 +197,5 @@ export function CompilerMachine({ quality }: { quality: RenderQuality }) {
     camera.position.set(placement.cameraX, placement.cameraY, placement.cameraZ * (1 + 0.18 * crossing));
     camera.lookAt(0, placement.lookY, 0);
   };
-  return <TB001Model quality={quality} drive={drive} />;
+  return <TB001Model quality={quality} drive={drive} onBuilt={onBuilt} onFailure={onFailure} />;
 }

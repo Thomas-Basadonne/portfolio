@@ -55,18 +55,12 @@ function RenderBridge() {
 function SceneLifecycle({
   quality,
   onDecline,
-  onReady,
 }: {
   quality: RenderQuality;
   onDecline: () => void;
-  onReady: () => void;
 }) {
   const monitor = useMemo(createFrameMonitor, []);
   const lastFrame = useRef(0);
-
-  useEffect(() => {
-    onReady();
-  }, [onReady]);
 
   // Every rendered frame counts, scrolling or not: a frame that takes 140 ms is slow even while the page is still.
   // What is dropped is the gap that is not a frame time — after a pause, a hidden tab or a closed drawer.
@@ -140,10 +134,13 @@ export function ExperienceCanvas({ onReady, onFailure }: ExperienceCanvasProps) 
         <SceneLifecycle
           quality={quality}
           onDecline={() => setDeclined(true)}
-          onReady={onReady}
         />
         <Suspense fallback={null}>
-          <CompilerMachine quality={quality} />
+          {/* Ready once the model is drawn: its build is split over several tasks. */}
+          <CompilerMachine quality={quality} onBuilt={onReady} onFailure={(error) => {
+            reportClientError("visual", error);
+            onFailure();
+          }} />
         </Suspense>
       </Canvas>
     </div>
