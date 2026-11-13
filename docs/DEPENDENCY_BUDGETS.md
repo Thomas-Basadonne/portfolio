@@ -3,8 +3,10 @@
 Thomas explicitly approved keeping all dependency upgrades on 2026-11-13, with
 these gzip-byte ceilings: **entry 98,000**, **visual 255,000**, **total JS 350,000**.
 Lighthouse, accessibility, unit/E2E assertions, source-map prohibition and CSP/link
-checks are unchanged. CSS is not part of this decision: #77 alone retains 40,000
-raw bytes; the gate in #76 has its separately approved 42,000-byte allowance.
+checks are unchanged. CSS is not part of this decision: the original independent
+#77 retained 40,000 raw bytes. This branch now integrates the reviewed #76 and #78
+heads, retaining the gate's separately approved **42,000-byte** allowance.
+Merge #78 and #76 before #77; the combined resolution is already on this branch.
 
 ## Why this is a budget decision, not a code fix
 
