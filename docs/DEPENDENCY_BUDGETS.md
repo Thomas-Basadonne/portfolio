@@ -1,6 +1,6 @@
 # Runtime dependency budget decision — PR #77
 
-Thomas explicitly approved keeping all dependency upgrades on 2026-11-13, with
+Thomas explicitly confirmed keeping all dependency upgrades on **2026-11-14**, with
 these gzip-byte ceilings: **entry 98,000**, **visual 255,000**, **total JS 350,000**.
 Lighthouse, accessibility, unit/E2E assertions, source-map prohibition and CSP/link
 checks are unchanged. CSS is not part of this decision: the original independent

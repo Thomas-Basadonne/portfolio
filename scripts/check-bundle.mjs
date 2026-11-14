@@ -3,7 +3,7 @@ import { readdir, readFile, stat } from "node:fs/promises";
 import { extname, join, relative } from "node:path";
 
 const dist = new URL("../dist", import.meta.url);
-// Runtime dependency JS baseline approved by Thomas on 2026-11-13 (#77):
+// Runtime dependency JS baseline explicitly confirmed by Thomas on 2026-11-14 (#77):
 // entry 98,000 / visual 255,000 / total 350,000 gzip; performance gates are unchanged.
 // CSS retains #76's separate 42,000-byte allowance for the boot loader and entry gate.
 // Measurements and the explicit trade-offs: docs/DEPENDENCY_BUDGETS.md and docs/PERFORMANCE.md.
