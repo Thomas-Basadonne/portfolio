@@ -89,9 +89,12 @@ encoding regression, first-frame/PMREM diagnostics, payload budgets and the rema
 
 ## Content integrity
 
-The source repository was empty. Only facts stated in the brief or found on Thomas’s public
-LinkedIn profile are presented as facts. Case-study metrics, dates, links, CV and project details
-are explicit placeholders in `src/content/portfolio.ts`; none are silently invented.
+Published EN/IT content lives in `src/content/portfolio.ts`. Project roles, release states and evidence
+boundaries are explicit; private client metrics, code and documents are not published. Media distinguish
+real application captures, illustrative websites and synthetic fixtures. Editorial source copies in
+[docs/content](content/README.md) retain their dates and privacy boundary: approved decisions and the
+published content take precedence over historical drafts. See [SYS-01](SYS-01_AUDIT.md) for the measured
+system audit and follow-up ownership; proposals there do not authorize new claims or a rebrand.
 
 ## Research synthesis
 
