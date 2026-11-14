@@ -76,10 +76,12 @@ body {
   overflow-x: clip;
   color: var(--bone);
   background: var(--graphite);
+  transition: background-color 0.6s ease;
 }
 
 body.is-calibrating {
   overflow: hidden;
+  background: var(--bone);
 }
 
 button,
@@ -269,156 +271,197 @@ a {
   transform: translate3d(0.35%, -0.35%, 0);
 }
 
-/* Entry / calibration */
+/* Entry gate (#17) */
 
 .entry-sequence {
   position: fixed;
   z-index: var(--layer-entry);
   inset: 0;
+  display: grid;
+  grid-template: minmax(0, 1fr) auto / minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 1.5rem var(--gutter);
+  padding: calc(var(--gutter) + 4.25rem) max(var(--gutter), env(safe-area-inset-right)) max(var(--gutter), env(safe-area-inset-bottom)) max(var(--gutter), env(safe-area-inset-left));
   overflow: hidden;
   color: var(--graphite);
-  background: var(--bone);
-  clip-path: inset(0 0 0 0);
-  transition:
-    clip-path var(--motion-entry) cubic-bezier(0.77, 0, 0.175, 1),
-    visibility 0s linear var(--motion-entry);
+  transition: opacity var(--gate-dissolve) ease;
 }
 
-.entry-sequence::before,
-.entry-sequence::after {
-  position: absolute;
-  content: "";
+/* Hidden only once the dissolve ends; shown at once on a recalibration, so its button can take the focus. */
+.entry-sequence.is-complete {
+  visibility: hidden;
+  opacity: 0;
   pointer-events: none;
+  transition: opacity var(--gate-dissolve) ease, visibility 0s linear var(--gate-dissolve);
 }
 
-.entry-sequence::before {
+/* The paper grid lies under the scene: the Compiler is never crossed by its lines. */
+.gate-grid {
+  position: fixed;
   inset: 0;
+  pointer-events: none;
   background:
     linear-gradient(var(--line-dark) 1px, transparent 1px),
     linear-gradient(90deg, var(--line-dark) 1px, transparent 1px);
   background-size: 5vw 5vw;
-  mask-image: linear-gradient(to bottom, transparent, black 22%, black 80%, transparent);
+  mask-image: linear-gradient(transparent, #000 22%, #000 80%, transparent);
+  transition: opacity 0.6s ease;
 }
 
-.entry-sequence::after {
-  top: 0;
-  bottom: 0;
-  left: 50%;
-  width: 1px;
-  background: var(--line-dark);
+.gate-grid.is-complete {
+  opacity: 0;
 }
 
-.entry-sequence.is-complete {
-  visibility: hidden;
-  pointer-events: none;
-  clip-path: inset(0 0 100% 0);
-}
-
-.entry-sequence.is-complete * {
-  animation-play-state: paused;
-}
-
-.entry-sequence__meta {
+.gate-drag {
   position: absolute;
-  z-index: 2;
-  top: max(var(--gutter), env(safe-area-inset-top));
-  right: max(var(--gutter), env(safe-area-inset-right));
-  left: max(var(--gutter), env(safe-area-inset-left));
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-bottom: 0.75rem;
-  border-bottom: 1px solid var(--line-dark);
-}
-
-.calibration-mark {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: min(29vw, 27rem);
-  aspect-ratio: 1;
-  transform: translate(-50%, -50%);
-}
-
-.calibration-mark::before,
-.calibration-mark::after,
-.calibration-mark__ring,
-.calibration-mark__axis {
-  position: absolute;
-  content: "";
-}
-
-.calibration-mark::before {
-  inset: 15%;
-  border: 1px solid var(--graphite);
-  border-radius: 50%;
-  animation: calibration-pulse 2.6s ease-in-out infinite;
-}
-
-.calibration-mark::after {
-  inset: 38%;
-  border: 2px solid var(--signal);
-  border-radius: 50%;
-  background: var(--signal);
-  box-shadow: 0 0 0 0.65rem var(--bone) inset;
-}
-
-.calibration-mark__ring {
+  z-index: 1;
   inset: 0;
-  border: 1px dashed var(--graphite);
-  border-radius: 50%;
-  animation: calibration-spin 18s linear infinite;
 }
 
-.calibration-mark__ring--inner {
-  inset: 27%;
-  border-style: solid;
-  animation-direction: reverse;
-  animation-duration: 8s;
+.is-gate-ready .gate-drag {
+  cursor: grab;
+  touch-action: none;
 }
 
-.calibration-mark__axis--x {
-  top: 50%;
-  right: -12%;
-  left: -12%;
-  height: 1px;
-  background: var(--graphite);
+.is-gate-ready .gate-drag:active {
+  cursor: grabbing;
 }
 
-.calibration-mark__axis--y {
-  top: -12%;
-  bottom: -12%;
-  left: 50%;
-  width: 1px;
-  background: var(--graphite);
+/* The gate header shares the HUD's geometry rules in the paper tone: on entry it changes tone, not place. */
+.gate-bar__identity,
+.gate-bar__tools {
+  color: var(--graphite);
+  background: var(--bone);
+  border: 1px solid var(--line-dark);
 }
 
-.calibration-mark strong {
-  position: absolute;
-  z-index: 2;
-  top: 50%;
-  left: 50%;
+.gate-bar__identity {
+  margin: 0;
+}
+
+.gate-bar .gate-bar__identity small {
+  color: #5d5b55;
+}
+
+.gate-bar .gate-bar__monogram {
   color: var(--bone);
-  font-family: "DM Mono", monospace;
-  font-size: clamp(1rem, 2vw, 1.8rem);
+  background: var(--graphite);
+}
+
+.gate-bar__status {
+  display: flex;
+  margin: 0;
+  gap: 0.6rem;
+  color: #5d5b55;
+}
+
+.gate-bar__status strong {
+  color: var(--graphite);
   font-weight: 400;
-  transform: translate(-50%, -53%);
 }
 
-@keyframes calibration-spin {
-  to { transform: rotate(360deg); }
+/* The instrument's box: the free height between the header and the statement, never under text. */
+.gate-stage {
+  position: relative;
+  z-index: 0;
+  grid-area: 1 / 1 / 2 / -1;
+  width: min(100%, 64rem);
+  height: 100%;
+  align-self: center;
+  justify-self: center;
+  pointer-events: none;
+  color: #5d5b55;
 }
 
-@keyframes calibration-pulse {
-  50% { transform: scale(0.94); }
+/* Corner marks: a border masked down to its four corners. */
+.gate-stage::before {
+  position: absolute;
+  inset: 0;
+  content: "";
+  border: 1px solid;
+  mask: conic-gradient(at 1rem 1rem, #0000 75%, #000 0) 0 0 / calc(100% - 1rem) calc(100% - 1rem);
+}
+
+.gate-poster {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  /* The gate frames the Compiler at GATE_SCALE: the poster follows. */
+  transform: scale(1.06);
+  transition: opacity 0.6s ease;
+}
+
+.is-interactive.is-gate-ready .gate-poster {
+  opacity: 0;
+}
+
+/* The caption sits on the box's lower edge, between the corner marks, where a round object leaves room. */
+.gate-stage__caption {
+  position: absolute;
+  right: 1.6rem;
+  bottom: 0;
+  left: 1.6rem;
+  transform: translateY(50%);
+  display: flex;
+  margin: 0;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+body.is-calibrating .site-shell :is(.identity-section .story-section__content, .hud, .paper-grain, .webgl-fallback) {
+  opacity: 0;
+}
+
+body.is-calibrating .site-shell .story-section:not(.identity-section) {
+  visibility: hidden;
+}
+
+.site-shell .identity-section .story-section__content,
+.site-shell .hud {
+  transition: opacity 0.6s ease 0.6s, transform 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.6s;
+}
+
+body.is-calibrating .site-shell :is(.identity-section .story-section__content, .hud) {
+  transition-delay: 0s;
+}
+
+body.is-calibrating .identity-section .story-section__content {
+  transform: scale(0.985);
+}
+
+/* While the gate holds the Compiler, its canvas covers the viewport (one canvas, two framings: see the travel). */
+body.is-gating .scene-staged[data-scene-layout] .scene-stage {
+  overflow: visible;
+  background: transparent;
+  clip-path: none;
+}
+
+body.is-gating .scene-staged[data-scene-layout] .scene-stage .webgl-shell {
+  position: fixed;
+  inset: 0;
+}
+
+.scene-staged[data-gate-ready] .scene-stage .webgl-shell {
+  opacity: 1;
+}
+
+body.is-arriving .motion-control {
+  animation: gate-arrive 0.6s ease 0.6s both;
+}
+
+@keyframes gate-arrive {
+  from { opacity: 0; }
 }
 
 .entry-sequence__statement {
-  position: absolute;
+  position: relative;
   z-index: 2;
-  bottom: var(--gutter);
-  left: var(--gutter);
-  width: min(44rem, 52vw);
+}
+
+/* On wide screens the serif line holds on one line: the statement loses a row, the instrument gains it. */
+.entry-sequence__statement h2 em {
+  white-space: nowrap;
 }
 
 .entry-sequence__statement p {
@@ -426,7 +469,6 @@ a {
 }
 
 .entry-sequence__statement h2 {
-  max-width: 12ch;
   margin: 0;
   font-size: clamp(3.2rem, 7vw, 7.6rem);
   font-weight: 540;
@@ -442,10 +484,8 @@ a {
 }
 
 .calibrate-button {
-  position: absolute;
+  position: relative;
   z-index: 3;
-  right: var(--gutter);
-  bottom: var(--gutter);
   display: flex;
   width: min(25rem, 32vw);
   min-height: 5.25rem;
@@ -486,24 +526,128 @@ a {
   text-transform: uppercase;
 }
 
-.entry-sequence__note {
+/* Boot loader (#17): static in index.html, over everything until the scene is ready. Only transform and
+   opacity animate, so it keeps moving through the first compile. */
+.boot {
+  position: fixed;
+  z-index: calc(var(--layer-skip) - 1);
+  inset: 0;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  padding: max(var(--gutter), env(safe-area-inset-top)) var(--gutter) max(var(--gutter), env(safe-area-inset-bottom));
+  overflow: hidden;
+  color: var(--bone);
+  background: var(--graphite);
+  transition: transform 0.95s cubic-bezier(0.77, 0, 0.175, 1);
+}
+
+.boot__top,
+.boot__foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  font: 0.75rem/1.2 "DM Mono", monospace;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.boot__top span + span,
+.boot__foot span:first-child {
+  color: var(--muted);
+}
+
+/* On a phone the stage wraps: it keeps the right edge, as the count beneath it. */
+.boot__top span + span {
+  text-align: right;
+}
+
+.boot__count b {
+  font-weight: 400;
+}
+
+.boot__name {
+  align-self: end;
+  margin: 0 0 1.5rem;
+  font-size: min(16vw, 24svh);
+  font-weight: 540;
+  letter-spacing: -0.075em;
+  line-height: 0.86;
+}
+
+.boot__name > span {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.06em;
+}
+
+.boot__name b {
+  display: block;
+  font-weight: inherit;
+  animation: boot-rise 1s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.boot__name > span + span b {
+  font-family: "Instrument Serif", Georgia, serif;
+  font-weight: 400;
+  font-style: italic;
+  letter-spacing: -0.045em;
+  animation-delay: 0.12s;
+}
+
+
+.boot__bar {
+  position: relative;
+  height: 1px;
+  margin-top: 0.9rem;
+  background: rgba(233, 229, 218, 0.22);
+}
+
+.boot__bar i,
+.boot__bar::after {
   position: absolute;
-  z-index: 2;
-  right: var(--gutter);
-  bottom: calc(var(--gutter) + 6.2rem);
-  color: #5d5b55;
+  inset: 0;
+  content: "";
+  background: var(--signal);
+  transform: scaleX(var(--boot, 0.08));
+  transform-origin: left;
+  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* A scan that never stops, even while the main thread compiles the scene. */
+.boot__bar::after {
+  width: 12%;
+  background: var(--bone);
+  opacity: 0.6;
+  transform: none;
+  animation: boot-scan 1.4s linear infinite;
+}
+
+.boot.is-done {
+  pointer-events: none;
+  transform: translateY(-100%);
+}
+
+@keyframes boot-rise {
+  from { transform: translateY(105%); }
+}
+
+@keyframes boot-scan {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(850%); }
 }
 
 /* Heads-up display */
 
-.hud {
+.hud,
+.gate-bar {
   position: fixed;
   z-index: var(--layer-hud);
   inset: var(--gutter) var(--gutter) auto;
   display: grid;
   grid-template-columns: 1fr auto;
   column-gap: 1rem;
-  align-items: start;
+  /* Identity and tools share the row's height, on the gate and in the story alike (Thomas, 13/11). */
+  align-items: stretch;
   pointer-events: none;
 }
 
@@ -534,7 +678,8 @@ a {
   outline-color: var(--graphite);
 }
 
-.hud__identity {
+.hud__identity,
+.gate-bar__identity {
   display: flex;
   width: max-content;
   min-width: 2.75rem;
@@ -549,7 +694,8 @@ a {
   line-height: 1.15;
 }
 
-.hud__identity small {
+.hud__identity small,
+.gate-bar__identity small {
   display: block;
   margin-top: 0.25rem;
   color: var(--muted);
@@ -560,7 +706,8 @@ a {
   text-transform: uppercase;
 }
 
-.hud__monogram {
+.hud__monogram,
+.gate-bar__monogram {
   display: grid;
   width: 2.3rem;
   aspect-ratio: 1;
@@ -1208,7 +1355,8 @@ a.contact-link:focus-visible {
 
 /* Language switch, hero actions and inline links */
 
-.hud__tools {
+.hud__tools,
+.gate-bar__tools {
   display: flex;
   padding: 0.4rem 0.6rem;
   align-items: center;
@@ -1222,7 +1370,8 @@ a.contact-link:focus-visible {
   border: 1px solid var(--line-light);
 }
 
-.lang-switch button {
+.lang-switch button,
+.hud__recalibrate {
   min-width: 2.75rem;
   min-height: 2.75rem;
   padding: 0 0.5rem;
@@ -1233,7 +1382,22 @@ a.contact-link:focus-visible {
   cursor: pointer;
 }
 
-.lang-switch button:hover {
+.hud__recalibrate {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  pointer-events: auto;
+  font: 400 0.75rem/1.5 "DM Mono", monospace;
+  letter-spacing: 0.06em;
+}
+
+.hud__recalibrate svg {
+  width: 0.95rem;
+  height: 0.95rem;
+}
+
+.lang-switch button:hover,
+.hud__recalibrate:hover {
   color: var(--bone);
 }
 
@@ -1668,7 +1832,7 @@ a.contact-link:focus-visible {
     --reading-top: calc(max(0.75rem, env(safe-area-inset-top)) + 4.75rem);
   }
 
-  .webgl-shell,
+  /* The scene's own shell lives in the stage (scene-stages.css); only the fallback is sized here. */
   .webgl-fallback {
     right: 0;
     bottom: auto;
@@ -1676,60 +1840,45 @@ a.contact-link:focus-visible {
     height: 61svh;
   }
 
-  .webgl-shell::after {
-    position: absolute;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    height: 28%;
-    content: "";
-    background: linear-gradient(to bottom, transparent, var(--graphite));
-  }
-
   .paper-grain {
     opacity: 0.12;
   }
 
-  .entry-sequence::before {
+  .gate-grid {
     background-size: 12.5vw 12.5vw;
   }
 
-  .entry-sequence::after {
-    display: none;
+  .entry-sequence {
+    grid-template: minmax(0, 1fr) auto auto / minmax(0, 1fr);
+    gap: 1.25rem;
+    padding-top: calc(max(0.75rem, env(safe-area-inset-top)) + 4.25rem);
   }
 
-  .entry-sequence__meta span:last-child {
-    display: none;
-  }
-
-  .calibration-mark {
-    top: 38%;
-    width: min(68vw, 22rem);
-  }
-
-  .entry-sequence__statement {
-    right: var(--gutter);
-    bottom: 8.8rem;
+  .gate-bar__identity {
     width: auto;
+    min-width: 0;
   }
 
   .entry-sequence__statement h2 {
     max-width: 9ch;
-    font-size: clamp(3.3rem, 15vw, 5rem);
+    font-size: clamp(2.6rem, min(15vw, 8svh), 5rem);
+  }
+
+  .entry-sequence__statement h2 em {
+    white-space: normal;
   }
 
   .calibrate-button {
-    right: var(--gutter);
-    bottom: max(1.2rem, env(safe-area-inset-bottom));
-    left: var(--gutter);
     width: auto;
   }
 
-  .entry-sequence__note {
+  .hud__recalibrate span,
+  .gate-bar__status {
     display: none;
   }
 
-  .hud {
+  .hud,
+  .gate-bar {
     top: max(0.75rem, env(safe-area-inset-top));
     right: max(0.75rem, env(safe-area-inset-right));
     left: max(0.75rem, env(safe-area-inset-left));
@@ -1989,25 +2138,13 @@ a.contact-link:focus-visible {
     padding-right: calc(var(--nav-lane) + env(safe-area-inset-right));
   }
 
-  .webgl-shell,
   .webgl-fallback {
     height: 100svh;
   }
 
-  .entry-sequence__meta {
-    top: max(0.8rem, env(safe-area-inset-top));
-  }
-
-  .calibration-mark {
-    top: 43%;
-    width: min(28vw, 9.5rem);
-  }
-
-  .entry-sequence__statement {
-    right: 48%;
-    bottom: max(1rem, env(safe-area-inset-bottom));
-    left: max(1rem, env(safe-area-inset-left));
-    width: auto;
+  .entry-sequence {
+    grid-template: minmax(0, 1fr) auto / minmax(0, 1fr) auto;
+    gap: 0.75rem;
   }
 
   .entry-sequence__statement p {
@@ -2021,9 +2158,6 @@ a.contact-link:focus-visible {
   }
 
   .calibrate-button {
-    right: max(1rem, env(safe-area-inset-right));
-    bottom: max(1rem, env(safe-area-inset-bottom));
-    left: auto;
     width: min(42vw, 20rem);
     min-height: 4rem;
   }
@@ -2069,6 +2203,20 @@ a.contact-link:focus-visible {
 }
 
 @media (max-width: 420px) {
+  /* Room for «Recalibrate» at 320 px: the readout keeps its number, the bar beneath still says depth. */
+  .hud__readout {
+    grid-template-columns: 2.25rem auto;
+  }
+
+  .hud__readout span:first-child {
+    display: none;
+  }
+
+  .hud__tools {
+    padding-inline: 0.4rem;
+    gap: 0.5rem;
+  }
+
   .case-index__code {
     font-size: 0.75rem;
   }
@@ -2090,6 +2238,11 @@ a.contact-link:focus-visible {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
+  }
+
+  .site-shell .identity-section .story-section__content,
+  .site-shell .hud {
+    transition-delay: 0s;
   }
 
   .paper-grain {
@@ -2146,7 +2299,8 @@ a.contact-link:focus-visible {
   }
 
   .hud .lang-switch button,
-  .hud .chapter-nav a {
+  .hud .chapter-nav a,
+  .hud__recalibrate {
     color: LinkText;
   }
 

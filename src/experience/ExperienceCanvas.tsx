@@ -28,14 +28,26 @@ function deviceQuality(): RenderQuality {
 
 function RenderBridge() {
   const invalidate = useThree((state) => state.invalidate);
+  const get = useThree((state) => state.get);
 
   useEffect(() => {
     experienceStore.requestRender = invalidate;
+    // The entry gate (#17) moves the canvas between the viewport and its page box. Waiting for the resize observer
+    // would show one frame of the old buffer in the new box: resize and draw now, before the browser paints.
+    const settle = () => {
+      const { gl, setSize, advance } = get();
+      const box = gl.domElement.parentElement?.getBoundingClientRect();
+      if (!box || box.width < 1 || box.height < 1) return;
+      setSize(box.width, box.height, box.top, box.left);
+      advance(performance.now());
+    };
+    experienceStore.settleCanvas = settle;
     invalidate();
     return () => {
       if (experienceStore.requestRender === invalidate) experienceStore.requestRender = null;
+      if (experienceStore.settleCanvas === settle) experienceStore.settleCanvas = null;
     };
-  }, [invalidate]);
+  }, [get, invalidate]);
 
   return null;
 }
@@ -43,18 +55,12 @@ function RenderBridge() {
 function SceneLifecycle({
   quality,
   onDecline,
-  onReady,
 }: {
   quality: RenderQuality;
   onDecline: () => void;
-  onReady: () => void;
 }) {
   const monitor = useMemo(createFrameMonitor, []);
   const lastFrame = useRef(0);
-
-  useEffect(() => {
-    onReady();
-  }, [onReady]);
 
   // Every rendered frame counts, scrolling or not: a frame that takes 140 ms is slow even while the page is still.
   // What is dropped is the gap that is not a frame time — after a pause, a hidden tab or a closed drawer.
@@ -128,10 +134,13 @@ export function ExperienceCanvas({ onReady, onFailure }: ExperienceCanvasProps) 
         <SceneLifecycle
           quality={quality}
           onDecline={() => setDeclined(true)}
-          onReady={onReady}
         />
         <Suspense fallback={null}>
-          <CompilerMachine quality={quality} />
+          {/* Ready once the model is drawn: its build is split over several tasks. */}
+          <CompilerMachine quality={quality} onBuilt={onReady} onFailure={(error) => {
+            reportClientError("visual", error);
+            onFailure();
+          }} />
         </Suspense>
       </Canvas>
     </div>

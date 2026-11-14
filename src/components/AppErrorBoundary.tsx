@@ -1,5 +1,6 @@
 import { Component, type ErrorInfo, type ReactNode } from "react";
 import { reportClientError } from "../lib/reportClientError";
+import { finishBoot } from "../lib/bootLoader";
 
 type AppErrorBoundaryProps = { children: ReactNode };
 type AppErrorBoundaryState = { failed: boolean };
@@ -15,6 +16,8 @@ export class AppErrorBoundary extends Component<
   }
 
   componentDidCatch(error: Error, info: ErrorInfo) {
+    // A crash before App commits never starts its boot timeout; expose the resilient fallback immediately.
+    finishBoot(true);
     reportClientError("application", error, info.componentStack ?? undefined);
   }
 

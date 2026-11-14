@@ -16,8 +16,9 @@
   pointer-events: none;
 }
 .scene-stage .motion-control { pointer-events: auto; }
-/* index.css sizes the old full-screen shell (fixed, 61svh on phones); inside the stage it simply fills it. */
-.scene-stage .webgl-shell {
+/* index.css makes the shell a fixed layer (as the fallback); inside the stage it simply fills it. */
+.scene-stage .webgl-shell,
+.scene-stage__probe {
   position: absolute;
   z-index: 0;
   inset: 0;
@@ -26,7 +27,6 @@
   opacity: 0;
   transition: opacity 600ms var(--ease-mechanical);
 }
-.scene-stage .webgl-shell::after { display: none; }
 .scene-staged[data-visual-ready] .scene-stage .webgl-shell { opacity: 1; }
 
 /*
@@ -110,7 +110,7 @@
     top: 0;
     height: var(--band-read);
   }
-  .scene-staged[data-scene-layout] .scene-stage .webgl-shell { top: var(--band-header); }
+  .scene-staged[data-scene-layout] .scene-stage :is(.webgl-shell, .scene-stage__probe) { top: var(--band-header); }
   .scene-staged[data-scene-layout] .motion-control { bottom: calc(var(--nav-clearance) + var(--band-cut, 0px)); }
   .scene-staged[data-scene-layout] .story-section {
     min-height: auto;

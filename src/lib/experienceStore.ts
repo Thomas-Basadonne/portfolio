@@ -27,6 +27,21 @@ export const experienceStore = {
   interacting: false,
   quality: "high" as RenderQuality,
   requestRender: null as null | (() => void),
+  /**
+   * Entry gate (#17). `gate` blends the framing: 1 = the Compiler centred in `gateBox` (viewport px), 0 = its hero
+   * place. `gateYaw`/`gatePitch` are the visitor's drag on top of the hero orientation (radians).
+   */
+  gate: 0,
+  gateYaw: 0,
+  gatePitch: 0,
+  gateBox: { x: 0, y: 0, size: 0 },
+  /**
+   * While `gating`, the canvas covers the viewport and the hero framing is computed for `heroBox`, the box the
+   * canvas takes back in the page (viewport px). `settleCanvas` resizes and redraws the canvas in the same frame.
+   */
+  gating: false,
+  heroBox: null as null | { x: number; y: number; width: number; height: number },
+  settleCanvas: null as null | (() => void),
 };
 
 export const clamp01 = (value: number) => Math.min(1, Math.max(0, value));

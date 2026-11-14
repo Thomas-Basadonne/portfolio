@@ -81,6 +81,76 @@ untouched.
 current shaders (studio dome, seam) were checked and are ordered. NaN/precision/AO-clipping concerns were not
 reproduced and were left untouched.
 
+## Entry gate preload — #17
+
+The entry gate shows the Compiler alive, so wherever WebGL runs (`src/lib/gatePolicy.ts`: not with reduced motion,
+forced colors or `saveData`; phones and low tiers included, owner's decision of 12/11) the visual chunk is loaded and
+the scene built **before** entry, under a full-page boot loader (`index.html` `#boot`, `src/lib/bootLoader.ts`). This
+reverses «canvas only after entry» for those visits. The static poster (`public/gate/*.webp`) is used for the other
+visits and when the loader has to leave before the scene: `BOOT_CAP_MS` = 5 s after hydration (owner, 13/11).
+
+**Software rasterizers get the poster.** On CI (no GPU) Chrome renders WebGL with SwiftShader, and the live gate
+measured performance 0.48–0.65 and TBT 125 s in Lighthouse. The gate's probe is `webglRenderer(true)`: a context with
+`failIfMajorPerformanceCaveat`, which a browser falling back to software refuses at once (1 ms, instead of the
+~0.7–0.9 s Chrome spends starting SwiftShader on the main thread for the first context), plus the renderer's name
+(`isSoftwareRenderer`) for a rasterizer chosen explicitly, where the caveat does not refuse. After entry the scene
+still loads on any WebGL, as before #17.
+
+What keeps the first paint and the main thread where they were:
+
+- **The chunk starts after the gate is painted** (`afterGatePaint` in `App.tsx`): the largest-paint entry for the
+  gate, or 500 ms where the gate is not the largest paint (phones), then idle. Started on `load` + idle it was on the
+  path of the gate's h2 in Lighthouse's simulation: mobile LCP 3.5 s in 4 runs of 6.
+- **The poster is not requested by interactive visits**: the gate mode is `null` until the policy runs, so the first
+  render no longer fetches it (−26 KB).
+- **The scene is built in four tasks** (environment, textures, geometry, programs; `TB001Model`). In one go it was a
+  single task of ~200 ms at 4× CPU; the longest is now ~130 ms at 4× on desktop (the program link, not split) and
+  ~100 ms on a phone viewport.
+
+### Measured (13/11, same machine and method as above)
+
+Lighthouse, repo config, per-run reports (`lhci` asserts on the best run, so every run is read):
+
+| | Performance | LCP (ms) | TBT (ms) | CLS | Weight |
+|---|---|---|---|---|---|
+| mobile, `main` before #17 | 99 | 1,974 | 0 | 0 | 160 KB |
+| mobile, gate (12 runs) | 95–99 | 1,980–2,000 | 59–113, one run 213 | 0.002 | 397 KB |
+| desktop, gate (3 runs) | 99–100 | 451–453 | 0 | 0.0006 | 397 KB |
+
+The TBT is the scene build, now during loading instead of after entry; the limit is 200 and one run in twelve
+exceeded it.
+
+Same Lighthouse config with Chrome falling back to software (`--disable-gpu --enable-unsafe-swiftshader`, the CI
+case): poster gate, no chunk before entry, mobile 99 / LCP 2,104–2,106 / TBT 0, desktop 100 / TBT 0, 186 KB. With
+SwiftShader forced as the GPU (`--use-angle=swiftshader`, which needs the flag) the caveat does not refuse, the name
+check still picks the poster, but the probe itself costs mobile TBT 739–909: not a configuration visitors run. Boot loader on screen (Playwright, median of 3, Chromium with GPU):
+
+| | fast network | slow 4G + CPU 4× |
+|---|---|---|
+| desktop 1440×900 | 0.99 s | 3.55 s |
+| phone 390×844 | 0.87 s | 3.86 s |
+
+Click → hero readable: 1.20–1.30 s, with the Compiler already in the hero.
+
+### Budgets
+
+CSS raw 40,000 → **42,000** (`scripts/check-bundle.mjs`): the loader and the new gate add ~3.6 KB of rules; ~1.6 KB
+of dead rules (old gate, the pre-#49 shell sizing) were removed. Historical measurement: 41,886.
+Thomas explicitly confirmed the 42,000-byte CSS ceiling on **2026-11-14**, during review.
+The reviewed gate with crash-fallback cleanup measures 41,901 CSS raw bytes, 88,156 entry
+and 242,043 visual gzip bytes (330,199 total); compressor: `scripts/check-bundle.mjs`.
+With the #77 runtime upgrades the separately confirmed JS ceilings will be applied by #77:
+entry 98,000, visual 255,000 and total 350,000 gzip bytes. This gate-only branch retains
+90,000 / 250,000 / 331,000; Lighthouse and all other checks are unchanged.
+
+Total JS 330,000 → **331,000** gzip (owner, 13/11): the software-renderer probe took it to 330,116 (entry 88,118,
+limit 90,000; visual chunk 241,998). The +0.3% is spent on #17; the next feature (#47) has to make its own room.
+
+### Not verified
+
+No real phone or weak GPU: the cost of 242 KB + the scene build before entry on a mid-range Android or an iPhone on
+cellular is unknown. The 5 s cap bounds the wait, not the work.
+
 ## Still open on #22
 
 - GPU table on an integrated GPU and at least one real phone (limit declared until then); Lighthouse and soak on the
