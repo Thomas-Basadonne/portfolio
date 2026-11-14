@@ -4,7 +4,7 @@ import { extname, join, relative } from "node:path";
 
 const dist = new URL("../dist", import.meta.url);
 // CSS 40,000 → 42,000 with #17 (boot loader + entry gate, ~3.6 KB of new rules, ~1.6 KB of dead rules removed):
-// a decision recorded in docs/PERFORMANCE.md, to be confirmed by the owner on the PR.
+// a decision recorded in docs/PERFORMANCE.md, explicitly confirmed by Thomas on 2026-11-14.
 // Total JS 330,000 → 331,000 with #17: the gate's policy, loader, recalibrate and the software-renderer probe
 // (SwiftShader on CI had TBT 125 s with the live gate) left it at 330,116. +0.3%, owner's decision of 13/11.
 const limits = { entryJs: 90_000, visualJs: 250_000, css: 42_000, totalJs: 331_000 };
