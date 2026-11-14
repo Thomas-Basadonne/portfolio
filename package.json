@@ -44,10 +44,10 @@
     "@types/react-dom": "^19.2.3",
     "@types/three": "^0.185.1",
     "@vitejs/plugin-react": "^6.2.1",
-    "oxlint": "1.92.0",
+    "oxlint": "1.93.0",
     "typescript": "^7.0.2",
     "vite": "^8.3.6",
     "vitest": "5.1.0",
-    "wrangler": "4.158.0"
+    "wrangler": "4.160.0"
   }
 }
