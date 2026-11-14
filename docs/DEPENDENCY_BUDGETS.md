@@ -37,6 +37,12 @@ compressed-size estimate is not this gate's compressor.
 | original #77 `92c84e2` | 93,661 | 247,623 | 341,284 |
 | #77 with old React/React DOM/scheduler (diagnostic aliases, not shipped) | 85,053 | 247,623 | 332,676 |
 | original #76 + #77 + #78, local merge tree `b8bcca8` | 96,759 | 248,188 | 344,947 |
+| reviewed #76 `b1a7e07` + #77 + #78, final 2026-11-14 build | 96,814 | 248,231 | 345,045 |
+
+Final CSS: **41,901 / 42,000 raw bytes** (99 bytes remaining). The final row includes
+the startup crash fallback fix, not just the original gate. Regression coverage:
+138 unit tests and the initial-crash E2E on Chromium, Firefox and WebKit; real-GPU
+gate/entry/recalibrate probes on EN/IT desktop and phone-sized viewports.
 
 The final combined-tree measurements and CI SHA are recorded in the PR review.
 The ceilings include the reviewed gate plus these dependencies, not permission

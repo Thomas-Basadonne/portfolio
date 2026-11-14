@@ -138,7 +138,13 @@ Click → hero readable: 1.20–1.30 s, with the Compiler already in the hero.
 ### Budgets
 
 CSS raw 40,000 → **42,000** (`scripts/check-bundle.mjs`): the loader and the new gate add ~3.6 KB of rules; ~1.6 KB
-of dead rules (old gate, the pre-#49 shell sizing) were removed. Now 41,886.
+of dead rules (old gate, the pre-#49 shell sizing) were removed. Historical measurement: 41,886.
+Thomas explicitly confirmed the 42,000-byte CSS ceiling on **2026-11-14**, during review.
+The reviewed gate with crash-fallback cleanup measures 41,901 CSS raw bytes, 88,156 entry
+and 242,043 visual gzip bytes (330,199 total); compressor: `scripts/check-bundle.mjs`.
+With the #77 runtime upgrades the separately confirmed JS ceilings will be applied by #77:
+entry 98,000, visual 255,000 and total 350,000 gzip bytes. The gate-only #76 retains
+90,000 / 250,000 / 331,000; Lighthouse and all other checks are unchanged.
 
 Total JS 330,000 → **331,000** gzip (owner, 13/11): the software-renderer probe took it to 330,116 (entry 88,118,
 limit 90,000; visual chunk 241,998). The +0.3% is spent on #17; the next feature (#47) has to make its own room.
