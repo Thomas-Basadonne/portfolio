@@ -1,0 +1,41 @@
+{
+  "baseline": "d909b1b",
+  "application_modified": false,
+  "lint": {"exit_code": 0},
+  "typecheck": {"exit_code": 0},
+  "check": {
+    "exit_code": 0,
+    "unit_files_passed": 20,
+    "unit_tests_passed": 121,
+    "build": "passed",
+    "bundle_gate": "passed",
+    "local_resources_checked": 9,
+    "csp_script_hashes_checked": 1,
+    "asset_sizes": {
+      "css_raw": 39555,
+      "entry_gzip": 85053,
+      "visual_gzip": 241439,
+      "total_js_gzip": 326492
+    }
+  },
+  "targeted_e2e": {
+    "grep": "e-mail address stays on one line",
+    "projects": ["chromium", "webkit"],
+    "workers": 2,
+    "passed": 4,
+    "failed": 0,
+    "note": "Existing normal-state phone tests pass despite hover/focus defects; not a fix acceptance."
+  },
+  "publication": {
+    "date": "2026-11-14",
+    "source_commit": "96ce8e7",
+    "sources_commit_check_exit_code": 0,
+    "sources_commit_unit_tests_passed": 121,
+    "source_originals_preserved": 4,
+    "privacy_review": "Initial review findings removed by retaining whole declared source sections only; final extracts read and checked before commit.",
+    "application_source_diff": "empty",
+    "full_e2e_and_lighthouse_not_repeated_reason": "Documentation-only delivery; application, config, dependencies and test sources unchanged; built asset names and measured bytes identical to baseline."
+  },
+  "not_run": ["full e2e suite", "lighthouse", "firefox", "physical iOS", "screen reader", "real 200% zoom", "live production acceptance"],
+  "sources": "Local terminal output from pnpm check and targeted Playwright; no invented CI run."
+}

@@ -1,0 +1,1130 @@
+{
+  "method": "Real renderer ready; normal motion; pause using real control; settled 450ms; desktop mouse context including phone-sized viewports; axe snapshot page + Twin drawer",
+  "records": [
+    {
+      "engine": "chromium",
+      "locale": "en",
+      "w": 390,
+      "h": 664,
+      "pauseResult": {
+        "box": {
+          "x": 12,
+          "y": 32.953125,
+          "w": 44,
+          "h": 44
+        },
+        "centerTarget": "<a class=\"hud__identity\" href=\"#identity\" aria-labelledby=\"hud-monogram hud-name hud-purpose\" title=\"Thomas Basadonne, frontend developer — back to start\"><span id=\"hud-monogram\" class=\"hud__monogram\">TB</span> <span id=\"hud-name\">Thomas Basadonne <small>Frontend Developer · Commerce &amp; AI tools</small></span><span id=\"hud-purpose\" class=\"visual",
+        "pointerClick": false,
+        "blocker": "locator.click: Timeout 1200ms exceeded.\nCall log:\n  - waiting for locator('.motion-control')\n    - locator resolved to <button type=\"button\" class=\"motion-control\" title=\"Pause animation\" aria-label=\"Pause animation\">…</button>\n  - attempting click action\n    2 × waiting for element to be visible, enabled and stable\n      - element is visible, enabled and stable\n      - scrolling into view if needed\n      - done scrolling\n      - <a href=\"#identity\" class=\"hud__identity\" aria-labelledby=\"hud-monogram hud-name hud-purpose\" title=\"Thomas Basadonne, frontend developer — back to start\">…</a> from <header class=\"hud\">…</header> subtree intercepts ",
+        "afterLabel": "Resume animation"
+      },
+      "normal": {
+        "lines": 1,
+        "width": 302,
+        "height": 56,
+        "paddingLeft": "0px",
+        "paddingRight": "0px",
+        "focusVisible": false,
+        "background": "rgba(0, 0, 0, 0)",
+        "foreground": "rgb(11, 11, 10)",
+        "stageReady": true
+      },
+      "hover": {
+        "lines": 2,
+        "width": 270,
+        "height": 73,
+        "paddingLeft": "16px",
+        "paddingRight": "16px",
+        "focusVisible": false,
+        "background": "rgb(11, 11, 10)",
+        "foreground": "rgb(233, 229, 218)",
+        "stageReady": true
+      },
+      "focus": {
+        "lines": 2,
+        "width": 270,
+        "height": 73,
+        "paddingLeft": "16px",
+        "paddingRight": "16px",
+        "focusVisible": true,
+        "background": "rgb(11, 11, 10)",
+        "foreground": "rgb(233, 229, 218)",
+        "stageReady": true
+      },
+      "capability": {
+        "normal": {
+          "h": 172.84375,
+          "w": 316,
+          "paddingLeft": "0px",
+          "paddingRight": "0px",
+          "tag": "LI",
+          "role": null,
+          "tabindex": null,
+          "text": "01\nCore frontend\n\nReact, TypeScript, Next.js App Router, Vite, Tailwind CSS and accessible, measurable UI.\n\nPROOF · MAPEI · LA FETUSERIA · MISSION CONTROL · THIS SITE"
+        },
+        "hover": {
+          "h": 172.84375,
+          "w": 316,
+          "paddingLeft": "11.2px",
+          "paddingRight": "11.2px",
+          "tag": "LI",
+          "role": null,
+          "tabindex": null,
+          "text": "01\nCore frontend\n\nReact, TypeScript, Next.js App Router, Vite, Tailwind CSS and accessible, measurable UI.\n\nPROOF · MAPEI · LA FETUSERIA · MISSION CONTROL · THIS SITE"
+        }
+      },
+      "status": {
+        "display": "none",
+        "text": "Ongoing"
+      },
+      "axe": {
+        "violations": [
+          {
+            "id": "color-contrast",
+            "impact": "serious",
+            "nodes": [
+              {
+                "target": [
+                  ".is-active > span"
+                ],
+                "summary": "Fix any of the following:\n  Element has insufficient color contrast of 2.85 (foreground color: #8a877e, background color: #e9e5da, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+              },
+              {
+                "target": [
+                  "a[href$=\"#work\"] > span"
+                ],
+                "summary": "Fix any of the following:\n  Element has insufficient color contrast of 2.43 (foreground color: #51504a, background color: #0b0b0a, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+              },
+              {
+                "target": [
+                  "a[href$=\"#experience\"] > span"
+                ],
+                "summary": "Fix any of the following:\n  Element has insufficient color contrast of 2.81 (foreground color: #5b5953, background color: #0b0b0a, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+              }
+            ]
+          }
+        ],
+        "passes": 25,
+        "incomplete": [
+          "color-contrast"
+        ]
+      },
+      "drawerAxe": {
+        "violations": [],
+        "passes": 28
+      }
+    },
+    {
+      "engine": "chromium",
+      "locale": "en",
+      "w": 1440,
+      "h": 900,
+      "pauseResult": {
+        "box": {
+          "x": 1349.921875,
+          "y": 809.921875,
+          "w": 44,
+          "h": 44
+        },
+        "centerTarget": "<svg viewBox=\"0 0 16 16\" width=\"16\" height=\"16\" aria-hidden=\"true\" focusable=\"false\"><path d=\"M3.5 2.5h3v11h-3zM9.5 2.5h3v11h-3z\" fill=\"currentColor\"></path></svg>",
+        "pointerClick": true,
+        "afterLabel": "Resume animation"
+      },
+      "normal": {
+        "lines": 2,
+        "width": 288.328125,
+        "height": 103.78125,
+        "paddingLeft": "0px",
+        "paddingRight": "0px",
+        "focusVisible": false,
+        "background": "rgba(0, 0, 0, 0)",
+        "foreground": "rgb(11, 11, 10)",
+        "stageReady": true
+      },
+      "hover": {
+        "lines": 2,
+        "width": 256.328125,
+        "height": 103.78125,
+        "paddingLeft": "16px",
+        "paddingRight": "16px",
+        "focusVisible": false,
+        "background": "rgb(11, 11, 10)",
+        "foreground": "rgb(233, 229, 218)",
+        "stageReady": true
+      },
+      "focus": {
+        "lines": 2,
+        "width": 256.328125,
+        "height": 103.78125,
+        "paddingLeft": "16px",
+        "paddingRight": "16px",
+        "focusVisible": true,
+        "background": "rgb(11, 11, 10)",
+        "foreground": "rgb(233, 229, 218)",
+        "stageReady": true
+      },
+      "capability": {
+        "normal": {
+          "h": 160.15625,
+          "w": 471.953125,
+          "paddingLeft": "0px",
+          "paddingRight": "0px",
+          "tag": "LI",
+          "role": null,
+          "tabindex": null,
+          "text": "01\nCore frontend\n\nReact, TypeScript, Next.js App Router, Vite, Tailwind CSS and accessible, measurable UI.\n\nPROOF · MAPEI · LA FETUSERIA · MISSION CONTROL · THIS SITE"
+        },
+        "hover": {
+          "h": 160.15625,
+          "w": 471.953125,
+          "paddingLeft": "11.2px",
+          "paddingRight": "11.2px",
+          "tag": "LI",
+          "role": null,
+          "tabindex": null,
+          "text": "01\nCore frontend\n\nReact, TypeScript, Next.js App Router, Vite, Tailwind CSS and accessible, measurable UI.\n\nPROOF · MAPEI · LA FETUSERIA · MISSION CONTROL · THIS SITE"
+        }
+      },
+      "status": {
+        "display": "block",
+        "text": "Ongoing"
+      },
+      "axe": {
+        "violations": [
+          {
+            "id": "color-contrast",
+            "impact": "serious",
+            "nodes": [
+              {
+                "target": [
+                  "a[href$=\"#work\"] > em"
+                ],
+                "summary": "Fix any of the following:\n  Element has insufficient color contrast of 1.11 (foreground color: #191817, background color: #0b0b0a, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+              }
+            ]
+          }
+        ],
+        "passes": 25,
+        "incomplete": [
+          "color-contrast"
+        ]
+      },
+      "drawerAxe": {
+        "violations": [],
+        "passes": 28
+      }
+    },
+    {
+      "engine": "chromium",
+      "locale": "en",
+      "w": 1920,
+      "h": 1080,
+      "pauseResult": {
+        "box": {
+          "x": 1818.40625,
+          "y": 978.40625,
+          "w": 44,
+          "h": 44
+        },
+        "centerTarget": "<svg viewBox=\"0 0 16 16\" width=\"16\" height=\"16\" aria-hidden=\"true\" focusable=\"false\"><path d=\"M3.5 2.5h3v11h-3zM9.5 2.5h3v11h-3z\" fill=\"currentColor\"></path></svg>",
+        "pointerClick": true,
+        "afterLabel": "Resume animation"
+      },
+      "normal": {
+        "lines": 1,
+        "width": 462.40625,
+        "height": 91.1875,
+        "paddingLeft": "0px",
+        "paddingRight": "0px",
+        "focusVisible": false,
+        "background": "rgba(0, 0, 0, 0)",
+        "foreground": "rgb(11, 11, 10)",
+        "stageReady": true
+      },
+      "hover": {
+        "lines": 2,
+        "width": 430.40625,
+        "height": 131.78125,
+        "paddingLeft": "16px",
+        "paddingRight": "16px",
+        "focusVisible": false,
+        "background": "rgb(11, 11, 10)",
+        "foreground": "rgb(233, 229, 218)",
+        "stageReady": true
+      },
+      "focus": {
+        "lines": 2,
+        "width": 430.40625,
+        "height": 131.78125,
+        "paddingLeft": "16px",
+        "paddingRight": "16px",
+        "focusVisible": true,
+        "background": "rgb(11, 11, 10)",
+        "foreground": "rgb(233, 229, 218)",
+        "stageReady": true
+      },
+      "capability": {
+        "normal": {
+          "h": 146.15625,
+          "w": 678.03125,
+          "paddingLeft": "0px",
+          "paddingRight": "0px",
+          "tag": "LI",
+          "role": null,
+          "tabindex": null,
+          "text": "01\nCore frontend\n\nReact, TypeScript, Next.js App Router, Vite, Tailwind CSS and accessible, measurable UI.\n\nPROOF · MAPEI · LA FETUSERIA · MISSION CONTROL · THIS SITE"
+        },
+        "hover": {
+          "h": 146.15625,
+          "w": 678.03125,
+          "paddingLeft": "11.2px",
+          "paddingRight": "11.2px",
+          "tag": "LI",
+          "role": null,
+          "tabindex": null,
+          "text": "01\nCore frontend\n\nReact, TypeScript, Next.js App Router, Vite, Tailwind CSS and accessible, measurable UI.\n\nPROOF · MAPEI · LA FETUSERIA · MISSION CONTROL · THIS SITE"
+        }
+      },
+      "status": {
+        "display": "block",
+        "text": "Ongoing"
+      },
+      "axe": {
+        "violations": [],
+        "passes": 25,
+        "incomplete": [
+          "color-contrast"
+        ]
+      },
+      "drawerAxe": {
+        "violations": [],
+        "passes": 28
+      }
+    },
+    {
+      "engine": "chromium",
+      "locale": "it",
+      "w": 390,
+      "h": 664,
+      "pauseResult": {
+        "box": {
+          "x": 12,
+          "y": 32.953125,
+          "w": 44,
+          "h": 44
+        },
+        "centerTarget": "<a class=\"hud__identity\" href=\"#identity\" aria-labelledby=\"hud-monogram hud-name hud-purpose\" title=\"Thomas Basadonne, frontend developer — torna all'inizio\"><span id=\"hud-monogram\" class=\"hud__monogram\">TB</span> <span id=\"hud-name\">Thomas Basadonne <small>Frontend Developer · Commerce &amp; AI tools</small></span><span id=\"hud-purpose\" class=\"vis",
+        "pointerClick": false,
+        "blocker": "locator.click: Timeout 1200ms exceeded.\nCall log:\n  - waiting for locator('.motion-control')\n    - locator resolved to <button type=\"button\" class=\"motion-control\" title=\"Pausa animazione\" aria-label=\"Pausa animazione\">…</button>\n  - attempting click action\n    2 × waiting for element to be visible, enabled and stable\n      - element is visible, enabled and stable\n      - scrolling into view if needed\n      - done scrolling\n      - <a href=\"#identity\" class=\"hud__identity\" aria-labelledby=\"hud-monogram hud-name hud-purpose\" title=\"Thomas Basadonne, frontend developer — torna all'inizio\">…</a> from <header class=\"hud\">…</header> subtree interc",
+        "afterLabel": "Riprendi animazione"
+      },
+      "normal": {
+        "lines": 1,
+        "width": 302,
+        "height": 56,
+        "paddingLeft": "0px",
+        "paddingRight": "0px",
+        "focusVisible": false,
+        "background": "rgba(0, 0, 0, 0)",
+        "foreground": "rgb(11, 11, 10)",
+        "stageReady": true
+      },
+      "hover": {
+        "lines": 2,
+        "width": 270,
+        "height": 73,
+        "paddingLeft": "16px",
+        "paddingRight": "16px",
+        "focusVisible": false,
+        "background": "rgb(11, 11, 10)",
+        "foreground": "rgb(233, 229, 218)",
+        "stageReady": true
+      },
+      "focus": {
+        "lines": 2,
+        "width": 270,
+        "height": 73,
+        "paddingLeft": "16px",
+        "paddingRight": "16px",
+        "focusVisible": true,
+        "background": "rgb(11, 11, 10)",
+        "foreground": "rgb(233, 229, 218)",
+        "stageReady": true
+      },
+      "capability": {
+        "normal": {
+          "h": 172.84375,
+          "w": 316,
+          "paddingLeft": "0px",
+          "paddingRight": "0px",
+          "tag": "LI",
+          "role": null,
+          "tabindex": null,
+          "text": "01\nFrontend\n\nReact, TypeScript, Next.js App Router, Vite, Tailwind CSS e interfacce accessibili e misurabili.\n\nPROVE · MAPEI · LA FETUSERIA · MISSION CONTROL · QUESTO SITO"
+        },
+        "hover": {
+          "h": 172.84375,
+          "w": 316,
+          "paddingLeft": "11.2px",
+          "paddingRight": "11.2px",
+          "tag": "LI",
+          "role": null,
+          "tabindex": null,
+          "text": "01\nFrontend\n\nReact, TypeScript, Next.js App Router, Vite, Tailwind CSS e interfacce accessibili e misurabili.\n\nPROVE · MAPEI · LA FETUSERIA · MISSION CONTROL · QUESTO SITO"
+        }
+      },
+      "status": {
+        "display": "none",
+        "text": "In corso"
+      },
+      "axe": {
+        "violations": [
+          {
+            "id": "color-contrast",
+            "impact": "serious",
+            "nodes": [
+              {
+                "target": [
+                  ".is-active > span"
+                ],
+                "summary": "Fix any of the following:\n  Element has insufficient color contrast of 2.85 (foreground color: #8a877e, background color: #e9e5da, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+              },
+              {
+                "target": [
+                  "a[href$=\"#work\"] > span"
+                ],
+                "summary": "Fix any of the following:\n  Element has insufficient color contrast of 2.43 (foreground color: #51504a, background color: #0b0b0a, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+              }
+            ]
+          }
+        ],
+        "passes": 25,
+        "incomplete": [
+          "color-contrast"
+        ]
+      },
+      "drawerAxe": {
+        "violations": [],
+        "passes": 28
+      }
+    },
+    {
+      "engine": "chromium",
+      "locale": "it",
+      "w": 1440,
+      "h": 900,
+      "pauseResult": {
+        "box": {
+          "x": 1349.921875,
+          "y": 809.921875,
+          "w": 44,
+          "h": 44
+        },
+        "centerTarget": "<svg viewBox=\"0 0 16 16\" width=\"16\" height=\"16\" aria-hidden=\"true\" focusable=\"false\"><path d=\"M3.5 2.5h3v11h-3zM9.5 2.5h3v11h-3z\" fill=\"currentColor\"></path></svg>",
+        "pointerClick": true,
+        "afterLabel": "Riprendi animazione"
+      },
+      "normal": {
+        "lines": 2,
+        "width": 288.328125,
+        "height": 103.78125,
+        "paddingLeft": "0px",
+        "paddingRight": "0px",
+        "focusVisible": false,
+        "background": "rgba(0, 0, 0, 0)",
+        "foreground": "rgb(11, 11, 10)",
+        "stageReady": true
+      },
+      "hover": {
+        "lines": 2,
+        "width": 256.328125,
+        "height": 103.78125,
+        "paddingLeft": "16px",
+        "paddingRight": "16px",
+        "focusVisible": false,
+        "background": "rgb(11, 11, 10)",
+        "foreground": "rgb(233, 229, 218)",
+        "stageReady": true
+      },
+      "focus": {
+        "lines": 2,
+        "width": 256.328125,
+        "height": 103.78125,
+        "paddingLeft": "16px",
+        "paddingRight": "16px",
+        "focusVisible": true,
+        "background": "rgb(11, 11, 10)",
+        "foreground": "rgb(233, 229, 218)",
+        "stageReady": true
+      },
+      "capability": {
+        "normal": {
+          "h": 160.15625,
+          "w": 471.953125,
+          "paddingLeft": "0px",
+          "paddingRight": "0px",
+          "tag": "LI",
+          "role": null,
+          "tabindex": null,
+          "text": "01\nFrontend\n\nReact, TypeScript, Next.js App Router, Vite, Tailwind CSS e interfacce accessibili e misurabili.\n\nPROVE · MAPEI · LA FETUSERIA · MISSION CONTROL · QUESTO SITO"
+        },
+        "hover": {
+          "h": 160.15625,
+          "w": 471.953125,
+          "paddingLeft": "11.2px",
+          "paddingRight": "11.2px",
+          "tag": "LI",
+          "role": null,
+          "tabindex": null,
+          "text": "01\nFrontend\n\nReact, TypeScript, Next.js App Router, Vite, Tailwind CSS e interfacce accessibili e misurabili.\n\nPROVE · MAPEI · LA FETUSERIA · MISSION CONTROL · QUESTO SITO"
+        }
+      },
+      "status": {
+        "display": "block",
+        "text": "In corso"
+      },
+      "axe": {
+        "violations": [
+          {
+            "id": "color-contrast",
+            "impact": "serious",
+            "nodes": [
+              {
+                "target": [
+                  ".is-active > em"
+                ],
+                "summary": "Fix any of the following:\n  Element has insufficient color contrast of 1.67 (foreground color: #393834, background color: #0b0b0a, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+              },
+              {
+                "target": [
+                  "a[href$=\"#work\"] > em"
+                ],
+                "summary": "Fix any of the following:\n  Element has insufficient color contrast of 1.7 (foreground color: #3a3936, background color: #0b0b0a, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+              }
+            ]
+          }
+        ],
+        "passes": 25,
+        "incomplete": [
+          "color-contrast"
+        ]
+      },
+      "drawerAxe": {
+        "violations": [],
+        "passes": 28
+      }
+    },
+    {
+      "engine": "chromium",
+      "locale": "it",
+      "w": 1920,
+      "h": 1080,
+      "pauseResult": {
+        "box": {
+          "x": 1818.40625,
+          "y": 978.40625,
+          "w": 44,
+          "h": 44
+        },
+        "centerTarget": "<svg viewBox=\"0 0 16 16\" width=\"16\" height=\"16\" aria-hidden=\"true\" focusable=\"false\"><path d=\"M3.5 2.5h3v11h-3zM9.5 2.5h3v11h-3z\" fill=\"currentColor\"></path></svg>",
+        "pointerClick": true,
+        "afterLabel": "Riprendi animazione"
+      },
+      "normal": {
+        "lines": 1,
+        "width": 462.40625,
+        "height": 91.1875,
+        "paddingLeft": "0px",
+        "paddingRight": "0px",
+        "focusVisible": false,
+        "background": "rgba(0, 0, 0, 0)",
+        "foreground": "rgb(11, 11, 10)",
+        "stageReady": true
+      },
+      "hover": {
+        "lines": 2,
+        "width": 430.40625,
+        "height": 131.78125,
+        "paddingLeft": "16px",
+        "paddingRight": "16px",
+        "focusVisible": false,
+        "background": "rgb(11, 11, 10)",
+        "foreground": "rgb(233, 229, 218)",
+        "stageReady": true
+      },
+      "focus": {
+        "lines": 2,
+        "width": 430.40625,
+        "height": 131.78125,
+        "paddingLeft": "16px",
+        "paddingRight": "16px",
+        "focusVisible": true,
+        "background": "rgb(11, 11, 10)",
+        "foreground": "rgb(233, 229, 218)",
+        "stageReady": true
+      },
+      "capability": {
+        "normal": {
+          "h": 146.15625,
+          "w": 678.03125,
+          "paddingLeft": "0px",
+          "paddingRight": "0px",
+          "tag": "LI",
+          "role": null,
+          "tabindex": null,
+          "text": "01\nFrontend\n\nReact, TypeScript, Next.js App Router, Vite, Tailwind CSS e interfacce accessibili e misurabili.\n\nPROVE · MAPEI · LA FETUSERIA · MISSION CONTROL · QUESTO SITO"
+        },
+        "hover": {
+          "h": 146.15625,
+          "w": 678.03125,
+          "paddingLeft": "11.2px",
+          "paddingRight": "11.2px",
+          "tag": "LI",
+          "role": null,
+          "tabindex": null,
+          "text": "01\nFrontend\n\nReact, TypeScript, Next.js App Router, Vite, Tailwind CSS e interfacce accessibili e misurabili.\n\nPROVE · MAPEI · LA FETUSERIA · MISSION CONTROL · QUESTO SITO"
+        }
+      },
+      "status": {
+        "display": "block",
+        "text": "In corso"
+      },
+      "axe": {
+        "violations": [],
+        "passes": 25,
+        "incomplete": [
+          "color-contrast"
+        ]
+      },
+      "drawerAxe": {
+        "violations": [],
+        "passes": 28
+      }
+    },
+    {
+      "engine": "webkit",
+      "locale": "en",
+      "w": 390,
+      "h": 664,
+      "pauseResult": {
+        "box": {
+          "x": 12,
+          "y": 32.953125,
+          "w": 44,
+          "h": 44
+        },
+        "centerTarget": "<a class=\"hud__identity\" href=\"#identity\" aria-labelledby=\"hud-monogram hud-name hud-purpose\" title=\"Thomas Basadonne, frontend developer — back to start\"><span id=\"hud-monogram\" class=\"hud__monogram\">TB</span> <span id=\"hud-name\">Thomas Basadonne <small>Frontend Developer · Commerce &amp; AI tools</small></span><span id=\"hud-purpose\" class=\"visual",
+        "pointerClick": false,
+        "blocker": "locator.click: Timeout 1200ms exceeded.\nCall log:\n  - waiting for locator('.motion-control')\n    - locator resolved to <button type=\"button\" class=\"motion-control\" title=\"Pause animation\" aria-label=\"Pause animation\">…</button>\n  - attempting click action\n    2 × waiting for element to be visible, enabled and stable\n      - element is visible, enabled and stable\n      - scrolling into view if needed\n      - done scrolling\n      - <a href=\"#identity\" class=\"hud__identity\" aria-labelledby=\"hud-monogram hud-name hud-purpose\" title=\"Thomas Basadonne, frontend developer — back to start\">…</a> from <header class=\"hud\">…</header> subtree intercepts ",
+        "afterLabel": "Resume animation"
+      },
+      "normal": {
+        "lines": 1,
+        "width": 302,
+        "height": 56,
+        "paddingLeft": "0px",
+        "paddingRight": "0px",
+        "focusVisible": false,
+        "background": "rgba(0, 0, 0, 0)",
+        "foreground": "rgb(11, 11, 10)",
+        "stageReady": true
+      },
+      "hover": {
+        "lines": 2,
+        "width": 270,
+        "height": 73,
+        "paddingLeft": "16px",
+        "paddingRight": "16px",
+        "focusVisible": false,
+        "background": "rgb(11, 11, 10)",
+        "foreground": "rgb(233, 229, 218)",
+        "stageReady": true
+      },
+      "focus": {
+        "lines": 2,
+        "width": 270,
+        "height": 73,
+        "paddingLeft": "16px",
+        "paddingRight": "16px",
+        "focusVisible": true,
+        "background": "rgb(11, 11, 10)",
+        "foreground": "rgb(233, 229, 218)",
+        "stageReady": true
+      },
+      "capability": {
+        "normal": {
+          "h": 172.75,
+          "w": 316,
+          "paddingLeft": "0px",
+          "paddingRight": "0px",
+          "tag": "LI",
+          "role": null,
+          "tabindex": null,
+          "text": "01\nCore frontend\n\nReact, TypeScript, Next.js App Router, Vite, Tailwind CSS and accessible, measurable UI.\n\nPROOF · MAPEI · LA FETUSERIA · MISSION CONTROL · THIS SITE"
+        },
+        "hover": {
+          "h": 172.75,
+          "w": 316,
+          "paddingLeft": "11.2px",
+          "paddingRight": "11.2px",
+          "tag": "LI",
+          "role": null,
+          "tabindex": null,
+          "text": "01\nCore frontend\n\nReact, TypeScript, Next.js App Router, Vite, Tailwind CSS and accessible, measurable UI.\n\nPROOF · MAPEI · LA FETUSERIA · MISSION CONTROL · THIS SITE"
+        }
+      },
+      "status": {
+        "display": "none",
+        "text": "Ongoing"
+      },
+      "axe": {
+        "violations": [],
+        "passes": 25,
+        "incomplete": [
+          "color-contrast"
+        ]
+      },
+      "drawerAxe": {
+        "violations": [],
+        "passes": 28
+      }
+    },
+    {
+      "engine": "webkit",
+      "locale": "en",
+      "w": 1440,
+      "h": 900,
+      "pauseResult": {
+        "box": {
+          "x": 1349.921875,
+          "y": 809.921875,
+          "w": 44,
+          "h": 44
+        },
+        "centerTarget": "<svg viewBox=\"0 0 16 16\" width=\"16\" height=\"16\" aria-hidden=\"true\" focusable=\"false\"><path d=\"M3.5 2.5h3v11h-3zM9.5 2.5h3v11h-3z\" fill=\"currentColor\"></path></svg>",
+        "pointerClick": true,
+        "afterLabel": "Resume animation"
+      },
+      "normal": {
+        "lines": 2,
+        "width": 288.328125,
+        "height": 103.78125,
+        "paddingLeft": "0px",
+        "paddingRight": "0px",
+        "focusVisible": false,
+        "background": "rgba(0, 0, 0, 0)",
+        "foreground": "rgb(11, 11, 10)",
+        "stageReady": true
+      },
+      "hover": {
+        "lines": 2,
+        "width": 256.328125,
+        "height": 103.78125,
+        "paddingLeft": "16px",
+        "paddingRight": "16px",
+        "focusVisible": false,
+        "background": "rgb(11, 11, 10)",
+        "foreground": "rgb(233, 229, 218)",
+        "stageReady": true
+      },
+      "focus": {
+        "lines": 2,
+        "width": 256.328125,
+        "height": 103.78125,
+        "paddingLeft": "16px",
+        "paddingRight": "16px",
+        "focusVisible": true,
+        "background": "rgb(11, 11, 10)",
+        "foreground": "rgb(233, 229, 218)",
+        "stageReady": true
+      },
+      "capability": {
+        "normal": {
+          "h": 160.09375,
+          "w": 471.953125,
+          "paddingLeft": "0px",
+          "paddingRight": "0px",
+          "tag": "LI",
+          "role": null,
+          "tabindex": null,
+          "text": "01\nCore frontend\n\nReact, TypeScript, Next.js App Router, Vite, Tailwind CSS and accessible, measurable UI.\n\nPROOF · MAPEI · LA FETUSERIA · MISSION CONTROL · THIS SITE"
+        },
+        "hover": {
+          "h": 160.09375,
+          "w": 471.953125,
+          "paddingLeft": "11.2px",
+          "paddingRight": "11.2px",
+          "tag": "LI",
+          "role": null,
+          "tabindex": null,
+          "text": "01\nCore frontend\n\nReact, TypeScript, Next.js App Router, Vite, Tailwind CSS and accessible, measurable UI.\n\nPROOF · MAPEI · LA FETUSERIA · MISSION CONTROL · THIS SITE"
+        }
+      },
+      "status": {
+        "display": "block",
+        "text": "Ongoing"
+      },
+      "axe": {
+        "violations": [],
+        "passes": 25,
+        "incomplete": [
+          "color-contrast"
+        ]
+      },
+      "drawerAxe": {
+        "violations": [],
+        "passes": 28
+      }
+    },
+    {
+      "engine": "webkit",
+      "locale": "en",
+      "w": 1920,
+      "h": 1080,
+      "pauseResult": {
+        "box": {
+          "x": 1818.40625,
+          "y": 978.40625,
+          "w": 44,
+          "h": 44
+        },
+        "centerTarget": "<svg viewBox=\"0 0 16 16\" width=\"16\" height=\"16\" aria-hidden=\"true\" focusable=\"false\"><path d=\"M3.5 2.5h3v11h-3zM9.5 2.5h3v11h-3z\" fill=\"currentColor\"></path></svg>",
+        "pointerClick": true,
+        "afterLabel": "Resume animation"
+      },
+      "normal": {
+        "lines": 1,
+        "width": 462.40625,
+        "height": 91.1875,
+        "paddingLeft": "0px",
+        "paddingRight": "0px",
+        "focusVisible": false,
+        "background": "rgba(0, 0, 0, 0)",
+        "foreground": "rgb(11, 11, 10)",
+        "stageReady": true
+      },
+      "hover": {
+        "lines": 2,
+        "width": 430.40625,
+        "height": 131.78125,
+        "paddingLeft": "16px",
+        "paddingRight": "16px",
+        "focusVisible": false,
+        "background": "rgb(11, 11, 10)",
+        "foreground": "rgb(233, 229, 218)",
+        "stageReady": true
+      },
+      "focus": {
+        "lines": 2,
+        "width": 430.40625,
+        "height": 131.78125,
+        "paddingLeft": "16px",
+        "paddingRight": "16px",
+        "focusVisible": true,
+        "background": "rgb(11, 11, 10)",
+        "foreground": "rgb(233, 229, 218)",
+        "stageReady": true
+      },
+      "capability": {
+        "normal": {
+          "h": 146.09375,
+          "w": 678.03125,
+          "paddingLeft": "0px",
+          "paddingRight": "0px",
+          "tag": "LI",
+          "role": null,
+          "tabindex": null,
+          "text": "01\nCore frontend\n\nReact, TypeScript, Next.js App Router, Vite, Tailwind CSS and accessible, measurable UI.\n\nPROOF · MAPEI · LA FETUSERIA · MISSION CONTROL · THIS SITE"
+        },
+        "hover": {
+          "h": 146.09375,
+          "w": 678.03125,
+          "paddingLeft": "11.2px",
+          "paddingRight": "11.2px",
+          "tag": "LI",
+          "role": null,
+          "tabindex": null,
+          "text": "01\nCore frontend\n\nReact, TypeScript, Next.js App Router, Vite, Tailwind CSS and accessible, measurable UI.\n\nPROOF · MAPEI · LA FETUSERIA · MISSION CONTROL · THIS SITE"
+        }
+      },
+      "status": {
+        "display": "block",
+        "text": "Ongoing"
+      },
+      "axe": {
+        "violations": [],
+        "passes": 25,
+        "incomplete": [
+          "color-contrast"
+        ]
+      },
+      "drawerAxe": {
+        "violations": [],
+        "passes": 28
+      }
+    },
+    {
+      "engine": "webkit",
+      "locale": "it",
+      "w": 390,
+      "h": 664,
+      "pauseResult": {
+        "box": {
+          "x": 12,
+          "y": 32.953125,
+          "w": 44,
+          "h": 44
+        },
+        "centerTarget": "<a class=\"hud__identity\" href=\"#identity\" aria-labelledby=\"hud-monogram hud-name hud-purpose\" title=\"Thomas Basadonne, frontend developer — torna all'inizio\"><span id=\"hud-monogram\" class=\"hud__monogram\">TB</span> <span id=\"hud-name\">Thomas Basadonne <small>Frontend Developer · Commerce &amp; AI tools</small></span><span id=\"hud-purpose\" class=\"vis",
+        "pointerClick": false,
+        "blocker": "locator.click: Timeout 1200ms exceeded.\nCall log:\n  - waiting for locator('.motion-control')\n    - locator resolved to <button type=\"button\" class=\"motion-control\" title=\"Pausa animazione\" aria-label=\"Pausa animazione\">…</button>\n  - attempting click action\n    2 × waiting for element to be visible, enabled and stable\n      - element is visible, enabled and stable\n      - scrolling into view if needed\n      - done scrolling\n      - <a href=\"#identity\" class=\"hud__identity\" aria-labelledby=\"hud-monogram hud-name hud-purpose\" title=\"Thomas Basadonne, frontend developer — torna all'inizio\">…</a> from <header class=\"hud\">…</header> subtree interc",
+        "afterLabel": "Riprendi animazione"
+      },
+      "normal": {
+        "lines": 1,
+        "width": 302,
+        "height": 56,
+        "paddingLeft": "0px",
+        "paddingRight": "0px",
+        "focusVisible": false,
+        "background": "rgba(0, 0, 0, 0)",
+        "foreground": "rgb(11, 11, 10)",
+        "stageReady": true
+      },
+      "hover": {
+        "lines": 2,
+        "width": 270,
+        "height": 73,
+        "paddingLeft": "16px",
+        "paddingRight": "16px",
+        "focusVisible": false,
+        "background": "rgb(11, 11, 10)",
+        "foreground": "rgb(233, 229, 218)",
+        "stageReady": true
+      },
+      "focus": {
+        "lines": 2,
+        "width": 270,
+        "height": 73,
+        "paddingLeft": "16px",
+        "paddingRight": "16px",
+        "focusVisible": true,
+        "background": "rgb(11, 11, 10)",
+        "foreground": "rgb(233, 229, 218)",
+        "stageReady": true
+      },
+      "capability": {
+        "normal": {
+          "h": 172.75,
+          "w": 316,
+          "paddingLeft": "0px",
+          "paddingRight": "0px",
+          "tag": "LI",
+          "role": null,
+          "tabindex": null,
+          "text": "01\nFrontend\n\nReact, TypeScript, Next.js App Router, Vite, Tailwind CSS e interfacce accessibili e misurabili.\n\nPROVE · MAPEI · LA FETUSERIA · MISSION CONTROL · QUESTO SITO"
+        },
+        "hover": {
+          "h": 172.75,
+          "w": 316,
+          "paddingLeft": "11.2px",
+          "paddingRight": "11.2px",
+          "tag": "LI",
+          "role": null,
+          "tabindex": null,
+          "text": "01\nFrontend\n\nReact, TypeScript, Next.js App Router, Vite, Tailwind CSS e interfacce accessibili e misurabili.\n\nPROVE · MAPEI · LA FETUSERIA · MISSION CONTROL · QUESTO SITO"
+        }
+      },
+      "status": {
+        "display": "none",
+        "text": "In corso"
+      },
+      "axe": {
+        "violations": [],
+        "passes": 25,
+        "incomplete": [
+          "color-contrast"
+        ]
+      },
+      "drawerAxe": {
+        "violations": [],
+        "passes": 28
+      }
+    },
+    {
+      "engine": "webkit",
+      "locale": "it",
+      "w": 1440,
+      "h": 900,
+      "pauseResult": {
+        "box": {
+          "x": 1349.921875,
+          "y": 809.921875,
+          "w": 44,
+          "h": 44
+        },
+        "centerTarget": "<svg viewBox=\"0 0 16 16\" width=\"16\" height=\"16\" aria-hidden=\"true\" focusable=\"false\"><path d=\"M3.5 2.5h3v11h-3zM9.5 2.5h3v11h-3z\" fill=\"currentColor\"></path></svg>",
+        "pointerClick": true,
+        "afterLabel": "Riprendi animazione"
+      },
+      "normal": {
+        "lines": 2,
+        "width": 288.328125,
+        "height": 103.78125,
+        "paddingLeft": "0px",
+        "paddingRight": "0px",
+        "focusVisible": false,
+        "background": "rgba(0, 0, 0, 0)",
+        "foreground": "rgb(11, 11, 10)",
+        "stageReady": true
+      },
+      "hover": {
+        "lines": 2,
+        "width": 256.328125,
+        "height": 103.78125,
+        "paddingLeft": "16px",
+        "paddingRight": "16px",
+        "focusVisible": false,
+        "background": "rgb(11, 11, 10)",
+        "foreground": "rgb(233, 229, 218)",
+        "stageReady": true
+      },
+      "focus": {
+        "lines": 2,
+        "width": 256.328125,
+        "height": 103.78125,
+        "paddingLeft": "16px",
+        "paddingRight": "16px",
+        "focusVisible": true,
+        "background": "rgb(11, 11, 10)",
+        "foreground": "rgb(233, 229, 218)",
+        "stageReady": true
+      },
+      "capability": {
+        "normal": {
+          "h": 160.09375,
+          "w": 471.953125,
+          "paddingLeft": "0px",
+          "paddingRight": "0px",
+          "tag": "LI",
+          "role": null,
+          "tabindex": null,
+          "text": "01\nFrontend\n\nReact, TypeScript, Next.js App Router, Vite, Tailwind CSS e interfacce accessibili e misurabili.\n\nPROVE · MAPEI · LA FETUSERIA · MISSION CONTROL · QUESTO SITO"
+        },
+        "hover": {
+          "h": 160.09375,
+          "w": 471.953125,
+          "paddingLeft": "11.2px",
+          "paddingRight": "11.2px",
+          "tag": "LI",
+          "role": null,
+          "tabindex": null,
+          "text": "01\nFrontend\n\nReact, TypeScript, Next.js App Router, Vite, Tailwind CSS e interfacce accessibili e misurabili.\n\nPROVE · MAPEI · LA FETUSERIA · MISSION CONTROL · QUESTO SITO"
+        }
+      },
+      "status": {
+        "display": "block",
+        "text": "In corso"
+      },
+      "axe": {
+        "violations": [],
+        "passes": 25,
+        "incomplete": [
+          "color-contrast"
+        ]
+      },
+      "drawerAxe": {
+        "violations": [],
+        "passes": 28
+      }
+    },
+    {
+      "engine": "webkit",
+      "locale": "it",
+      "w": 1920,
+      "h": 1080,
+      "pauseResult": {
+        "box": {
+          "x": 1818.40625,
+          "y": 978.40625,
+          "w": 44,
+          "h": 44
+        },
+        "centerTarget": "<svg viewBox=\"0 0 16 16\" width=\"16\" height=\"16\" aria-hidden=\"true\" focusable=\"false\"><path d=\"M3.5 2.5h3v11h-3zM9.5 2.5h3v11h-3z\" fill=\"currentColor\"></path></svg>",
+        "pointerClick": true,
+        "afterLabel": "Riprendi animazione"
+      },
+      "normal": {
+        "lines": 1,
+        "width": 462.40625,
+        "height": 91.1875,
+        "paddingLeft": "0px",
+        "paddingRight": "0px",
+        "focusVisible": false,
+        "background": "rgba(0, 0, 0, 0)",
+        "foreground": "rgb(11, 11, 10)",
+        "stageReady": true
+      },
+      "hover": {
+        "lines": 2,
+        "width": 430.40625,
+        "height": 131.78125,
+        "paddingLeft": "16px",
+        "paddingRight": "16px",
+        "focusVisible": false,
+        "background": "rgb(11, 11, 10)",
+        "foreground": "rgb(233, 229, 218)",
+        "stageReady": true
+      },
+      "focus": {
+        "lines": 2,
+        "width": 430.40625,
+        "height": 131.78125,
+        "paddingLeft": "16px",
+        "paddingRight": "16px",
+        "focusVisible": true,
+        "background": "rgb(11, 11, 10)",
+        "foreground": "rgb(233, 229, 218)",
+        "stageReady": true
+      },
+      "capability": {
+        "normal": {
+          "h": 146.09375,
+          "w": 678.03125,
+          "paddingLeft": "0px",
+          "paddingRight": "0px",
+          "tag": "LI",
+          "role": null,
+          "tabindex": null,
+          "text": "01\nFrontend\n\nReact, TypeScript, Next.js App Router, Vite, Tailwind CSS e interfacce accessibili e misurabili.\n\nPROVE · MAPEI · LA FETUSERIA · MISSION CONTROL · QUESTO SITO"
+        },
+        "hover": {
+          "h": 146.09375,
+          "w": 678.03125,
+          "paddingLeft": "11.2px",
+          "paddingRight": "11.2px",
+          "tag": "LI",
+          "role": null,
+          "tabindex": null,
+          "text": "01\nFrontend\n\nReact, TypeScript, Next.js App Router, Vite, Tailwind CSS e interfacce accessibili e misurabili.\n\nPROVE · MAPEI · LA FETUSERIA · MISSION CONTROL · QUESTO SITO"
+        }
+      },
+      "status": {
+        "display": "block",
+        "text": "In corso"
+      },
+      "axe": {
+        "violations": [],
+        "passes": 25,
+        "incomplete": [
+          "color-contrast"
+        ]
+      },
+      "drawerAxe": {
+        "violations": [],
+        "passes": 28
+      }
+    }
+  ],
+  "errors": []
+}
