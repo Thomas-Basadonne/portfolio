@@ -5,6 +5,9 @@ What this document records is implemented in `src/lib/qualityPolicy.ts`, `src/ex
 benchmarks and not a promise of 60 fps. Measurements are local samples (Chromium 149, ANGLE Metal, Apple M4 Pro): no
 phone, no weak integrated GPU, no statistics. SwiftShader/headless numbers are never compared with hardware ones.
 
+**Current JS budget decision:** see [Runtime dependency budgets](DEPENDENCY_BUDGETS.md) (#77, approved 2026-11-13).
+The measurements and limits below describe their original feature slices; #77 supersedes the JS ceilings only.
+
 ## Static tiers
 
 | | high | low |
@@ -140,7 +143,7 @@ Thomas explicitly confirmed the 42,000-byte CSS ceiling on **2026-11-14**, durin
 The reviewed gate with crash-fallback cleanup measures 41,901 CSS raw bytes, 88,156 entry
 and 242,043 visual gzip bytes (330,199 total); compressor: `scripts/check-bundle.mjs`.
 With the #77 runtime upgrades the separately confirmed JS ceilings will be applied by #77:
-entry 98,000, visual 255,000 and total 350,000 gzip bytes. This gate-only branch retains
+entry 98,000, visual 255,000 and total 350,000 gzip bytes. The gate-only #76 retains
 90,000 / 250,000 / 331,000; Lighthouse and all other checks are unchanged.
 
 Total JS 330,000 → **331,000** gzip (owner, 13/11): the software-renderer probe took it to 330,116 (entry 88,118,
