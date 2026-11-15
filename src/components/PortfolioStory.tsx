@@ -19,6 +19,16 @@ function ItemLink({ item, newTabLabel }: { item: ListItem; newTabLabel: string }
   );
 }
 
+/**
+ * An e-mail address may only break after its "@" (#79): when the column cannot hold it, it reads "name@ / domain",
+ * never a stray letter. The text, the copy and the accessible name stay the whole address.
+ */
+function breakAfterAt(label: string) {
+  const at = label.indexOf("@");
+  if (at < 0) return label;
+  return <>{label.slice(0, at + 1)}<wbr />{label.slice(at + 1)}</>;
+}
+
 function Timeline({ items }: { items: ListItem[] }) {
   return (
     <ol className="trace-list">
@@ -198,7 +208,7 @@ export function PortfolioStory({ content, onSelectCase, stageRef }: PortfolioSto
                 {...(channel.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
               >
                 <small className="mono-label">{channel.kind}</small>
-                <strong>{channel.label}</strong>
+                <strong>{breakAfterAt(channel.label)}</strong>
                 <span aria-hidden="true">↗</span>
                 {channel.external && <span className="visually-hidden"> {ui.opensNewTab}</span>}
               </a>

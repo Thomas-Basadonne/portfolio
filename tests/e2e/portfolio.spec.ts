@@ -1519,7 +1519,8 @@ for (const font of ["web font", "fallback font"] as const) {
       const lines = await page.locator(".contact-link[href^='mailto:'] strong").evaluate((element) => {
         const range = document.createRange();
         range.selectNodeContents(element);
-        return new Set([...range.getClientRects()].map((rect) => Math.round(rect.top))).size;
+        // The <wbr> after "@" (#79) gets an empty rect of its own in Firefox: only painted text counts as a line.
+        return new Set([...range.getClientRects()].filter((rect) => rect.width > 0).map((rect) => Math.round(rect.top))).size;
       });
       if (lines !== 1) failures.push(`${width}px: ${lines} lines`);
     }

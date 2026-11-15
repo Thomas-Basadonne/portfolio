@@ -72,7 +72,9 @@
   .scene-staged[data-scene-layout] .story-section .hero-thesis h2 { font-size: clamp(1.9rem, 5.6cqi, 3.8rem); }
   .scene-staged[data-scene-layout] .story-section h2 { font-size: clamp(2.4rem, 9.5cqi, 6.4rem); }
   .scene-staged[data-scene-layout] .story-section__content--contact h2 { font-size: clamp(2.6rem, 10.5cqi, 8rem); }
-  .scene-staged[data-scene-layout] .contact-link { grid-template-columns: 6.5rem 1fr auto; }
+  /* Half a screen is too narrow for label, address and arrow on one row (#79): the label takes its own row above. */
+  .scene-staged[data-scene-layout] .contact-link { grid-template-columns: 1fr auto; column-gap: 1rem; }
+  .scene-staged[data-scene-layout] .contact-link small { grid-column: 1 / -1; }
   .scene-staged[data-scene-layout] .contact-link strong { font-size: clamp(1.2rem, 4.4cqi, 2.8rem); }
   /* One control for the whole story, in the rail lane's bottom corner: never over text or the model. */
   .scene-staged[data-scene-layout] .motion-control { position: fixed; right: var(--gutter); bottom: var(--gutter); left: auto; }
