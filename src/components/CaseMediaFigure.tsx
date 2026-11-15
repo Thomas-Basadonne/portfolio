@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import type { CaseMedia, PortfolioContent } from "../content/portfolio";
 import { caseMediaSizes, caseMediaSrcSet } from "../lib/caseMedia";
+import { Arrow } from "./Arrow";
 
 type CaseMediaUi = Pick<PortfolioContent["ui"], "drawerMediaOpen" | "opensNewTab">;
 
@@ -47,7 +48,7 @@ function CaseMediaFigure({ media, ui, lead, onFocusLost }: FigureProps) {
           rel="noopener noreferrer"
         >
           {ui.drawerMediaOpen}
-          <span aria-hidden="true"> ↗</span>
+          <span aria-hidden="true"> <Arrow kind="out" /></span>
           <span className="visually-hidden"> {ui.opensNewTab}</span>
         </a>
       </figcaption>

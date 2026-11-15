@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import type { Locale, PortfolioContent } from "../content/portfolio";
 import { LanguageSwitch } from "./LanguageSwitch";
 
@@ -9,9 +10,11 @@ type HudProps = {
   onLocaleChange: (locale: Locale) => void;
   /** Back to the entry gate (#17). */
   onRecalibrate?: () => void;
+  /** The pause control, when the layout docks it in the tools (short landscape phones, #85). */
+  motionControl?: ReactNode;
 };
 
-export function Hud({ activeChapter, progressPercent, content, locale, onLocaleChange, onRecalibrate }: HudProps) {
+export function Hud({ activeChapter, progressPercent, content, locale, onLocaleChange, onRecalibrate, motionControl }: HudProps) {
   const { ui, profile, chapters } = content;
 
   return (
@@ -26,6 +29,7 @@ export function Hud({ activeChapter, progressPercent, content, locale, onLocaleC
       </a>
 
       <div className="hud__tools">
+        {motionControl}
         {onRecalibrate && (
           <button className="hud__recalibrate mono-label" type="button" onClick={onRecalibrate}
             aria-label={ui.hudRecalibrate.name} data-cursor="engage">

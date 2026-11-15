@@ -16,7 +16,8 @@ import { Hud } from "./components/Hud";
 import { MotionControl } from "./components/MotionControl";
 import { PortfolioStory } from "./components/PortfolioStory";
 import { VisualLayerBoundary } from "./components/VisualLayerBoundary";
-import { useExperienceController } from "./hooks/useExperienceController";
+import { SHORT_LANDSCAPE_QUERY, useExperienceController } from "./hooks/useExperienceController";
+import { useMediaQuery } from "./hooks/useMediaQuery";
 import {
   experienceReducer,
   getInitialExperiencePhase,
@@ -271,6 +272,11 @@ export default function App() {
 
   const backgroundBlocked = !entered || selectedCase !== null;
   const { ui } = content;
+  // One pause control: in the stage corner, or in the HUD tools on short landscape phones (SYS-03b #85).
+  const motionInHud = useMediaQuery(SHORT_LANDSCAPE_QUERY);
+  const motionControl = phase === "ready" && motionAvailable
+    ? <MotionControl locale={locale} paused={userPaused} onToggle={() => setUserPaused((paused) => !paused)} />
+    : null;
 
   return (
     <>
@@ -317,11 +323,9 @@ export default function App() {
           locale={locale}
           onLocaleChange={setLocale}
           onRecalibrate={recalibrate}
+          motionControl={motionInHud ? motionControl : null}
         />
-        {phase === "ready" && motionAvailable && stageNode && createPortal(
-          <MotionControl locale={locale} paused={userPaused} onToggle={() => setUserPaused((paused) => !paused)} />,
-          stageNode,
-        )}
+        {!motionInHud && motionControl && stageNode && createPortal(motionControl, stageNode)}
         <PortfolioStory content={content} onSelectCase={selectCase} stageRef={setStageNode} />
       </div>
 

@@ -4,6 +4,7 @@ import { experienceStore } from "../lib/experienceStore";
 import { onBootFinished } from "../lib/bootLoader";
 import { GATE_TIMING, shortestAngle, travelAt, type GateMode } from "../lib/gatePolicy";
 import { LanguageSwitch } from "./LanguageSwitch";
+import { Arrow } from "./Arrow";
 
 type EntrySequenceProps = {
   entered: boolean;
@@ -276,7 +277,7 @@ export function EntrySequence({
 
         <button ref={enterButton} className="calibrate-button" type="button" onClick={onEnter} data-cursor="engage">
           <span>{ui.entryButton}</span>
-          <span aria-hidden="true">→</span>
+          <span aria-hidden="true"><Arrow kind="in" /></span>
         </button>
       </section>
     </>

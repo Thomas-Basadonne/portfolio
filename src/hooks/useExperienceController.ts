@@ -18,6 +18,11 @@ const STORY_RATE = 4.2;
 const SETTLED = 0.0004;
 /** Layout with the model beside the text (must match scene-stages.css). */
 export const SIDE_BY_SIDE_QUERY = "(min-width: 1081px), (orientation: landscape) and (min-width: 600px)";
+/**
+ * Short landscape phones (SYS-03b #85, must match the index.css branch): the chapter rail fills the lane in which the
+ * stage corner would hold the pause control, so the control moves into the HUD tools instead.
+ */
+export const SHORT_LANDSCAPE_QUERY = "(max-width: 760px) and (orientation: landscape) and (max-height: 500px)";
 /** Portrait layout with the stage band over the reading flow: the only one where the band narrows. */
 export const PORTRAIT_BAND_QUERY = "(max-width: 1080px) and (orientation: portrait)";
 /** Column the model takes in each chapter (0 = left, 1 = right); the text takes the other one. */
