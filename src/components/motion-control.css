@@ -19,6 +19,9 @@
   pointer-events: auto;
 }
 
+/* Short landscape phones (#85): a tool in the HUD row, as tall as its neighbours. */
+.scene-staged .hud__tools .motion-control.motion-control { position: static; flex: none; }
+
 .motion-control:hover { border-color: var(--signal); }
 .motion-control:focus-visible { outline: 2px solid var(--bone); outline-offset: 3px; }
 
