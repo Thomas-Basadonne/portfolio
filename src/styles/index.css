@@ -1321,15 +1321,15 @@ main {
   grid-template-columns: 10rem 1fr auto;
   align-items: center;
   border-top: 1px solid rgba(11, 11, 10, 0.35);
-  transition: padding 0.3s ease, background 0.3s ease;
+  transition: 0.3s ease;
 }
 
-a.contact-link:hover,
-a.contact-link:focus-visible {
-  padding-right: 1rem;
-  padding-left: 1rem;
+/* SYS-02 (#79): the surface bleeds 1rem past the row as shadows, so the text keeps its measure in every state (padding
+   on hover pushed the address onto one more line). Focus adds the graphite ring above and below on the signal panel. */
+.contact-link:is(:hover, :focus-visible, :active) {
   color: var(--bone);
   background: var(--graphite);
+  box-shadow: -1rem 0 var(--graphite), 1rem 0 var(--graphite);
 }
 
 .contact-link strong {
