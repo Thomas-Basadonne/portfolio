@@ -1,6 +1,7 @@
 import type { Ref } from "react";
 import type { CaseStudy, ListItem, PortfolioContent } from "../content/portfolio";
 import { SceneStage } from "./SceneStage";
+import { Arrow } from "./Arrow";
 
 type PortfolioStoryProps = {
   content: PortfolioContent;
@@ -13,7 +14,7 @@ function ItemLink({ item, newTabLabel }: { item: ListItem; newTabLabel: string }
   return (
     <a className="item-link mono-label" href={item.link.href} target="_blank" rel="noopener noreferrer">
       {item.link.label}
-      <span aria-hidden="true"> ↗</span>
+      <span aria-hidden="true"> <Arrow kind="out" /></span>
       <span className="visually-hidden"> {newTabLabel}</span>
     </a>
   );
@@ -148,7 +149,7 @@ export function PortfolioStory({ content, onSelectCase, stageRef }: PortfolioSto
                 </span>
                 <span className="case-index__status mono-label">{caseStudy.status}</span>
                 <span className="case-index__arrow" aria-hidden="true">
-                  →
+                  <Arrow kind="in" />
                 </span>
               </button>
             ))}
@@ -209,7 +210,7 @@ export function PortfolioStory({ content, onSelectCase, stageRef }: PortfolioSto
               >
                 <small className="mono-label">{channel.kind}</small>
                 <strong>{breakAfterAt(channel.label)}</strong>
-                <span aria-hidden="true">↗</span>
+                <span aria-hidden="true"><Arrow kind="out" /></span>
                 {channel.external && <span className="visually-hidden"> {ui.opensNewTab}</span>}
               </a>
             ))}

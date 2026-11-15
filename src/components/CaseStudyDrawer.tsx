@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import type { CaseStudy, PortfolioContent } from "../content/portfolio";
 import { CaseMediaGallery } from "./CaseMediaFigure";
+import { Arrow } from "./Arrow";
 
 type CaseStudyDrawerProps = {
   caseStudy: CaseStudy | null;
@@ -132,7 +133,7 @@ export function CaseStudyDrawer({ caseStudy, ui, onClose }: CaseStudyDrawerProps
                     rel="noopener noreferrer"
                   >
                     {link.label}
-                    <span aria-hidden="true"> ↗</span>
+                    <span aria-hidden="true"> <Arrow kind="out" /></span>
                     <span className="visually-hidden"> {ui.opensNewTab}</span>
                   </a>
                 ))}

@@ -486,21 +486,40 @@ test("case drawer traps focus and restores it", async ({ page }) => {
 
 test("arrows say where a control goes: → stays in the page, ↗ leaves it", async ({ page }) => {
   // #26, decided by Thomas (12/11): → for the entry and the case index (internal), ↗ only for links that leave
-  // the site, the e-mail link included.
+  // the site, the e-mail link included. #75: the arrows are drawn icons (no web font has the glyphs and iOS drew ↗ as
+  // an emoji), read from their attribute; decorative, and no control keeps an arrow character in its text.
   await page.goto("/");
-  const glyphs = await page.evaluate(() => {
-    const arrow = (root: Element) => [...root.querySelectorAll("[aria-hidden='true']")].map((node) => node.textContent!.trim()).find((text) => /[→↗]/.test(text));
+  const read = () => page.evaluate(() => {
+    const arrow = (root: Element) => {
+      const icon = root.querySelector("svg[data-arrow]");
+      return icon && icon.closest("[aria-hidden='true']") ? icon.getAttribute("data-arrow") : null;
+    };
     return {
       entry: [...document.querySelectorAll(".calibrate-button")].map(arrow),
       cases: [...document.querySelectorAll(".case-index button")].map(arrow),
       leaving: [...document.querySelectorAll("a[target='_blank'], a[href^='mailto:']")].map(arrow).filter(Boolean),
+      glyphs: [...document.querySelectorAll("a, button")].filter((node) => /[→↗]/.test(node.textContent!)).length,
     };
   });
-  expect(glyphs.entry.length).toBeGreaterThan(0);
-  expect(glyphs.cases.length).toBeGreaterThan(0);
-  expect(glyphs.leaving.length).toBeGreaterThan(0);
-  expect([...new Set([...glyphs.entry, ...glyphs.cases])]).toEqual(["→"]);
-  expect([...new Set(glyphs.leaving)]).toEqual(["↗"]);
+  const story = await read();
+  expect(story.entry.length).toBeGreaterThan(0);
+  expect(story.cases.length).toBeGreaterThan(0);
+  expect(story.leaving.length).toBeGreaterThan(0);
+  expect([...new Set([...story.entry, ...story.cases])]).toEqual(["in"]);
+  expect([...new Set(story.leaving)]).toEqual(["out"]);
+  expect(story.glyphs).toBe(0);
+
+  // The drawer's links and the media captions' "open" links leave the site too.
+  await bypassEntry(page);
+  await page.goto("/#work");
+  await page.reload(); // a hash change alone keeps the gate document
+  await expect(page.locator(".hud__readout")).toBeVisible();
+  await page.getByRole("button", { name: /project twin/i }).click();
+  await expect(page.getByRole("dialog")).toBeVisible();
+  const drawer = await read();
+  expect(drawer.leaving.length).toBeGreaterThan(story.leaving.length);
+  expect([...new Set(drawer.leaving)]).toEqual(["out"]);
+  expect(drawer.glyphs).toBe(0);
 });
 
 test("case drawer returns focus to the trigger after a mouse click", async ({ page }) => {
