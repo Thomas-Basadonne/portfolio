@@ -76,8 +76,11 @@
   .scene-staged[data-scene-layout] .contact-link { grid-template-columns: 1fr auto; column-gap: 1rem; }
   .scene-staged[data-scene-layout] .contact-link small { grid-column: 1 / -1; }
   .scene-staged[data-scene-layout] .contact-link strong { font-size: clamp(1.2rem, 4.4cqi, 2.8rem); }
-  /* One control for the whole story, in the rail lane's bottom corner: never over text or the model. */
-  .scene-staged[data-scene-layout] .motion-control { position: fixed; right: var(--gutter); bottom: var(--gutter); left: auto; }
+  /* One control for the whole story, in the rail lane's bottom corner: never over text or the model; above the dock
+     where phones have one (portrait phones use the band slot below, #80). */
+  .scene-staged[data-scene-layout] .motion-control {
+    position: fixed; right: var(--gutter); bottom: max(var(--gutter), var(--nav-clearance)); left: auto;
+  }
 }
 @media (orientation: landscape) and (max-height: 500px) {
   .scene-stage { --stage-top: 5.25rem; --stage-bottom: 0.75rem; }
@@ -113,7 +116,13 @@
     height: var(--band-read);
   }
   .scene-staged[data-scene-layout] .scene-stage :is(.webgl-shell, .scene-stage__probe) { top: var(--band-header); }
-  .scene-staged[data-scene-layout] .motion-control { bottom: calc(var(--nav-clearance) + var(--band-cut, 0px)); }
+  /*
+   * The control rides the lower edge of the visible band (the clip hides what is below it), in a slot of its own: the
+   * dock clearance belongs to the page, not to the band, and on short phones it lifted the control under the HUD
+   * identity (#80, 55/121 points reachable at 390x664). The band's visible part is header + at least 14svh, so the
+   * 44px slot always sits below the header.
+   */
+  .scene-staged[data-scene-layout] .motion-control { bottom: calc(0.75rem + var(--band-cut, 0px)); }
   .scene-staged[data-scene-layout] .story-section {
     min-height: auto;
     padding-top: calc(clamp(1.5rem, 4svh, 2.5rem) + var(--band-gap));
@@ -166,8 +175,6 @@
     padding-bottom: var(--nav-clearance);
   }
   .scene-stage { --stage-bottom: var(--nav-clearance); }
-  /* The control rides the lower edge of the visible band (the clip hides what is below it). */
-  .scene-staged[data-scene-layout] .motion-control { bottom: calc(var(--nav-clearance) + var(--band-cut, 0px)); }
 }
 
 /*
@@ -182,11 +189,9 @@
   .scene-staged[data-scene-layout] main {
     padding-right: calc(var(--gutter) + var(--nav-lane) + env(safe-area-inset-right));
   }
-  .scene-staged[data-scene-layout] .motion-control {
-    top: max(0.75rem, env(safe-area-inset-top));
-    right: calc(var(--gutter) + 16rem);
-    bottom: auto;
-  }
+  /* In the rail lane, under the chapter rail: the reading sections cover both columns, header row included, and the
+     old slot in the header (16rem from the right) sat under them and under the tools (#80). */
+  .scene-staged[data-scene-layout] .motion-control { right: max(0.75rem, env(safe-area-inset-right)); bottom: 0.75rem; }
 }
 
 @media (forced-colors: active) {
