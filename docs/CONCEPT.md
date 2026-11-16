@@ -12,7 +12,7 @@ survive pressure, precise interfaces and disciplined architecture. Creative deve
 hardware experiments begin where the expected tolerances are deliberately exceeded. The machine
 therefore measures two things at once: reliability and useful deviation.
 
-The opening line — “Built to hold. Wired to wonder.” — is the thesis. The visitor first calibrates
+The opening line — “Solid under load. Curious by design.” (until 16/11/2026: “Built to hold. Wired to wonder.”) — is the thesis. The visitor first calibrates
 the instrument, then passes through six depths: identity, operating principles, fields of practice,
 case files, trace history and transmission/contact. Scroll is treated as a physical depth control.
 Pointer movement applies a small parallax force; projects open as inspection reports; the final
