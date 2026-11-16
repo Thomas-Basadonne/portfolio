@@ -183,6 +183,11 @@
  */
 @media (max-width: 760px) and (orientation: portrait) {
   .scene-staged[data-scene-layout] main { padding-bottom: calc(1.5rem + env(safe-area-inset-bottom)); }
+  /* The hero is the first screen under the band: it ends where the dock begins (its content stretches to it). */
+  .scene-staged[data-scene-layout] .identity-section {
+    min-height: calc(100svh - var(--band-height));
+    padding-bottom: var(--nav-clearance);
+  }
 }
 
 @media (max-width: 760px) and (orientation: landscape) and (max-height: 500px) {

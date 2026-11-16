@@ -1967,15 +1967,12 @@ main {
       calc(18svh + env(safe-area-inset-bottom)) max(var(--gutter), env(safe-area-inset-left));
   }
 
+  /* The hero is the first screen: it ends where the dock begins, and its content stretches to that height. */
   .identity-section {
-    min-height: 110svh;
+    min-height: 100svh;
     padding-top: 5.25rem;
-    padding-bottom: calc(7rem + env(safe-area-inset-bottom));
+    padding-bottom: var(--nav-clearance);
     align-items: stretch;
-  }
-
-  .identity-section .story-section__content--wide {
-    min-height: calc(110svh - 12.25rem);
   }
 
   .story-section:not(.identity-section)::before {
@@ -2220,6 +2217,38 @@ main {
 
   .story-section:not(.identity-section) {
     padding-top: 46svh;
+  }
+}
+
+/*
+ * Portrait phones: the hero shares its free height between the name and the promise, and the promise and the CTA,
+ * which closes the first screen above the dock (it used to stack at the top and leave a hole: 340px at 390x844
+ * without WebGL). Two flexible spacers around the text; the fixed margins stay as the minimum on short screens.
+ */
+@media (max-width: 760px) and (orientation: portrait) {
+  .identity-section .story-section__content--wide,
+  .hero-thesis {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .hero-thesis {
+    flex: 1;
+  }
+
+  .hero-thesis::before,
+  .hero-thesis::after {
+    flex: 1;
+    content: "";
+  }
+
+  /* The promise stays with its CTA: past 2.5rem the free height goes above the role (a 150px hole without WebGL). */
+  .hero-thesis::after {
+    max-height: 2.5rem;
+  }
+
+  .hero-actions {
+    order: 1;
   }
 }
 

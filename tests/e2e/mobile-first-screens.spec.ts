@@ -1,5 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 import { portfolioContent } from "../../src/content/portfolio";
+import { holdLayout, settleLayout } from "./hold-layout";
 
 /*
  * Mobile first screens (follow-up of the 16/11/2026 review on iPhone, both languages). Portrait phones, from the
@@ -8,6 +9,8 @@ import { portfolioContent } from "../../src/content/portfolio";
  * - Splash caption: the hint and the resolution shared one row on the stage's lower edge; in Italian they no longer
  *   fit (166 + 135px against 307px at 390) and both broke onto two lines; the loading text is longer still. Now a
  *   two-line legend under the instrument box: one label per line, flush left, never over the Compiler.
+ * - Hero: the content stacked at the top and the first screen ended in a hole above the dock (staged 390x844: 42px,
+ *   360x740: 101px; fallback 390x844: 340px).
  */
 
 const PHONES = [
@@ -102,4 +105,42 @@ for (const locale of ["en", "it"] as const) {
     }
     expect(failures, failures.join("\n")).toEqual([]);
   });
+
+  for (const layout of ["staged", "fallback"] as const) {
+    test(`the hero fills the first screen on phones, CTA at its foot (${locale}, ${layout} layout)`, async ({ page }) => {
+      test.setTimeout(90_000);
+      await holdLayout(page, layout);
+      await page.addInitScript(() => window.sessionStorage.setItem("tb:entry-seen", "1"));
+      await page.setViewportSize(PHONES[0]);
+      await page.goto(`/?lang=${locale}`);
+      await expect(page.locator(".hud__readout")).toBeVisible();
+      await settleLayout(page, layout);
+      const failures: string[] = [];
+      for (const viewport of PHONES) {
+        await page.setViewportSize(viewport);
+        await page.evaluate(() => window.scrollTo(0, 0));
+        const g = await page.evaluate(() => {
+          const box = (selector: string) => document.querySelector(selector)!.getBoundingClientRect();
+          return {
+            title: box(".hero-title").bottom, role: box(".hero-thesis > p:first-child").top, lede: box(".hero-lede").bottom,
+            cta: box(".hero-actions").top, ctaBottom: box(".hero-actions").bottom, dock: box(".chapter-nav").top,
+          };
+        });
+        const label = `${viewport.width}x${viewport.height}`;
+        const below = g.dock - g.ctaBottom;
+        // At the foot of the first screen: the dock clearance and no hole (where the content leaves room at all).
+        if (below > 32) failures.push(`${label}: ${Math.round(below)}px empty between the CTA and the dock`);
+        if (below < 0) failures.push(`${label}: CTA under the dock`);
+        // The free height is shared between the name and the promise, and the promise and the CTA, not left below; past
+        // 2.5rem above the CTA (40px + its 14.4px margin) it all goes above the role, so the promise keeps its CTA.
+        const upper = g.role - g.title;
+        const lower = g.cta - g.lede;
+        const gaps = `gaps ${Math.round(upper)} above the role, ${Math.round(lower)} above the CTA`;
+        if (lower < 14) failures.push(`${label}: CTA ${Math.round(lower)}px under the lede`);
+        if (lower > 56) failures.push(`${label}: ${gaps}`);
+        else if (lower < 53 ? Math.abs(upper - lower) > 4 : upper < lower - 4) failures.push(`${label}: ${gaps}`);
+      }
+      expect(failures, failures.join("\n")).toEqual([]);
+    });
+  }
 }
