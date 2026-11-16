@@ -1858,9 +1858,31 @@ main {
     min-width: 0;
   }
 
+  /*
+   * The title is set to its column, not to a 9ch box (four one-word lines on half the width): lead and emphasis on a
+   * line each, the longest («regge la complessità.», 6.03em with the web font) at ~95% of the column (100vw - 2rem).
+   */
   .entry-sequence__statement h2 {
-    max-width: 9ch;
-    font-size: clamp(2.6rem, min(15vw, 8svh), 5rem);
+    font-size: clamp(2.6rem, min(15.8vw - 0.32rem, 11svh), 6rem);
+  }
+
+  /*
+   * The caption becomes a two-line legend under the instrument box, one label per line, flush left: in Italian the
+   * hint and the resolution no longer shared one row (166 + 135px against 307px at 390) and both broke onto two
+   * lines; the loading text is longer still. Inside the box the Compiler covers its lower corners on short phones,
+   * and the top edge is no option (the bar ends 7px above it, and is 100px tall at 320). So the box gives back
+   * exactly the legend's two lines (2 × 1.125rem) and the Compiler, framed on the box, never sits behind it.
+   */
+  .gate-stage {
+    height: calc(100% - 2.25rem);
+    align-self: start;
+  }
+
+  .gate-stage__caption {
+    flex-direction: column;
+    gap: 0;
+    transform: translateY(100%);
+    white-space: nowrap;
   }
 
   .entry-sequence__statement h2 em {
