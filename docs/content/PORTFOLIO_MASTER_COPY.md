@@ -43,7 +43,7 @@ Non sono verifiche ripetute durante SYS-01.
 > **Thomas Basadonne**
 > Frontend Developer · Commerce & AI tools
 >
-> # Built to hold. Wired to wonder.
+> # Solid under load. Curious by design.
 >
 > I build storefronts that survive enterprise B2B traffic, and AI tools that keep your data on your own machine.
 >
@@ -54,7 +54,7 @@ Non sono verifiche ripetute durante SYS-01.
 > **Thomas Basadonne**
 > Frontend Developer · Commerce & AI tools
 >
-> # Costruito per reggere. Cablato per stupire.
+> # Solido sotto carico. Curioso per scelta.
 >
 > Costruisco storefront che reggono il traffico B2B enterprise e strumenti AI che tengono i tuoi dati sul tuo computer.
 >

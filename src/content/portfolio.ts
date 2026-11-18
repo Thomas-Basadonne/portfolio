@@ -198,7 +198,7 @@ const en: PortfolioContent = {
     role: "Frontend Developer · Commerce & AI tools",
     base: "Italy · Remote",
     availability: "Open to AI projects, client sites and ambitious open source.",
-    thesis: { lead: "Built to hold.", emphasis: " Wired to wonder." },
+    thesis: { lead: "Solid under load.", emphasis: " Curious by design." },
     heroLede:
       "I build storefronts that survive enterprise B2B traffic, and AI tools that keep your data on your own machine.",
   },
@@ -302,9 +302,9 @@ const en: PortfolioContent = {
   ],
   work: {
     kicker: "03 / Selected work",
-    title: "Work, opened to the decisions inside.",
+    title: "What I built, and why it holds.",
     intro:
-      "Five projects and a side hustle just getting started, with their context, my role and the decisions that shaped them. Co-developed work is labelled as such; client metrics stay with the client.",
+      "Five projects and a side hustle that is just starting. Each one opens on its context, my part in it and the technical trade-offs behind it. Co-developed work says so; client numbers stay with the client.",
     openSourceTitle: "Open source",
     labTitle: "Lab",
   },
@@ -725,7 +725,7 @@ const it: PortfolioContent = {
     role: "Frontend Developer · Commerce & AI tools",
     base: "Italia · Remote",
     availability: "Disponibile per progetti AI, siti per clienti e open source ambizioso.",
-    thesis: { lead: "Costruito per reggere.", emphasis: " Cablato per stupire." },
+    thesis: { lead: "Solido sotto carico.", emphasis: " Curioso per scelta." },
     heroLede:
       "Costruisco storefront che sostengono il traffico B2B enterprise e strumenti AI che tengono i tuoi dati sul tuo computer.",
   },
@@ -829,9 +829,9 @@ const it: PortfolioContent = {
   ],
   work: {
     kicker: "03 / Progetti",
-    title: "Progetti, aperti fino alle decisioni.",
+    title: "Cosa ho costruito, e perché regge.",
     intro:
-      "Cinque progetti e un'attività in parallelo appena avviata, con contesto, il mio ruolo e le decisioni che li hanno definiti. Il lavoro co-sviluppato è indicato come tale; le metriche dei clienti restano ai clienti.",
+      "Cinque progetti e un'attività in parallelo appena partita. Ognuno si apre sul contesto, sulla mia parte e sui compromessi tecnici che l'hanno definito. Il lavoro co-sviluppato lo dichiara; i numeri dei clienti restano ai clienti.",
     openSourceTitle: "Open source",
     labTitle: "Lab",
   },

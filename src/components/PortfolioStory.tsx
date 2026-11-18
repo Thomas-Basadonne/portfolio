@@ -146,8 +146,8 @@ export function PortfolioStory({ content, onSelectCase, stageRef }: PortfolioSto
                   </small>
                   <strong>{caseStudy.title}</strong>
                   <em>{caseStudy.summary}</em>
+                  <span className="case-index__status mono-label">{caseStudy.status}</span>
                 </span>
-                <span className="case-index__status mono-label">{caseStudy.status}</span>
                 <span className="case-index__arrow" aria-hidden="true">
                   <Arrow kind="in" />
                 </span>

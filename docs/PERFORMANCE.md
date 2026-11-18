@@ -146,6 +146,23 @@ With the #77 runtime upgrades the separately confirmed JS ceilings will be appli
 entry 98,000, visual 255,000 and total 350,000 gzip bytes. The gate-only #76 retains
 90,000 / 250,000 / 331,000; Lighthouse and all other checks are unchanged.
 
+CSS raw 42,000 → **42,500** (`scripts/check-bundle.mjs`, PR #87 / #81): Thomas explicitly confirmed the new ceiling on
+**2026-11-18**. Measured with `pnpm run build` (raw bytes of `dist/assets/index-*.css`, Node 26.10.0, Vite 8.3.7):
+
+| Tree | CSS raw | vs 42,000 |
+|---|---:|---:|
+| `main` `67a4b3a` | 41,944 | 56 B spare |
+| PR #87 head `1975674` | 42,413 | 413 B over |
+
+Where the +469 B goes: the portrait-phone first screens (hero stretched to the dock with two flexible spacers, splash
+title set to its column, two-line gate legend) and the Work rows (status as the last line of the text column).
+The coverage of Chromium over 13 viewports × staged/fallback/forced colors/reduced motion, drawer, hover and focus found
+no dead rules to recover; the remaining «unused» rules belong to real states (crash fallback, focus, interactive gate,
+pause control). Alternatives considered: dropping the flexible spacers (the hero would again leave a 340 px hole above
+the dock without WebGL at 390×844) or the legend (the Italian labels wrap at 390 px). The decision covers only the CSS
+ceiling: the JS ceilings and every other gate are unchanged, and it is not room for unrelated features. CI measures its
+own output.
+
 Total JS 330,000 → **331,000** gzip (owner, 13/11): the software-renderer probe took it to 330,116 (entry 88,118,
 limit 90,000; visual chunk 241,998). The +0.3% is spent on #17; the next feature (#47) has to make its own room.
 

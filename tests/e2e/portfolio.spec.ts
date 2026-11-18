@@ -914,7 +914,7 @@ test("language switch translates the page, persists and keeps a shareable URL", 
 
   await expect(page.locator("html")).toHaveAttribute("lang", "it");
   await expect(page.getByRole("button", { name: "Italiano" })).toHaveAttribute("aria-pressed", "true");
-  await expect(page.getByRole("heading", { level: 2, name: /progetti, aperti fino alle decisioni/i })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 2, name: portfolioContent.it.work.title })).toBeVisible();
   await expect(page).toHaveURL(/\?lang=it#work$/);
   await expect(page).toHaveTitle(/Thomas Basadonne/);
 
