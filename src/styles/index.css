@@ -47,9 +47,8 @@
   --layer-entry: 100;
   --layer-cursor: 150;
   --layer-skip: 200;
-  --motion-fast: 180ms;
-  --motion-standard: 350ms;
-  --motion-entry: 900ms;
+  /* Disclosure: rail label and tick, Work row wipe, drawer backdrop. Feedback and reveals keep their own beats. */
+  --motion-disclosure: 350ms;
   --ease-mechanical: cubic-bezier(0.22, 1, 0.36, 1);
   color: var(--bone);
   background: var(--graphite);
@@ -421,7 +420,7 @@ body.is-calibrating .site-shell .story-section:not(.identity-section) {
 
 .site-shell .identity-section .story-section__content,
 .site-shell .hud {
-  transition: opacity 0.6s ease 0.6s, transform 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.6s;
+  transition: opacity 0.6s ease 0.6s, transform 0.6s var(--ease-mechanical) 0.6s;
 }
 
 body.is-calibrating .site-shell :is(.identity-section .story-section__content, .hud) {
@@ -507,7 +506,7 @@ body.is-arriving .motion-control {
   background: var(--signal);
   transform: scaleX(0);
   transform-origin: right;
-  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform 0.45s var(--ease-mechanical);
 }
 
 .calibrate-button:hover::before,
@@ -585,7 +584,7 @@ body.is-arriving .motion-control {
 .boot__name b {
   display: block;
   font-weight: inherit;
-  animation: boot-rise 1s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: boot-rise 1s var(--ease-mechanical) both;
 }
 
 .boot__name > span + span b {
@@ -612,7 +611,7 @@ body.is-arriving .motion-control {
   background: var(--signal);
   transform: scaleX(var(--boot, 0.08));
   transform-origin: left;
-  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform 0.45s var(--ease-mechanical);
 }
 
 /* A scan that never stops, even while the main thread compiles the scene. */
@@ -776,7 +775,7 @@ body.is-arriving .motion-control {
   height: 1px;
   content: "";
   background: currentColor;
-  transition: width 0.35s ease, background 0.35s ease;
+  transition: width var(--motion-disclosure), background var(--motion-disclosure);
 }
 
 .chapter-nav a em {
@@ -785,7 +784,7 @@ body.is-arriving .motion-control {
   font-style: normal;
   opacity: 0;
   white-space: nowrap;
-  transition: max-width 0.35s ease, opacity 0.25s ease;
+  transition: max-width var(--motion-disclosure), opacity 0.25s ease;
 }
 
 .chapter-nav a:hover em,
@@ -1127,7 +1126,7 @@ main {
   background: var(--signal);
   transform: scaleY(0);
   transform-origin: bottom;
-  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform var(--motion-disclosure) var(--ease-mechanical);
 }
 
 .case-index__item:hover::before,
@@ -1509,7 +1508,7 @@ main {
   display: flex;
   justify-content: flex-end;
   background: rgba(11, 11, 10, 0.72);
-  animation: overlay-in 0.35s ease both;
+  animation: overlay-in var(--motion-disclosure) both;
 }
 
 @keyframes overlay-in {
@@ -1524,7 +1523,7 @@ main {
   color: var(--graphite);
   background: var(--bone);
   box-shadow: -2rem 0 6rem rgba(0, 0, 0, 0.3);
-  animation: drawer-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: drawer-in 0.7s var(--ease-mechanical) both;
 }
 
 @keyframes drawer-in {
