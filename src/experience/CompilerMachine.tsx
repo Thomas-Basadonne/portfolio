@@ -1,21 +1,18 @@
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
-import { Quaternion, Vector3, type Object3D, type PerspectiveCamera, type Texture } from "three";
+import { Quaternion, Vector3, type PerspectiveCamera, type Texture } from "three";
 import { experienceStore, type RenderQuality } from "../lib/experienceStore";
 import { createMachine } from "./tb001/machine";
 import { createMachineTextures } from "./tb001/textures";
 import { pose, writePose, type MachinePose } from "./tb001/pose";
 import { createStudioEnvironment } from "./tb001/studio";
 import { createPresentation, writePresentation } from "./tb001/presentation";
-import { innerDir } from "./tb001/pose";
-import { createReadout, sameReadout, writeReadout, type ReadoutPart } from "./tb001/readout";
+import { createReadout, sameReadout, writeReadout } from "./tb001/readout";
 
 type TB001ModelProps = {
   quality: RenderQuality;
   /** Mutates the preallocated pose. Its controller owns motion/pauses and calls invalidate. */
   drive: (target: MachinePose, delta: number) => void;
-  /** After the model took this frame's pose: reads that need the parts where they are drawn (#20 callout). */
-  afterUpdate?: (machine: Built["machine"]) => void;
   /** Called once, after the first frame drawn with the model. */
   onBuilt?: () => void;
   /** A build step that throws: the build runs outside React's render, so the error boundary would not see it. */
@@ -34,7 +31,7 @@ const nextTask = () => new Promise<void>((resolve) => { window.setTimeout(resolv
  * (#17) and pushed Lighthouse's mobile TBT to its limit. A rebuild (quality change) keeps the previous model on
  * screen until the new one is complete.
  */
-export function TB001Model({ quality, drive, afterUpdate, onBuilt, onFailure }: TB001ModelProps) {
+export function TB001Model({ quality, drive, onBuilt, onFailure }: TB001ModelProps) {
   const { gl, scene, camera, invalidate } = useThree();
   const model = useRef<Built["machine"] | null>(null);
   const built = useRef<Built | null>(null);
@@ -123,7 +120,6 @@ export function TB001Model({ quality, drive, afterUpdate, onBuilt, onFailure }: 
     if (!model.current) return;
     drive(currentPose, Math.min(delta, 0.05));
     model.current.update(currentPose);
-    afterUpdate?.(model.current);
     if (!announced.current) {
       announced.current = true;
       // After this frame is on screen.
@@ -141,19 +137,6 @@ const HATCH_AXIS = new Vector3(0, 0, 1);
 const GATE_SCALE = 1.06;
 const spin = new Quaternion();
 
-/*
- * Callout anchors (#20): a point on each readout part, in the part's own frame, so the leader follows the part as it
- * opens, turns and leaves in the teardown. The ring point is on the outer gimbal's pin axis; the inner shell point is
- * on its first sector's belt.
- */
-const [innerX, innerY, innerZ] = innerDir(0);
-const ANCHORS: Record<ReadoutPart, readonly [string, number, number, number]> = {
-  outer: ["shell.front", 0, 0, 1],
-  inner: ["inner0", innerX * 0.89, innerY * 0.89, innerZ * 0.89],
-  joints: ["joints.piston0.rod", 0, 0, 0],
-  rings: ["ring.outer", 0.82, 0, 0],
-  core: ["core", 0, 0, 0],
-};
 const READOUT_PAD = 16;
 
 /** Applies the chapter choreography in the persistent stage; scheduling belongs to the controller. */
@@ -165,10 +148,6 @@ export function CompilerMachine({ quality, onBuilt, onFailure }: {
   const { camera, scene, gl, get } = useThree();
   const placement = useMemo(createPresentation, []);
   const readout = useMemo(createReadout, []);
-  /** This frame's model region, in canvas px (the drive writes it, the callout reads it after the pose is applied). */
-  const frame = useMemo(() => ({ left: 0, width: 1, visible: 1 }), []);
-  const point = useMemo(() => new Vector3(), []);
-  const anchors = useMemo(() => new WeakMap<object, Map<string, Object3D | undefined>>(), []);
   const input = useMemo(() => ({
     progress: 0, chapter: 0, stageProgress: 0, isMobile: false, reducedMotion: false, userPaused: false,
     pointerX: 0, pointerY: 0, aspect: 1, time: 0,
@@ -216,9 +195,6 @@ export function CompilerMachine({ quality, onBuilt, onFailure }: {
     const lens = camera as PerspectiveCamera;
     lens.aspect = regionWidth / regionHeight;
     lens.setViewOffset(regionWidth, regionHeight, regionWidth / 2 - centreX, regionHeight / 2 - centreY, width, height);
-    frame.left = centreX - regionWidth / 2;
-    frame.width = regionWidth;
-    frame.visible = visible;
     input.aspect = regionWidth / regionHeight;
     input.time = experienceStore.motionTime;
     writePresentation(placement, input);
@@ -237,65 +213,29 @@ export function CompilerMachine({ quality, onBuilt, onFailure }: {
     const crossing = experienceStore.region < 1 ? 4 * experienceStore.side * (1 - experienceStore.side) : 0;
     camera.position.set(placement.cameraX, placement.cameraY, placement.cameraZ * (1 + 0.18 * crossing));
     camera.lookAt(0, placement.lookY, 0);
+    // R3F wraps the canvas in its own div: the stage offset is the shell's (below the band header on phones).
+    const shell = gl.domElement.closest<HTMLElement>(".webgl-shell");
+    writeModelReadout(shell, centreX - regionWidth / 2);
   };
   /*
-   * Model readout and callout (#20), after the model took this frame's pose. The label re-renders only when a rounded
-   * value changes; the box and the leader are placed directly (stage px), never through a React render per frame.
-   * Beside the text the box sits in the top corner of the model's column; with a fine pointer one leader reaches the
-   * active part. Not shown in the portrait band.
+   * Model readout (#20). The label re-renders only when a rounded value changes; the box is placed directly (stage
+   * px), never through a React render per frame: in the top corner of the model's column, where the stage sits beside
+   * the text. Not shown in the portrait band. No leader to the model (Thomas, 23/11/2026: the readout stays alone).
    */
-  const afterUpdate = (machine: { root: Object3D }) => {
+  const writeModelReadout = (shell: HTMLElement | null, regionLeft: number) => {
     const store = experienceStore;
     writeReadout(readout, placement.cycle, placement.explode);
     if (!sameReadout(readout, store.readout)) {
       Object.assign(store.readout, readout);
       store.onReadout?.();
     }
-    const box = store.readoutBox, callout = store.calloutLine;
-    if (!box || !callout) return;
-    const canvas = gl.domElement;
-    // R3F wraps the canvas in its own div: the stage offset is the shell's (below the band header on phones).
-    const shell = canvas.closest<HTMLElement>(".webgl-shell");
+    const box = store.readoutBox;
+    if (!box) return;
     const dx = shell?.offsetLeft ?? 0, dy = shell?.offsetTop ?? 0;
-    const travelling = store.gating || store.gate > 0;
     // Only where the stage sits beside the text (desktop, landscape): the portrait band has no room outside the model
     // (Thomas, 23/11/2026), so there the readout is not shown at all.
-    const beside = store.region < 1;
-    box.style.visibility = travelling || !beside ? "hidden" : "";
-    // The leader needs a fine pointer's precision of reading; touch landscape keeps the label alone.
-    const wide = beside && !store.isMobile;
-    const bx = dx + frame.left + READOUT_PAD;
-    const by = dy + READOUT_PAD;
-    const bh = box.offsetHeight;
-    box.style.transform = `translate(${Math.round(bx)}px, ${Math.round(by)}px)`;
-
-    let shown = false;
-    if (wide && !travelling && readout.part) {
-      let named = anchors.get(machine.root);
-      if (!named) anchors.set(machine.root, (named = new Map()));
-      const [name, x, y, z] = ANCHORS[readout.part];
-      if (!named.has(name)) named.set(name, machine.root.getObjectByName(name));
-      const target = named.get(name);
-      if (target) {
-        target.updateWorldMatrix(true, false);
-        point.set(x, y, z).applyMatrix4(target.matrixWorld).project(camera);
-        const px = dx + ((point.x + 1) / 2) * canvas.clientWidth;
-        const py = dy + ((1 - point.y) / 2) * canvas.clientHeight;
-        // In front of the camera, inside the model's column and the visible band, and clear of the readout itself.
-        shown = point.z < 1 && px > dx + frame.left && px < dx + frame.left + frame.width && py > dy && py < dy + frame.visible
-          && py > by + bh + READOUT_PAD;
-        if (shown) {
-          const [line, dot] = callout.children as unknown as [SVGLineElement, SVGCircleElement];
-          line.setAttribute("x1", String(Math.round(bx)));
-          line.setAttribute("y1", String(Math.round(by + bh + 6)));
-          line.setAttribute("x2", px.toFixed(1));
-          line.setAttribute("y2", py.toFixed(1));
-          dot.setAttribute("cx", px.toFixed(1));
-          dot.setAttribute("cy", py.toFixed(1));
-        }
-      }
-    }
-    callout.style.visibility = shown ? "" : "hidden";
+    box.style.visibility = store.gating || store.gate > 0 || store.region >= 1 ? "hidden" : "";
+    box.style.transform = `translate(${Math.round(dx + regionLeft + READOUT_PAD)}px, ${Math.round(dy + READOUT_PAD)}px)`;
   };
-  return <TB001Model quality={quality} drive={drive} afterUpdate={afterUpdate} onBuilt={onBuilt} onFailure={onFailure} />;
+  return <TB001Model quality={quality} drive={drive} onBuilt={onBuilt} onFailure={onFailure} />;
 }
