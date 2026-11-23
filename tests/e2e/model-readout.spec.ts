@@ -6,7 +6,7 @@ import { portfolioContent } from "../../src/content/portfolio";
  * WOW-08 (#20): the model readout. Approved table (23/11/2026): state, one contextual percentage (CYCLE until the parts
  * separate, then EXPLODED) and the active part, all read from the pose. With reduced motion every chapter rests on its
  * final pose, so the expected values are exact. Shown where the stage sits beside the text; not in the portrait band
- * (Thomas, 23/11/2026); absent without a model.
+ * (Thomas, 23/11/2026); absent without a model. No leader to the model (removed by Thomas the same day, #21).
  */
 
 const SCENE_TIMEOUT = 20_000;
@@ -99,28 +99,14 @@ test("model readout re-labels on a language change and holds across the drawer",
   await expect.poll(() => readoutText(page), { timeout: SCENE_TIMEOUT }).toEqual([it.states[3], `${it.explode} 100%`, it.parts.core]);
 });
 
-test("the leader reaches the active part inside the model's column", async ({ page }) => {
-  test.setTimeout(90_000);
+test("the readout stays alone: no leader to the model (Thomas, 23/11/2026)", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await enterWithScene(page, "en");
-  await goToChapter(page, "capabilities");
-  const callout = page.locator(".scene-callout");
-  await expect.poll(() => callout.evaluate((svg) => getComputedStyle(svg).visibility), { timeout: SCENE_TIMEOUT }).toBe("visible");
-  const geometry = await page.evaluate(() => {
-    const stage = document.querySelector(".scene-stage")!.getBoundingClientRect();
-    const box = document.querySelector(".scene-readout")!.getBoundingClientRect();
-    const line = document.querySelector(".scene-callout line")!;
-    const read = (name: string) => Number(line.getAttribute(name));
-    return { stage: [stage.left, stage.top, stage.width, stage.height], box: [box.left, box.top, box.width, box.height],
-      start: [stage.left + read("x1"), stage.top + read("y1")], end: [stage.left + read("x2"), stage.top + read("y2")] };
-  });
-  // The leader starts under the readout and ends inside the stage, below the box.
-  expect(Math.abs(geometry.start[0] - geometry.box[0])).toBeLessThan(2);
-  expect(geometry.start[1]).toBeGreaterThan(geometry.box[1] + geometry.box[3]);
-  expect(geometry.end[0]).toBeGreaterThan(geometry.stage[0]);
-  expect(geometry.end[0]).toBeLessThan(geometry.stage[0] + geometry.stage[2]);
-  expect(geometry.end[1]).toBeGreaterThan(geometry.box[1] + geometry.box[3]);
-  expect(geometry.end[1]).toBeLessThan(geometry.stage[1] + geometry.stage[3]);
+  for (const id of ["about", "capabilities", "work"]) {
+    await goToChapter(page, id);
+    await expect(page.locator(".scene-readout")).toBeVisible();
+    expect(await page.locator(".scene-callout, [data-scene-stage] line, [data-scene-stage] circle").count(), id).toBe(0);
+  }
 });
 
 test("no readout in the portrait band or without a model", async ({ page, browser }) => {
@@ -128,7 +114,6 @@ test("no readout in the portrait band or without a model", async ({ page, browse
   await page.setViewportSize({ width: 390, height: 844 });
   await enterWithScene(page, "en", "#capabilities");
   await expect(page.locator(".scene-readout")).toBeHidden();
-  await expect(page.locator(".scene-callout")).toBeHidden();
 
   const fallback = await browser.newPage({ viewport: { width: 1440, height: 900 } });
   await fallback.route(/ExperienceCanvas-.*\.js/, (route) => route.abort());

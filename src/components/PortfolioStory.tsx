@@ -2,6 +2,7 @@ import type { Ref } from "react";
 import type { CaseStudy, ListItem, PortfolioContent } from "../content/portfolio";
 import { SceneStage } from "./SceneStage";
 import { Arrow } from "./Arrow";
+import { experienceStore } from "../lib/experienceStore";
 
 type PortfolioStoryProps = {
   content: PortfolioContent;
@@ -18,6 +19,18 @@ function ItemLink({ item, newTabLabel }: { item: ListItem; newTabLabel: string }
       <span className="visually-hidden"> {newTabLabel}</span>
     </a>
   );
+}
+
+/**
+ * Work rows (#21, option C): a row under a fine pointer or with keyboard focus turns the model a little, the same for
+ * every case (no row stands for a part). Touch has no hover: one tap opens the case. A focus that the browser does not
+ * show (a mouse click, focus returned after the drawer) does not count as keyboard focus.
+ */
+const inspecting = { hover: false, focus: false };
+function inspect(source: keyof typeof inspecting, on: boolean) {
+  inspecting[source] = on;
+  experienceStore.inspectTarget = inspecting.hover || inspecting.focus ? 1 : 0;
+  experienceStore.requestRender?.();
 }
 
 /**
@@ -137,6 +150,10 @@ export function PortfolioStory({ content, onSelectCase, stageRef }: PortfolioSto
                 type="button"
                 className="case-index__item"
                 onClick={(event) => onSelectCase(caseStudy, event.currentTarget)}
+                onPointerEnter={(event) => { if (event.pointerType !== "touch") inspect("hover", true); }}
+                onPointerLeave={() => inspect("hover", false)}
+                onFocus={(event) => inspect("focus", event.currentTarget.matches(":focus-visible"))}
+                onBlur={() => inspect("focus", false)}
                 data-cursor="inspect"
               >
                 <span className="case-index__code mono-label">{caseStudy.code}</span>
