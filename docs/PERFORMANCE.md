@@ -180,6 +180,9 @@ drawer, crash fallback, failed images) found **no recoverable bytes**: the 1,819
 content-dependent `.item-link + .item-link` (a case with two links). The alternative considered, a readout without
 border and background, would read worse over the model. The JS ceilings and every other gate are unchanged.
 
+On the same day #21 removed the leader (Thomas: the readout stays alone) and added the Work rows' turn: CSS raw
+**42,605**, entry JS **97,686** gzip, visual JS **248,760**, total JS **346,446**. The 42,800 ceiling stays as decided.
+
 Total JS 330,000 → **331,000** gzip (owner, 13/11): the software-renderer probe took it to 330,116 (entry 88,118,
 limit 90,000; visual chunk 241,998). The +0.3% is spent on #17; the next feature (#47) has to make its own room.
 

@@ -13,6 +13,8 @@ type PresentationInput = {
   aspect?: number;
   /** Ambient motion time (s); advances only while motion is allowed. */
   time?: number;
+  /** Work rows' hover/focus turn (#21), 0..1, already sprung by the caller. */
+  inspect?: number;
 };
 
 export const createPresentation = () => ({
@@ -95,6 +97,12 @@ const PITCH = [12, 18, 12, 22, -4, 12];
 const YAW_START = -50;
 const PITCH_START = 6;
 const DEGREE = Math.PI / 180;
+/**
+ * Work rows (#21, option C): hover or keyboard focus turns the model about its own hatch axis, the same for every case.
+ * A turn about that axis leaves the envelope unchanged, so the framing does not move and the readout (cycle, explode)
+ * does not change: it is a gesture of the presentation, not a state of the mechanism.
+ */
+export const INSPECT_TURN = 14 * DEGREE;
 
 type ChapterState = { cycle: number; explode: number; rx: number; ry: number; rz: number; spin: number };
 const current: ChapterState = { cycle: 0, explode: 0, rx: 0, ry: 0, rz: 0, spin: 0 };
@@ -159,7 +167,7 @@ export function writePresentation(target: ReturnType<typeof createPresentation>,
   target.cycle = current.cycle;
   target.explode = current.explode;
   target.rotationZ = current.rz;
-  target.spin = current.spin;
+  target.spin = current.spin + clamp01(input.inspect ?? 0) * INSPECT_TURN;
 
   const time = input.time ?? 0;
   const swayX = motion * 1.2 * DEGREE * Math.sin(time * 0.31 + 1);

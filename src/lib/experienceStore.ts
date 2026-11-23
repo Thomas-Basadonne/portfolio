@@ -51,6 +51,8 @@ export const experienceStore = {
   readout: { state: 0, metric: "cycle" as "cycle" | "explode", value: 0, part: null as ReadoutPart | null },
   onReadout: null as null | (() => void),
   readoutBox: null as null | HTMLElement,
+  /** Work rows (#21): 1 while a case row has the pointer or keyboard focus; the frame loop springs the turn to it. */
+  inspectTarget: 0,
 };
 
 export const clamp01 = (value: number) => Math.min(1, Math.max(0, value));

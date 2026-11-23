@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { afterAll, describe, expect, it } from "vitest";
 import { createMachine } from "../src/experience/tb001/machine";
 import { pose } from "../src/experience/tb001/pose";
-import { createPresentation, writePresentation } from "../src/experience/tb001/presentation";
+import { createPresentation, INSPECT_TURN, writePresentation } from "../src/experience/tb001/presentation";
 import { boundsOnScreen, coreVisibility } from "./helpers/tb001-probes";
 import { hideUnframedOrbits } from "./helpers/tb001-framing";
 
@@ -25,8 +25,8 @@ const machine = createMachine({ quality: "low", textures: { wear: texture(), pan
 afterAll(() => machine.dispose());
 
 /** Applies the presentation exactly as CompilerMachine does and projects the real geometry. */
-function frame(chapter: number, stageProgress: number, aspect: number) {
-  const placement = writePresentation(createPresentation(), { ...input, chapter, stageProgress, aspect });
+function frame(chapter: number, stageProgress: number, aspect: number, inspect = 0) {
+  const placement = writePresentation(createPresentation(), { ...input, chapter, stageProgress, aspect, inspect });
   const state = pose(placement.cycle, placement.explode, 0);
   machine.update(state);
   machine.root.position.set(placement.x, placement.y, 0);
@@ -126,6 +126,36 @@ describe("TB-001 semantic chapter choreography", () => {
       for (const [chapter, gate] of [[2, 0.9], [3, 0.95], [5, 0.9]] as const) {
         const { camera } = frame(chapter, 1, aspect);
         expect(coreVisibility(machine.root, camera).vis, `chapter ${chapter} aspect ${aspect}`).toBeGreaterThanOrEqual(gate);
+      }
+    }
+  }, 60000);
+
+  it("turns the model about its own axis for a Work row and changes nothing else (#21)", () => {
+    // Option C: the same small turn for every case. Not a state of the mechanism: cycle and explode (the readout), the
+    // framing and the camera stay exactly where the chapter puts them.
+    for (const aspect of aspects) {
+      for (let step = 0; step <= 20; step += 1) {
+        const at = { ...input, chapter: 3, stageProgress: step / 20, aspect };
+        const rest = writePresentation(createPresentation(), at);
+        const turned = writePresentation(createPresentation(), { ...at, inspect: 1 });
+        expect(turned.spin - rest.spin).toBeCloseTo(INSPECT_TURN, 9);
+        expect({ ...turned, spin: 0 }).toEqual({ ...rest, spin: 0 });
+        const half = writePresentation(createPresentation(), { ...at, inspect: 0.5 });
+        expect(half.spin - rest.spin).toBeCloseTo(INSPECT_TURN / 2, 9);
+      }
+    }
+    // Clamped: a spring overshoot never turns the model further.
+    const over = writePresentation(createPresentation(), { ...input, chapter: 3, stageProgress: 0.5, inspect: 3 });
+    const full = writePresentation(createPresentation(), { ...input, chapter: 3, stageProgress: 0.5, inspect: 1 });
+    expect(over.spin).toBe(full.spin);
+    expect(INSPECT_TURN).toBeLessThanOrEqual((15 * Math.PI) / 180);
+  });
+
+  it("keeps the real geometry inside every stage aspect with a Work row turned (#21)", () => {
+    for (const aspect of aspects) {
+      for (let step = 0; step <= 20; step += 1) {
+        const { min, max } = frame(3, step / 20, aspect, 1);
+        expect(Math.max(-min[0], max[0], -min[1], max[1]), `u=${step / 20} aspect ${aspect}`).toBeLessThanOrEqual(0.95);
       }
     }
   }, 60000);

@@ -138,6 +138,8 @@ const GATE_SCALE = 1.06;
 const spin = new Quaternion();
 
 const READOUT_PAD = 16;
+/** Spring rate of the Work rows' turn (1/s): ~0.3 s to settle. */
+const INSPECT_RATE = 10;
 
 /** Applies the chapter choreography in the persistent stage; scheduling belongs to the controller. */
 export function CompilerMachine({ quality, onBuilt, onFailure }: {
@@ -150,9 +152,9 @@ export function CompilerMachine({ quality, onBuilt, onFailure }: {
   const readout = useMemo(createReadout, []);
   const input = useMemo(() => ({
     progress: 0, chapter: 0, stageProgress: 0, isMobile: false, reducedMotion: false, userPaused: false,
-    pointerX: 0, pointerY: 0, aspect: 1, time: 0,
+    pointerX: 0, pointerY: 0, aspect: 1, time: 0, inspect: 0,
   }), []);
-  const drive = (target: MachinePose) => {
+  const drive = (target: MachinePose, delta: number) => {
     // Before entry the story is paused, but the gate still drives the Compiler it shows.
     const gate = experienceStore.gate;
     if (experienceStore.paused && gate === 0) return;
@@ -197,6 +199,13 @@ export function CompilerMachine({ quality, onBuilt, onFailure }: {
     lens.setViewOffset(regionWidth, regionHeight, regionWidth / 2 - centreX, regionHeight / 2 - centreY, width, height);
     input.aspect = regionWidth / regionHeight;
     input.time = experienceStore.motionTime;
+    // Work rows (#21): hover or keyboard focus turns the model a little about its own axis, the same for every case.
+    // No reaction under reduced motion; a pause holds the turn where it is.
+    if (experienceStore.reducedMotion) input.inspect = 0;
+    else if (!experienceStore.userPaused) {
+      input.inspect += (experienceStore.inspectTarget - input.inspect) * (1 - Math.exp(-INSPECT_RATE * delta));
+      if (Math.abs(experienceStore.inspectTarget - input.inspect) < 0.002) input.inspect = experienceStore.inspectTarget;
+    }
     writePresentation(placement, input);
     // The visitor's drag rides on the hero orientation and fades out with the gate: it returns the short way round.
     placement.rotationX += experienceStore.gatePitch * gate;
@@ -215,6 +224,8 @@ export function CompilerMachine({ quality, onBuilt, onFailure }: {
     camera.lookAt(0, placement.lookY, 0);
     // R3F wraps the canvas in its own div: the stage offset is the shell's (below the band header on phones).
     const shell = gl.domElement.closest<HTMLElement>(".webgl-shell");
+    // The turn as drawn, for the stage's own state (and the e2e): set while the model is turned for a Work row.
+    shell?.closest("[data-scene-stage]")?.toggleAttribute("data-inspecting", input.inspect > 0.5);
     writeModelReadout(shell, centreX - regionWidth / 2);
   };
   /*
