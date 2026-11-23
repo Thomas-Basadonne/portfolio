@@ -31,6 +31,8 @@
   --signal-ink: #982d00;
   --oxide: #a8b6ac;
   --muted: #8a877e;
+  /* Secondary text on bone (gate, Work, archive, Experience): 5.39:1 on --bone. */
+  --muted-ink: #5d5b55;
   --line-dark: rgba(11, 11, 10, 0.18);
   --line-light: rgba(233, 229, 218, 0.2);
   --gutter: clamp(1.1rem, 3.2vw, 3.6rem);
@@ -45,9 +47,8 @@
   --layer-entry: 100;
   --layer-cursor: 150;
   --layer-skip: 200;
-  --motion-fast: 180ms;
-  --motion-standard: 350ms;
-  --motion-entry: 900ms;
+  /* Disclosure: rail label and tick, Work row wipe, drawer backdrop. Feedback and reveals keep their own beats. */
+  --motion-disclosure: 350ms;
   --ease-mechanical: cubic-bezier(0.22, 1, 0.36, 1);
   color: var(--bone);
   background: var(--graphite);
@@ -340,7 +341,7 @@ a {
 }
 
 .gate-bar .gate-bar__identity small {
-  color: #5d5b55;
+  color: var(--muted-ink);
 }
 
 .gate-bar .gate-bar__monogram {
@@ -352,7 +353,7 @@ a {
   display: flex;
   margin: 0;
   gap: 0.6rem;
-  color: #5d5b55;
+  color: var(--muted-ink);
 }
 
 .gate-bar__status strong {
@@ -370,7 +371,7 @@ a {
   align-self: center;
   justify-self: center;
   pointer-events: none;
-  color: #5d5b55;
+  color: var(--muted-ink);
 }
 
 /* Corner marks: a border masked down to its four corners. */
@@ -419,7 +420,7 @@ body.is-calibrating .site-shell .story-section:not(.identity-section) {
 
 .site-shell .identity-section .story-section__content,
 .site-shell .hud {
-  transition: opacity 0.6s ease 0.6s, transform 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.6s;
+  transition: opacity 0.6s ease 0.6s, transform 0.6s var(--ease-mechanical) 0.6s;
 }
 
 body.is-calibrating .site-shell :is(.identity-section .story-section__content, .hud) {
@@ -505,7 +506,7 @@ body.is-arriving .motion-control {
   background: var(--signal);
   transform: scaleX(0);
   transform-origin: right;
-  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform 0.45s var(--ease-mechanical);
 }
 
 .calibrate-button:hover::before,
@@ -583,7 +584,7 @@ body.is-arriving .motion-control {
 .boot__name b {
   display: block;
   font-weight: inherit;
-  animation: boot-rise 1s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: boot-rise 1s var(--ease-mechanical) both;
 }
 
 .boot__name > span + span b {
@@ -610,7 +611,7 @@ body.is-arriving .motion-control {
   background: var(--signal);
   transform: scaleX(var(--boot, 0.08));
   transform-origin: left;
-  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform 0.45s var(--ease-mechanical);
 }
 
 /* A scan that never stops, even while the main thread compiles the scene. */
@@ -774,7 +775,7 @@ body.is-arriving .motion-control {
   height: 1px;
   content: "";
   background: currentColor;
-  transition: width 0.35s ease, background 0.35s ease;
+  transition: width var(--motion-disclosure), background var(--motion-disclosure);
 }
 
 .chapter-nav a em {
@@ -783,7 +784,7 @@ body.is-arriving .motion-control {
   font-style: normal;
   opacity: 0;
   white-space: nowrap;
-  transition: max-width 0.35s ease, opacity 0.25s ease;
+  transition: max-width var(--motion-disclosure), opacity 0.25s ease;
 }
 
 .chapter-nav a:hover em,
@@ -1038,13 +1039,6 @@ main {
   grid-template-columns: 2.7rem 1fr;
   gap: 1rem;
   border-top: 1px solid var(--line-light);
-  transition: padding 0.35s ease, border-color 0.35s ease;
-}
-
-.capability-list li:hover {
-  padding-right: 0.7rem;
-  padding-left: 0.7rem;
-  border-color: var(--signal);
 }
 
 .capability-list__code {
@@ -1132,7 +1126,7 @@ main {
   background: var(--signal);
   transform: scaleY(0);
   transform-origin: bottom;
-  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform var(--motion-disclosure) var(--ease-mechanical);
 }
 
 .case-index__item:hover::before,
@@ -1153,7 +1147,7 @@ main {
 
 .case-index__title small {
   margin-bottom: 0.25rem;
-  color: #68665f;
+  color: var(--muted-ink);
   font-family: "DM Mono", monospace;
   font-size: 0.75rem;
   letter-spacing: 0.06em;
@@ -1226,7 +1220,7 @@ main {
 .archive-strip p {
   grid-column: 2;
   margin: 0.2rem 0 0;
-  color: #626059;
+  color: var(--muted-ink);
   font-size: 0.75rem;
   line-height: 1.5;
 }
@@ -1273,7 +1267,7 @@ main {
 
 .trace-list p {
   margin: 0;
-  color: #5f5d57;
+  color: var(--muted-ink);
   font-size: 0.875rem;
   line-height: 1.5;
 }
@@ -1414,7 +1408,7 @@ main {
 }
 
 .entry-sequence .lang-switch button {
-  color: #5d5b55;
+  color: var(--muted-ink);
 }
 
 .entry-sequence .lang-switch button[aria-pressed="true"] {
@@ -1514,7 +1508,7 @@ main {
   display: flex;
   justify-content: flex-end;
   background: rgba(11, 11, 10, 0.72);
-  animation: overlay-in 0.35s ease both;
+  animation: overlay-in var(--motion-disclosure) both;
 }
 
 @keyframes overlay-in {
@@ -1529,7 +1523,7 @@ main {
   color: var(--graphite);
   background: var(--bone);
   box-shadow: -2rem 0 6rem rgba(0, 0, 0, 0.3);
-  animation: drawer-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: drawer-in 0.7s var(--ease-mechanical) both;
 }
 
 @keyframes drawer-in {
@@ -2311,6 +2305,7 @@ main {
     --signal-ink: LinkText;
     --oxide: CanvasText;
     --muted: GrayText;
+    --muted-ink: CanvasText;
     --focus-on-light: Highlight;
     --line-dark: CanvasText;
     --line-light: CanvasText;
