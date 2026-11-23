@@ -1038,13 +1038,6 @@ main {
   grid-template-columns: 2.7rem 1fr;
   gap: 1rem;
   border-top: 1px solid var(--line-light);
-  transition: padding 0.35s ease, border-color 0.35s ease;
-}
-
-.capability-list li:hover {
-  padding-right: 0.7rem;
-  padding-left: 0.7rem;
-  border-color: var(--signal);
 }
 
 .capability-list__code {
