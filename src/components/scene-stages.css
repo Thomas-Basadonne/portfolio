@@ -28,6 +28,19 @@
   transition: opacity 600ms var(--ease-mechanical);
 }
 .scene-staged[data-visual-ready] .scene-stage .webgl-shell { opacity: 1; }
+/* Model readout and its leader (#20): placed by the frame loop in stage px, over the canvas, never interactive. */
+.scene-readout {
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  left: 0;
+  display: grid;
+  padding: 0.35rem 0.5rem;
+  color: var(--bone);
+  background: rgba(11, 11, 10, 0.72);
+  border: 1px solid var(--line-light);
+}
+.scene-callout { position: absolute; z-index: 1; inset: 0; width: 100%; height: 100%; overflow: visible; stroke: var(--bone-dim); fill: var(--bone); }
 
 /*
  * Wide screens and landscape phones (SIDE_BY_SIDE_QUERY in the controller): the stage spans the content box

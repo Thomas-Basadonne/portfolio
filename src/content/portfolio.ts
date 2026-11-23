@@ -109,6 +109,13 @@ export type PortfolioContent = {
     hudNav: string;
     hudDepth: string;
     hudRecalibrate: { label: string; name: string };
+    /** Model readout (#20): the four cycle states, the two percentages and the parts of the TB-001 board. */
+    readout: {
+      states: [string, string, string, string];
+      cycle: string;
+      explode: string;
+      parts: Record<"outer" | "inner" | "joints" | "rings" | "core", string>;
+    };
     instrument: string;
     heroWork: string;
     heroEmail: string;
@@ -218,6 +225,12 @@ const en: PortfolioContent = {
     hudNav: "Portfolio sections",
     hudDepth: "Inspection depth",
     hudRecalibrate: { label: "Recalibrate", name: "Recalibrate: back to the entry gate" },
+    readout: {
+      states: ["01 Standby", "02 Activation", "03 Expansion", "04 Operational"],
+      cycle: "Cycle",
+      explode: "Exploded",
+      parts: { outer: "Outer shell", inner: "Inner shell", joints: "Joint system", rings: "Stabilisation rings", core: "Computational core" },
+    },
     instrument: "Instrument TB–001",
     heroWork: "See selected work",
     heroEmail: "Email me",
@@ -745,6 +758,12 @@ const it: PortfolioContent = {
     hudNav: "Sezioni del portfolio",
     hudDepth: "Profondità di ispezione",
     hudRecalibrate: { label: "Ricalibra", name: "Ricalibra: torna all'ingresso" },
+    readout: {
+      states: ["01 Standby", "02 Attivazione", "03 Espansione", "04 Operativo"],
+      cycle: "Ciclo",
+      explode: "Esploso",
+      parts: { outer: "Involucro esterno", inner: "Involucro interno", joints: "Sistema di giunti", rings: "Anelli di stabilizzazione", core: "Core computazionale" },
+    },
     instrument: "Strumento TB–001",
     heroWork: "Guarda i progetti",
     heroEmail: "Scrivimi",

@@ -44,8 +44,8 @@ the startup crash fallback fix, not just the original gate. Regression coverage:
 138 unit tests and the initial-crash E2E on Chromium, Firefox and WebKit; real-GPU
 gate/entry/recalibrate probes on EN/IT desktop and phone-sized viewports.
 
-The CSS allowance above was later raised to **42,500** by PR #87 (decision of 2026-11-18, `docs/PERFORMANCE.md`); it does
-not change this decision's JS ceilings.
+The CSS allowance above was later raised to **42,500** by PR #87 (decision of 2026-11-18) and to **42,800** for the #20
+model readout (decision of 2026-11-23), both in `docs/PERFORMANCE.md`; neither changes this decision's JS ceilings.
 
 The final combined-tree measurements and CI SHA are recorded in the PR review.
 The ceilings include the reviewed gate plus these dependencies, not permission

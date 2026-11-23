@@ -14,6 +14,7 @@ import { CustomCursor } from "./components/CustomCursor";
 import { EntrySequence } from "./components/EntrySequence";
 import { Hud } from "./components/Hud";
 import { MotionControl } from "./components/MotionControl";
+import { SceneReadout } from "./components/SceneReadout";
 import { PortfolioStory } from "./components/PortfolioStory";
 import { VisualLayerBoundary } from "./components/VisualLayerBoundary";
 import { SHORT_LANDSCAPE_QUERY, useExperienceController } from "./hooks/useExperienceController";
@@ -326,6 +327,7 @@ export default function App() {
           motionControl={motionInHud ? motionControl : null}
         />
         {!motionInHud && motionControl && stageNode && createPortal(motionControl, stageNode)}
+        {entered && phase === "ready" && stageNode && createPortal(<SceneReadout labels={ui.readout} />, stageNode)}
         <PortfolioStory content={content} onSelectCase={selectCase} stageRef={setStageNode} />
       </div>
 
