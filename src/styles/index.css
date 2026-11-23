@@ -1225,18 +1225,35 @@ main {
   line-height: 1.5;
 }
 
-/* A narrow side-by-side column cannot hold three archive tracks without crushing words: stack them. */
-@container (max-width: 25rem) {
+/*
+ * D4 (#81): the strip follows its own width, in the staged and the fallback layout alike (the chapter is a container
+ * only when staged). Three tracks until the notes would fall under ~15em, then the title over two, then one.
+ */
+.archive {
+  container-type: inline-size;
+}
+
+@container (max-width: 42rem) {
+  .archive-strip {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .archive-strip h3 {
+    grid-column: 1 / -1;
+  }
+
+  .archive-strip > div:nth-of-type(2n + 1) {
+    grid-column: auto;
+  }
+}
+
+@container (max-width: 31rem) {
   .archive-strip {
     grid-template-columns: 1fr;
   }
 
   .archive-strip > div {
     grid-template-columns: 2.7rem 1fr;
-  }
-
-  .archive-strip > div:nth-of-type(2n + 1) {
-    grid-column: auto;
   }
 }
 
@@ -2057,18 +2074,6 @@ main {
 
   .case-index__title em {
     display: none;
-  }
-
-  .archive-strip {
-    grid-template-columns: 1fr;
-  }
-
-  .archive-strip > div {
-    grid-template-columns: 2.7rem 1fr;
-  }
-
-  .archive-strip > div:nth-of-type(2n + 1) {
-    grid-column: auto;
   }
 
   .contact-section {
