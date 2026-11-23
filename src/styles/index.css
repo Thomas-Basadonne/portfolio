@@ -31,6 +31,8 @@
   --signal-ink: #982d00;
   --oxide: #a8b6ac;
   --muted: #8a877e;
+  /* Secondary text on bone (gate, Work, archive, Experience): 5.39:1 on --bone. */
+  --muted-ink: #5d5b55;
   --line-dark: rgba(11, 11, 10, 0.18);
   --line-light: rgba(233, 229, 218, 0.2);
   --gutter: clamp(1.1rem, 3.2vw, 3.6rem);
@@ -340,7 +342,7 @@ a {
 }
 
 .gate-bar .gate-bar__identity small {
-  color: #5d5b55;
+  color: var(--muted-ink);
 }
 
 .gate-bar .gate-bar__monogram {
@@ -352,7 +354,7 @@ a {
   display: flex;
   margin: 0;
   gap: 0.6rem;
-  color: #5d5b55;
+  color: var(--muted-ink);
 }
 
 .gate-bar__status strong {
@@ -370,7 +372,7 @@ a {
   align-self: center;
   justify-self: center;
   pointer-events: none;
-  color: #5d5b55;
+  color: var(--muted-ink);
 }
 
 /* Corner marks: a border masked down to its four corners. */
@@ -1146,7 +1148,7 @@ main {
 
 .case-index__title small {
   margin-bottom: 0.25rem;
-  color: #68665f;
+  color: var(--muted-ink);
   font-family: "DM Mono", monospace;
   font-size: 0.75rem;
   letter-spacing: 0.06em;
@@ -1219,7 +1221,7 @@ main {
 .archive-strip p {
   grid-column: 2;
   margin: 0.2rem 0 0;
-  color: #626059;
+  color: var(--muted-ink);
   font-size: 0.75rem;
   line-height: 1.5;
 }
@@ -1266,7 +1268,7 @@ main {
 
 .trace-list p {
   margin: 0;
-  color: #5f5d57;
+  color: var(--muted-ink);
   font-size: 0.875rem;
   line-height: 1.5;
 }
@@ -1407,7 +1409,7 @@ main {
 }
 
 .entry-sequence .lang-switch button {
-  color: #5d5b55;
+  color: var(--muted-ink);
 }
 
 .entry-sequence .lang-switch button[aria-pressed="true"] {
@@ -2304,6 +2306,7 @@ main {
     --signal-ink: LinkText;
     --oxide: CanvasText;
     --muted: GrayText;
+    --muted-ink: CanvasText;
     --focus-on-light: Highlight;
     --line-dark: CanvasText;
     --line-light: CanvasText;
