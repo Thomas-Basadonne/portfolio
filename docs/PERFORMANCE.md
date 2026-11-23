@@ -163,6 +163,23 @@ the dock without WebGL at 390×844) or the legend (the Italian labels wrap at 39
 ceiling: the JS ceilings and every other gate are unchanged, and it is not room for unrelated features. CI measures its
 own output.
 
+CSS raw 42,500 → **42,800** (`scripts/check-bundle.mjs`, #20 model readout): Thomas explicitly confirmed the new ceiling
+on **2026-11-23**, after the coverage audit below. Measured with `pnpm run build` (raw bytes of `dist/assets/index-*.css`,
+Node 26.10.0, Vite 8.3.8):
+
+| Tree | CSS raw | vs 42,500 | Entry JS gzip | Visual JS gzip | Total JS gzip |
+|---|---:|---:|---:|---:|---:|
+| `main` `dcf9544` | 42,441 | 59 B spare | 97,110 | 248,231 | 345,341 |
+| #20 readout | 42,736 | 236 B over | 97,624 | 249,112 | 346,736 |
+
+Where the +295 B goes: the readout box (placed in the model's column by the frame loop) and the leader's SVG layer, in
+`scene-stages.css`. The coverage of Chromium over 164 contexts (16 viewports × staged/fallback/chunk failure × normal,
+reduced motion, forced colors dark and light, IT and EN, live WebGL on four viewports; gate, story, hover, focus, every
+drawer, crash fallback, failed images) found **no recoverable bytes**: the 1,819 «unused» bytes are `@font-face` and
+`@keyframes` (never counted), states of the live gate and the pause control, Firefox's `::-moz-progress-bar` and the
+content-dependent `.item-link + .item-link` (a case with two links). The alternative considered, a readout without
+border and background, would read worse over the model. The JS ceilings and every other gate are unchanged.
+
 Total JS 330,000 → **331,000** gzip (owner, 13/11): the software-renderer probe took it to 330,116 (entry 88,118,
 limit 90,000; visual chunk 241,998). The +0.3% is spent on #17; the next feature (#47) has to make its own room.
 
