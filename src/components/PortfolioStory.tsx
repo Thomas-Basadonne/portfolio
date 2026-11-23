@@ -155,24 +155,27 @@ export function PortfolioStory({ content, onSelectCase, stageRef }: PortfolioSto
             ))}
           </div>
 
-          {[
-            { id: "open-source", title: work.openSourceTitle, items: openSource },
-            { id: "lab", title: work.labTitle, items: lab },
-          ].map((group) => (
-            <section key={group.id} className="archive-strip" aria-labelledby={`${group.id}-title`}>
-              <h3 id={`${group.id}-title`} className="mono-label">
-                {group.title}
-              </h3>
-              {group.items.map((item) => (
-                <div key={item.title}>
-                  <span className="mono-label">{item.time}</span>
-                  <strong>{item.title}</strong>
-                  <p>{item.note}</p>
-                  <ItemLink item={item} newTabLabel={ui.opensNewTab} />
-                </div>
-              ))}
-            </section>
-          ))}
+          {/* The archive is its own size container: its columns follow its real width in every layout. */}
+          <div className="archive">
+            {[
+              { id: "open-source", title: work.openSourceTitle, items: openSource },
+              { id: "lab", title: work.labTitle, items: lab },
+            ].map((group) => (
+              <section key={group.id} className="archive-strip" aria-labelledby={`${group.id}-title`}>
+                <h3 id={`${group.id}-title`} className="mono-label">
+                  {group.title}
+                </h3>
+                {group.items.map((item) => (
+                  <div key={item.title}>
+                    <span className="mono-label">{item.time}</span>
+                    <strong>{item.title}</strong>
+                    <p>{item.note}</p>
+                    <ItemLink item={item} newTabLabel={ui.opensNewTab} />
+                  </div>
+                ))}
+              </section>
+            ))}
+          </div>
         </div>
       </section>
 
