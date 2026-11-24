@@ -50,6 +50,7 @@ async function goToChapter(page: Page, id: string) {
 for (const locale of ["en", "it"] as const) {
   const labels = portfolioContent[locale].ui.readout;
   const expected = {
+    identity: [labels.states[0], `${labels.cycle} 000%`, labels.rest],
     about: [labels.states[1], `${labels.cycle} 035%`, labels.parts.outer],
     capabilities: [labels.states[2], `${labels.cycle} 068%`, labels.parts.rings],
     work: [labels.states[3], `${labels.explode} 100%`, labels.parts.core],

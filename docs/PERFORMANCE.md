@@ -193,13 +193,13 @@ entry ceiling is variant A of the AST-01 decision document, chosen after both va
 | `main` `9589a1c` | 42,605 | 97,686 | 248,760 | — | 346,446 |
 | A: chapter text in the entry, log in a chunk (prototype) | 42,952 | 99,127 | 248,788 | 916 | 348,831 |
 | B: the chapter body in the chunk (prototype) | 42,952 | 98,155 | 248,788 | 2,055 | 348,998 |
-| #47 as shipped (A, flow chunk, core hover and tap) | **42,784** | **98,867** | **250,007** | **881** | **349,755** |
+| #47 as shipped (A, flow chunk, core hover and tap) | **42,784** | **98,884** | **250,009** | **881** | **349,774** |
 
 The bilingual chapter text costs ~1.2 KB gzip in the entry by itself; B would have saved ~1 KB but moved the body
 after hydration, a layout shift on a page whose chapters the controller measures. The CSS reuses the timeline's
 classes; the seven-chapter dock and the core's cursor ring are paid in part by shorter grid-row selectors. The core's
-hover and tap add ~1.2 KB to the visual chunk. Margins after #47: CSS 416 B, entry 633 B, visual 4,993 B, total
-1,245 B. Every other gate is unchanged.
+hover and tap add ~1.2 KB to the visual chunk. Margins after #47: CSS 416 B, entry 616 B, visual 4,991 B, total
+1,226 B. Every other gate is unchanged.
 
 Total JS 330,000 → **331,000** gzip (owner, 13/11): the software-renderer probe took it to 330,116 (entry 88,118,
 limit 90,000; visual chunk 241,998). The +0.3% is spent on #17; the next feature (#47) has to make its own room.

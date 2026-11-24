@@ -35,7 +35,7 @@ export function SceneReadout({ labels }: { labels: PortfolioContent["ui"]["reado
       {note ? <span>{labels.note}</span> : <>
         <span>{labels.states[state]}</span>
         <span>{metric === "cycle" ? labels.cycle : labels.explode} {String(value).padStart(3, "0")}%</span>
-        <span>{part ? labels.parts[part] : "—"}</span>
+        <span>{part ? labels.parts[part] : labels.rest}</span>
       </>}
     </div>
   );

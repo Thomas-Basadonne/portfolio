@@ -115,6 +115,8 @@ export type PortfolioContent = {
       cycle: string;
       explode: string;
       parts: Record<"outer" | "inner" | "joints" | "rings" | "core", string>;
+      /** In standby nothing moves with the scroll: the third line names what the hero shows, the closed shell (Thomas, 24/11/2026). */
+      rest: string;
       /** The core tap's note (#47): a fixed line on the method, shown for a few seconds (Thomas, 23/11/2026). */
       note: string;
     };
@@ -246,6 +248,7 @@ const en: PortfolioContent = {
       cycle: "Cycle",
       explode: "Exploded",
       parts: { outer: "Outer shell", inner: "Inner shell", joints: "Joint system", rings: "Stabilisation rings", core: "Computational core" },
+      rest: "Shell closed",
       note: "Asterion · prepares, checks, waits for my go-ahead",
     },
     instrument: "Instrument TB–001",
@@ -801,6 +804,7 @@ const it: PortfolioContent = {
       cycle: "Ciclo",
       explode: "Esploso",
       parts: { outer: "Involucro esterno", inner: "Involucro interno", joints: "Sistema di giunti", rings: "Anelli di stabilizzazione", core: "Core computazionale" },
+      rest: "Involucro chiuso",
       note: "Asterion · prepara, verifica, aspetta il mio ok",
     },
     instrument: "Strumento TB–001",
