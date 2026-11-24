@@ -81,4 +81,12 @@ describe("Method chapter contract (#47)", () => {
       for (const rule of rules[locale]) expect(text, locale).toMatch(rule);
     }
   });
+
+  it("gives the core a fixed line on the method, in both languages, with nothing outside the inventory", () => {
+    expect(portfolioContent.en.ui.readout.note).toBe("Asterion · prepares, checks, waits for my go-ahead");
+    expect(portfolioContent.it.ui.readout.note).toBe("Asterion · prepara, verifica, aspetta il mio ok");
+    for (const locale of locales) {
+      for (const pattern of FORBIDDEN) expect(portfolioContent[locale].ui.readout.note).not.toMatch(pattern);
+    }
+  });
 });

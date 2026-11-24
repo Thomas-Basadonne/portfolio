@@ -56,7 +56,7 @@
   }
   /*
    * Explicit rows: the rail shares every chapter row (auto-placement would push the chapters below it). The
-   * attribute sits only on `.scene-staged`, so the row rules leave the class out: the bytes pay for #47's dock.
+   * attribute sits only on `.scene-staged`, so the row rules leave the class out: the bytes pay for #47's dock and cursor.
    */
   [data-scene-layout] .scene-rail { grid-column: 1 / -1; grid-row: 1 / 8; }
   [data-scene-layout] [data-chapter="00"] { grid-row: 1; }

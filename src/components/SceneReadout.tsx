@@ -29,11 +29,14 @@ export function SceneReadout({ labels }: { labels: PortfolioContent["ui"]["reado
   useEffect(() => { experienceStore.requestRender?.(); }, [labels]);
 
   const { state, metric, value, part } = experienceStore.readout;
+  const note = experienceStore.readoutNote;
   return (
     <div ref={box} className="scene-readout mono-label" aria-hidden="true" data-readout-part={part ?? ""}>
-      <span>{labels.states[state]}</span>
-      <span>{metric === "cycle" ? labels.cycle : labels.explode} {String(value).padStart(3, "0")}%</span>
-      <span>{part ? labels.parts[part] : "—"}</span>
+      {note ? <span>{labels.note}</span> : <>
+        <span>{labels.states[state]}</span>
+        <span>{metric === "cycle" ? labels.cycle : labels.explode} {String(value).padStart(3, "0")}%</span>
+        <span>{part ? labels.parts[part] : "—"}</span>
+      </>}
     </div>
   );
 }

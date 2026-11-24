@@ -115,6 +115,8 @@ export type PortfolioContent = {
       cycle: string;
       explode: string;
       parts: Record<"outer" | "inner" | "joints" | "rings" | "core", string>;
+      /** The core tap's note (#47): a fixed line on the method, shown for a few seconds (Thomas, 23/11/2026). */
+      note: string;
     };
     instrument: string;
     heroWork: string;
@@ -244,6 +246,7 @@ const en: PortfolioContent = {
       cycle: "Cycle",
       explode: "Exploded",
       parts: { outer: "Outer shell", inner: "Inner shell", joints: "Joint system", rings: "Stabilisation rings", core: "Computational core" },
+      note: "Asterion · prepares, checks, waits for my go-ahead",
     },
     instrument: "Instrument TB–001",
     heroWork: "See selected work",
@@ -798,6 +801,7 @@ const it: PortfolioContent = {
       cycle: "Ciclo",
       explode: "Esploso",
       parts: { outer: "Involucro esterno", inner: "Involucro interno", joints: "Sistema di giunti", rings: "Anelli di stabilizzazione", core: "Core computazionale" },
+      note: "Asterion · prepara, verifica, aspetta il mio ok",
     },
     instrument: "Strumento TB–001",
     heroWork: "Guarda i progetti",

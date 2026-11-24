@@ -1746,6 +1746,18 @@ main {
   background: var(--signal);
 }
 
+/*
+ * Over the Compiler's core (#47) the scene drives the ring's diameter (--r) with the core's breath; the size
+ * transition smooths it and eases it back on leaving. Size, not `scale`: `scale` also multiplies the `translate3d`
+ * that places the ring, and threw it away from the pointer. No blending: `difference` darkened it on the orange.
+ */
+.cursor.is-core {
+  width: var(--r);
+  height: var(--r);
+  margin: calc(var(--r) / -2) 0 0 calc(var(--r) / -2);
+  mix-blend-mode: normal;
+}
+
 @media (pointer: fine) and (forced-colors: none) {
   body.has-custom-cursor,
   body.has-custom-cursor a,
