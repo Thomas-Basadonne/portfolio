@@ -201,6 +201,9 @@ classes; the seven-chapter dock and the core's cursor ring are paid in part by s
 hover and tap add ~1.2 KB to the visual chunk. Margins after #47: CSS 416 B, entry 616 B, visual 4,991 B, total
 1,226 B. Every other gate is unchanged.
 
+#95 (24/11, reduced-motion transitions): CSS 42,784 → **42,780** raw (`transition-duration: 0s` instead of `.001ms`);
+JS unchanged. No ceiling moves.
+
 Total JS 330,000 → **331,000** gzip (owner, 13/11): the software-renderer probe took it to 330,116 (entry 88,118,
 limit 90,000; visual chunk 241,998). The +0.3% is spent on #17; the next feature (#47) has to make its own room.
 

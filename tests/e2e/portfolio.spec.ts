@@ -616,6 +616,41 @@ test("reduced motion and forced colors keep a stable native interaction", async 
   await expectNoHorizontalOverflow(page);
 });
 
+// #95: a 0.001ms duration on every element made every property transition, so a layout change (here the fallback
+// replacing the staged layout) kept the old geometry until the next animation tick, and a scroll in between landed
+// short. Read the layout in the same task as the change: it must already be the final one, with nothing in flight.
+test("reduced motion applies a layout change at once: no property transitions in flight", async ({ page }) => {
+  await page.setViewportSize({ width: 720, height: 450 });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.route(/ExperienceCanvas-.*\.js/, (route) => route.abort());
+  await bypassEntry(page);
+  await page.addInitScript(() => {
+    new MutationObserver((records, observer) => {
+      const added = records.some(({ addedNodes }) => Array.from(addedNodes).some((node) => node instanceof Element && node.matches(".visual-status--failed")));
+      if (!added) return;
+      observer.disconnect();
+      const tail = document.querySelector(".hero-actions a:last-child");
+      Reflect.set(window, "__atChange", {
+        bottom: tail ? tail.getBoundingClientRect().bottom + window.scrollY : null,
+        transitions: document.getAnimations().filter((animation) => animation instanceof CSSTransition)
+          .map((animation) => `${(animation as CSSTransition).transitionProperty} on ${(animation.effect as KeyframeEffect | null)?.target?.className ?? "?"}`),
+      });
+    }).observe(document, { childList: true, subtree: true });
+  });
+  await page.goto("/?lang=en");
+  await expect(page.locator(".visual-status--failed")).toBeVisible();
+  await page.evaluate(() => document.fonts.ready);
+  const settled = await page.evaluate(async () => {
+    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    const tail = document.querySelector(".hero-actions a:last-child");
+    return tail ? tail.getBoundingClientRect().bottom + window.scrollY : null;
+  });
+  const atChange = await page.evaluate(() => Reflect.get(window, "__atChange") as { bottom: number | null; transitions: string[] } | undefined);
+  expect(atChange, "the fallback status was never added").toBeDefined();
+  expect(atChange?.transitions).toEqual([]);
+  expect(Math.abs((atChange?.bottom ?? 0) - (settled ?? 0)), `hero tail at the change ${atChange?.bottom}, settled ${settled}`).toBeLessThan(0.5);
+});
+
 test("visual chunk failure leaves the complete portfolio usable", async ({ page }) => {
   await page.route(/ExperienceCanvas-.*\.js/, (route) => route.abort());
   await page.goto("/");
