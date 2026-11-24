@@ -8,6 +8,7 @@ import { pose, writePose, type MachinePose } from "./tb001/pose";
 import { createStudioEnvironment } from "./tb001/studio";
 import { createPresentation, writePresentation } from "./tb001/presentation";
 import { createReadout, sameReadout, writeReadout } from "./tb001/readout";
+import { CORE_FLASH_MS, CORE_NOTE_MS, coreFlash, coreHover, hitsCore, type CoreOnScreen } from "./tb001/coreTap";
 
 type TB001ModelProps = {
   quality: RenderQuality;
@@ -138,6 +139,10 @@ const GATE_SCALE = 1.06;
 const spin = new Quaternion();
 
 const READOUT_PAD = 16;
+const coreWorld = new Vector3();
+const coreEdge = new Vector3();
+/** Controls a click on the core must not steal. */
+const INTERACTIVE = "a, button, input, select, textarea, label, [role=dialog], .case-overlay";
 /** Spring rate of the Work rows' turn (1/s): ~0.3 s to settle. */
 const INSPECT_RATE = 10;
 
@@ -147,7 +152,10 @@ export function CompilerMachine({ quality, onBuilt, onFailure }: {
   onBuilt?: () => void;
   onFailure?: (error: unknown) => void;
 }) {
-  const { camera, scene, gl, get } = useThree();
+  const { camera, scene, gl, get, invalidate } = useThree();
+  /** The core as drawn this frame (canvas px), for the tap (#47); `flashAt` starts the light pulse. */
+  const core = useMemo<CoreTarget>(() => ({ x: 0, y: 0, r: 0, visible: false, flashAt: -Infinity, written: "", hover: false, mouse: null, refresh: () => {} }), []);
+  useCoreTap(core, gl.domElement, invalidate);
   const placement = useMemo(createPresentation, []);
   const readout = useMemo(createReadout, []);
   const input = useMemo(() => ({
@@ -211,6 +219,20 @@ export function CompilerMachine({ quality, onBuilt, onFailure }: {
     placement.rotationX += experienceStore.gatePitch * gate;
     placement.rotationY += experienceStore.gateYaw * gate;
     writePose(target, placement.cycle, placement.explode, experienceStore.motionTime);
+    // The core tap's light (#47): a pulse that eases out, or a plain on/off without motion.
+    const flash = coreFlash(performance.now() - core.flashAt, experienceStore.reducedMotion || experienceStore.userPaused);
+    if (flash > 0) {
+      target.light.core += 0.9 * flash;
+      if (!experienceStore.reducedMotion && !experienceStore.userPaused) invalidate();
+    }
+    // Under the mouse the core breathes and the cursor ring with it, so the click is discoverable (Thomas, 23/11/2026).
+    if (core.hover) {
+      const still = experienceStore.reducedMotion || experienceStore.userPaused;
+      const breath = coreHover(performance.now(), still);
+      target.light.core += breath;
+      core.ring?.style.setProperty("--r", `${2.5 + 1.25 * breath}rem`);
+      if (!still) invalidate();
+    }
     const root = scene.getObjectByName("TB-001");
     if (root) {
       root.position.set(placement.x, placement.y, 0);
@@ -224,16 +246,43 @@ export function CompilerMachine({ quality, onBuilt, onFailure }: {
     camera.lookAt(0, placement.lookY, 0);
     // R3F wraps the canvas in its own div: the stage offset is the shell's (below the band header on phones).
     const shell = gl.domElement.closest<HTMLElement>(".webgl-shell");
+    const stage = shell?.closest<HTMLElement>("[data-scene-stage]");
     // The turn as drawn, for the stage's own state (and the e2e): set while the model is turned for a Work row.
-    shell?.closest("[data-scene-stage]")?.toggleAttribute("data-inspecting", input.inspect > 0.5);
-    writeModelReadout(shell, centreX - regionWidth / 2);
+    stage?.toggleAttribute("data-inspecting", input.inspect > 0.5);
+    placeCore(stage, centreX - regionWidth / 2, regionWidth, visible);
+    writeModelReadout(shell, centreX - regionWidth / 2, regionWidth);
   };
   /*
    * Model readout (#20). The label re-renders only when a rounded value changes; the box is placed directly (stage
    * px), never through a React render per frame: in the top corner of the model's column, where the stage sits beside
    * the text. Not shown in the portrait band. No leader to the model (Thomas, 23/11/2026: the readout stays alone).
    */
-  const writeModelReadout = (shell: HTMLElement | null, regionLeft: number) => {
+  /**
+   * Where the core is drawn (canvas px) and how large, for the tap. Visible only inside the model's region and the
+   * visible band; `data-core` mirrors it on the stage for the e2e.
+   */
+  const placeCore = (stage: HTMLElement | null | undefined, regionLeft: number, regionWidth: number, visibleHeight: number) => {
+    const object = scene.getObjectByName("core");
+    core.visible = false;
+    if (object && !experienceStore.gating && experienceStore.gate === 0) {
+      object.getWorldPosition(coreWorld);
+      coreEdge.setFromMatrixColumn(camera.matrixWorld, 0).multiplyScalar(0.2).add(coreWorld);
+      coreWorld.project(camera);
+      coreEdge.project(camera);
+      const canvas = gl.domElement;
+      core.x = ((coreWorld.x + 1) / 2) * canvas.clientWidth;
+      core.y = ((1 - coreWorld.y) / 2) * canvas.clientHeight;
+      core.r = Math.hypot(((coreEdge.x - coreWorld.x) / 2) * canvas.clientWidth, ((coreEdge.y - coreWorld.y) / 2) * canvas.clientHeight);
+      core.visible = coreWorld.z < 1 && core.x > regionLeft && core.x < regionLeft + regionWidth && core.y > 0 && core.y < visibleHeight;
+    }
+    core.refresh();
+    const written = core.visible ? `${Math.round(core.x)} ${Math.round(core.y)} ${Math.round(core.r)}` : "";
+    if (stage && written !== core.written) {
+      core.written = written;
+      stage.dataset.core = written;
+    }
+  };
+  const writeModelReadout = (shell: HTMLElement | null, regionLeft: number, regionWidth: number) => {
     const store = experienceStore;
     writeReadout(readout, placement.cycle, placement.explode);
     if (!sameReadout(readout, store.readout)) {
@@ -247,6 +296,117 @@ export function CompilerMachine({ quality, onBuilt, onFailure }: {
     // (Thomas, 23/11/2026), so there the readout is not shown at all.
     box.style.visibility = store.gating || store.gate > 0 || store.region >= 1 ? "hidden" : "";
     box.style.transform = `translate(${Math.round(dx + regionLeft + READOUT_PAD)}px, ${Math.round(dy + READOUT_PAD)}px)`;
+    // The core's note (#47) is one longer line: it wraps inside the model's column, never over the text.
+    box.style.maxWidth = `${Math.round(regionWidth - 2 * READOUT_PAD)}px`;
   };
   return <TB001Model quality={quality} drive={drive} onBuilt={onBuilt} onFailure={onFailure} />;
+}
+
+/**
+ * The core tap (#47, L1): a click or tap on the drawn core, anywhere the model is visible. Under a mouse the core
+ * breathes and the cursor changes before the click, so it is discoverable. The click lights the core and,
+ * where the readout is shown (beside the text, not in the portrait band), shows a fixed line on the method for a few
+ * seconds; the timer stops while the tab is hidden. The accessible way to the same content is the
+ * Method entry of the chapter navigation, so the core is not a focus stop.
+ */
+type CoreTarget = CoreOnScreen & {
+  flashAt: number;
+  written: string;
+  /** The mouse is over the core: it breathes and the cursor shows the click. */
+  hover: boolean;
+  /** Last mouse position (viewport px) and the element under it; null when the pointer is not a mouse. */
+  mouse: { x: number; y: number; target: EventTarget | null } | null;
+  /** Re-checks the hover against the core as drawn this frame. */
+  refresh: () => void;
+  /** The custom cursor's ring while it is over the core. */
+  ring?: HTMLElement | null;
+};
+
+/** Whether the core can take a click now: the scene is entered, running and past the gate. */
+const coreLive = () => {
+  const store = experienceStore;
+  return store.entered && !store.paused && !store.gating && store.gate === 0;
+};
+
+function useCoreTap(core: CoreTarget, canvas: HTMLCanvasElement, invalidate: () => void) {
+  useEffect(() => {
+    let timer = 0, left = 0, shownAt = 0;
+    /**
+     * Hover (mouse only): the core breathes and so does the cursor ring (`.cursor.is-core`), or the system pointer
+     * shows when the custom cursor is off (reduced motion, forced colours).
+     */
+    const setHover = (on: boolean) => {
+      if (core.hover === on) return;
+      core.hover = on;
+      const ring = document.querySelector<HTMLElement>(".cursor");
+      ring?.classList.toggle("is-core", on);
+      if (!on) ring?.style.removeProperty("--r");
+      core.ring = on ? ring : null;
+      const custom = document.body.classList.contains("has-custom-cursor");
+      document.body.style.cursor = on && !custom ? "pointer" : "";
+      invalidate();
+    };
+    core.refresh = () => {
+      const mouse = core.mouse;
+      if (!mouse || !coreLive() || (mouse.target instanceof Element && mouse.target.closest(INTERACTIVE))) return setHover(false);
+      const rect = canvas.getBoundingClientRect();
+      setHover(hitsCore(mouse.x - rect.left, mouse.y - rect.top, core));
+    };
+    const onPointerMove = (event: PointerEvent) => {
+      core.mouse = event.pointerType === "mouse" ? { x: event.clientX, y: event.clientY, target: event.target } : null;
+      core.refresh();
+    };
+    const onPointerLeave = () => {
+      core.mouse = null;
+      setHover(false);
+    };
+    const clear = () => {
+      window.clearTimeout(timer);
+      timer = 0;
+      if (!experienceStore.readoutNote) return;
+      experienceStore.readoutNote = false;
+      experienceStore.onReadout?.();
+    };
+    const start = (ms: number) => {
+      window.clearTimeout(timer);
+      left = ms;
+      shownAt = performance.now();
+      timer = window.setTimeout(clear, ms);
+    };
+    const onVisibility = () => {
+      if (!experienceStore.readoutNote) return;
+      if (document.hidden) {
+        window.clearTimeout(timer);
+        left = Math.max(0, left - (performance.now() - shownAt));
+      } else start(left);
+    };
+    const onPointerDown = (event: PointerEvent) => {
+      const store = experienceStore;
+      if (!coreLive() || event.button !== 0) return;
+      if (event.target instanceof Element && event.target.closest(INTERACTIVE)) return;
+      const rect = canvas.getBoundingClientRect();
+      if (!hitsCore(event.clientX - rect.left, event.clientY - rect.top, core)) return;
+      core.flashAt = performance.now();
+      invalidate();
+      // The light ends by itself only while frames run: without motion one more frame turns it off.
+      window.setTimeout(() => store.requestRender?.(), CORE_FLASH_MS + 50);
+      if (store.region >= 1) return;
+      store.readoutNote = true;
+      store.onReadout?.();
+      start(CORE_NOTE_MS);
+    };
+    window.addEventListener("pointerdown", onPointerDown);
+    window.addEventListener("pointermove", onPointerMove, { passive: true });
+    document.documentElement.addEventListener("pointerleave", onPointerLeave);
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => {
+      window.removeEventListener("pointerdown", onPointerDown);
+      window.removeEventListener("pointermove", onPointerMove);
+      document.documentElement.removeEventListener("pointerleave", onPointerLeave);
+      document.removeEventListener("visibilitychange", onVisibility);
+      core.refresh = () => {};
+      onPointerLeave();
+      clear();
+    };
+  }, [core, canvas, invalidate]);
 }

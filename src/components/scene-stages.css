@@ -54,14 +54,18 @@
     /* The fixed chapter rail keeps its own lane, shared with the fallback layout. */
     padding: 0 calc(var(--gutter) + var(--nav-lane)) var(--nav-clearance) var(--gutter);
   }
-  /* Explicit rows: the rail shares every chapter row (auto-placement would push the chapters below it). */
-  .scene-staged[data-scene-layout] .scene-rail { grid-column: 1 / -1; grid-row: 1 / 7; }
-  .scene-staged[data-scene-layout] [data-chapter="00"] { grid-row: 1; }
-  .scene-staged[data-scene-layout] [data-chapter="01"] { grid-row: 2; }
-  .scene-staged[data-scene-layout] [data-chapter="02"] { grid-row: 3; }
-  .scene-staged[data-scene-layout] [data-chapter="03"] { grid-row: 4; }
-  .scene-staged[data-scene-layout] [data-chapter="04"] { grid-row: 5; }
-  .scene-staged[data-scene-layout] [data-chapter="05"] { grid-row: 6; }
+  /*
+   * Explicit rows: the rail shares every chapter row (auto-placement would push the chapters below it). The
+   * attribute sits only on `.scene-staged`, so the row rules leave the class out: the bytes pay for #47's dock and cursor.
+   */
+  [data-scene-layout] .scene-rail { grid-column: 1 / -1; grid-row: 1 / 8; }
+  [data-scene-layout] [data-chapter="00"] { grid-row: 1; }
+  [data-scene-layout] [data-chapter="01"] { grid-row: 2; }
+  [data-scene-layout] [data-chapter="02"] { grid-row: 3; }
+  [data-scene-layout] [data-chapter="03"] { grid-row: 4; }
+  [data-scene-layout] [data-chapter="04"] { grid-row: 5; }
+  [data-scene-layout] [data-chapter="05"] { grid-row: 6; }
+  [data-scene-layout] [data-chapter="06"] { grid-row: 7; }
   /* Each chapter ends with half a viewport of open stage: the beat in which the model changes side. */
   .scene-staged[data-scene-layout] .story-section {
     position: relative;
@@ -75,7 +79,7 @@
     container-type: inline-size;
   }
   .scene-staged[data-scene-layout] .contact-section { padding-bottom: 0; }
-  .scene-staged[data-scene-layout] .story-section:is([data-chapter="01"], [data-chapter="03"], [data-chapter="05"]) {
+  .scene-staged[data-scene-layout] .story-section:is([data-chapter="01"], [data-chapter="03"], [data-chapter="06"]) {
     grid-column: 2;
   }
   .scene-staged[data-scene-layout] .story-section__content { width: 100%; }

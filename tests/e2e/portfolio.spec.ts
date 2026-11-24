@@ -116,7 +116,8 @@ for (const locale of ["en", "it"]) {
         await page.evaluate(() => document.fonts.ready);
         const tails = [
           ".hero-actions a:last-child", ".principle-equation li:last-child", ".capability-list li:last-child small",
-          ".archive-strip:last-child > div:last-child .item-link:last-child", ".trace-list:last-child li:last-child p", ".site-footer span:last-child",
+          ".archive-strip:last-child > div:last-child .item-link:last-child", "#experience .trace-list:last-child li:last-child p",
+          "#method .trace-list:last-child li:last-child p", ".site-footer span:last-child",
         ];
         const measurements = [];
         for (const selector of tails) {
@@ -172,7 +173,7 @@ for (const viewport of [{ width: 761, height: 400 }, { width: 844, height: 390 }
       expect(await chapterRailFit(page)).toEqual({ hidden: [], collisions: [], scrollable: false });
     }
     // Compact cells keep each chapter's label in its accessible name.
-    await expect(page.locator(".chapter-nav a[href='#contact']")).toHaveAccessibleName(/05.*Contatti/);
+    await expect(page.locator(".chapter-nav a[href='#contact']")).toHaveAccessibleName(/06.*Contatti/);
   });
 }
 
@@ -638,7 +639,7 @@ test("motion pause remains explicit across drawer and language changes", async (
   await expect(page.getByRole("button", { name: "Resume animation", exact: true })).toBeVisible();
   await page.getByRole("button", { name: "IT — Italiano", exact: true }).click();
   await expect(page.getByRole("button", { name: "Riprendi animazione", exact: true })).toBeVisible();
-  await page.getByRole("link", { name: /05 contatti/i }).click();
+  await page.getByRole("link", { name: /06 contatti/i }).click();
   await expect(page.locator(".chapter-nav a[aria-current=location]")).toHaveAttribute("href", "#contact");
   const resume = page.getByRole("button", { name: "Riprendi animazione", exact: true });
   await expect(resume).toBeVisible();
@@ -722,7 +723,9 @@ test("a constrained device renders in the low tier at the low cadence", async ({
   expect(rendered).toBeLessThanOrEqual(MOTION_RATES.low.idle * 2 + 4);
 });
 
-const CHAPTERS = ["identity", "about", "capabilities", "work", "experience", "contact"] as const;
+const CHAPTERS = ["identity", "about", "capabilities", "work", "experience", "method", "contact"] as const;
+/** Chapters whose text takes the right column (the model the left one): Method keeps Experience's side (#47). */
+const TEXT_RIGHT = new Set<string>(["about", "work", "contact"]);
 
 test("one persistent stage holds the model while chapters alternate around it", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
@@ -740,7 +743,7 @@ test("one persistent stage holds the model while chapters alternate around it", 
     const sideBySide = await page.evaluate(() =>
       matchMedia("(min-width: 1081px), (orientation: landscape) and (min-width: 600px)").matches);
     let first: number[] | undefined;
-    for (const [index, id] of CHAPTERS.entries()) {
+    for (const id of CHAPTERS) {
       await page.locator(`.chapter-nav a[href="#${id}"]`).click();
       await expect(page.locator(".chapter-nav a[aria-current=location]")).toHaveAttribute("href", `#${id}`);
       // The stage never moves or resizes between chapters: only the model inside it does.
@@ -763,8 +766,8 @@ test("one persistent stage holds the model while chapters alternate around it", 
         };
       });
       if (sideBySide) {
-        // Text takes the column the model leaves: left for 00/02/04, right for 01/03/05.
-        if (index % 2 === 0) expect(geometry.textRight, id).toBeLessThanOrEqual(geometry.middle + 1);
+        // Text takes the column the model leaves: left for 00/02/04/05, right for 01/03/06.
+        if (!TEXT_RIGHT.has(id)) expect(geometry.textRight, id).toBeLessThanOrEqual(geometry.middle + 1);
         else expect(geometry.textLeft, id).toBeGreaterThanOrEqual(geometry.middle - 1);
       } else if (id !== "identity") {
         // Portrait: a chapter reached from the navigation starts below the sticky band.
@@ -884,7 +887,7 @@ test("critical interaction path has no unexpected console warnings or errors", a
   await page.getByRole("button", { name: /promptify/i }).click();
   await page.getByRole("button", { name: /close/i }).click();
   await page.getByRole("button", { name: "Italiano" }).click();
-  await page.getByRole("link", { name: /05 contatti/i }).click();
+  await page.getByRole("link", { name: /06 contatti/i }).click();
   expect(unexpectedLogs).toEqual([]);
 });
 

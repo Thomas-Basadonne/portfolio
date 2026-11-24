@@ -46,6 +46,8 @@ gate/entry/recalibrate probes on EN/IT desktop and phone-sized viewports.
 
 The CSS allowance above was later raised to **42,500** by PR #87 (decision of 2026-11-18) and to **42,800** for the #20
 model readout (decision of 2026-11-23), both in `docs/PERFORMANCE.md`; neither changes this decision's JS ceilings.
+For the #47 Method chapter (decision of 2026-11-23, measurements in `docs/PERFORMANCE.md`) the entry JS ceiling was
+raised to **99,500** gzip, the total to **351,000** gzip and the CSS to **43,200** raw; the visual ceiling is unchanged.
 
 The final combined-tree measurements and CI SHA are recorded in the PR review.
 The ceilings include the reviewed gate plus these dependencies, not permission

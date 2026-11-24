@@ -1,0 +1,64 @@
+{
+  "flow": {
+    "en": [
+      {
+        "step": "Issue",
+        "text": "Every task starts from an issue with numbered acceptance criteria."
+      },
+      {
+        "step": "Questions",
+        "text": "Asterion reads the code and measures, then asks me, in a form, the decisions it cannot take. My answers go into the issue."
+      },
+      {
+        "step": "Worktree",
+        "text": "It works in a worktree and a branch of its own; the main checkout stays untouched."
+      },
+      {
+        "step": "Tests",
+        "text": "Tests come before the patch, and each one is proven by breaking the code on purpose until it fails."
+      },
+      {
+        "step": "Evidence",
+        "text": "The full suite runs on Chromium, WebKit and Firefox, and the result is checked on real screenshots against the request."
+      },
+      {
+        "step": "Pull request",
+        "text": "The pull request carries the evidence, the limits and what was not verified; CI has to be green."
+      },
+      {
+        "step": "My go-ahead",
+        "text": "Nothing is merged or published until I say so. After the merge, production is checked."
+      }
+    ],
+    "it": [
+      {
+        "step": "Issue",
+        "text": "Ogni task parte da un'issue con criteri di accettazione numerati."
+      },
+      {
+        "step": "Domande",
+        "text": "Asterion legge il codice e misura, poi mi chiede in un form le decisioni che non può prendere. Le risposte finiscono nell'issue."
+      },
+      {
+        "step": "Worktree",
+        "text": "Lavora in una worktree e in un branch dedicati; il checkout principale resta intatto."
+      },
+      {
+        "step": "Test",
+        "text": "Prima i test, poi la patch; ogni test viene provato rompendo il codice di proposito finché non fallisce."
+      },
+      {
+        "step": "Prove",
+        "text": "La suite completa gira su Chromium, WebKit e Firefox e il risultato si controlla su catture reali, confrontandolo con la richiesta."
+      },
+      {
+        "step": "Pull request",
+        "text": "La pull request porta le prove, i limiti e cosa non è stato verificato; la CI deve essere verde."
+      },
+      {
+        "step": "Il mio ok",
+        "text": "Niente viene mergiato o pubblicato finché non lo dico io. Dopo il merge si verifica la produzione."
+      }
+    ]
+  }
+}

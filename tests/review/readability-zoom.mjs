@@ -58,7 +58,7 @@ try {
     await page.bringToFront();
     const viewport = await page.evaluate(() => ({ width: innerWidth, height: innerHeight, dpr: devicePixelRatio }));
     const sections = [];
-    for (const id of ["identity", "about", "capabilities", "work", "experience", "contact"]) {
+    for (const id of ["identity", "about", "capabilities", "work", "experience", "method", "contact"]) {
       await page.locator(`#${id} .story-section__content`).evaluate((element) => element.scrollIntoView({ block: "start", behavior: "instant" }));
       const overflow = await page.evaluate(() => document.documentElement.scrollWidth - innerWidth);
       assert(overflow <= 1, `${locale}/${id}: horizontal overflow ${overflow}`);

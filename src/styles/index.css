@@ -1746,6 +1746,18 @@ main {
   background: var(--signal);
 }
 
+/*
+ * Over the Compiler's core (#47) the scene drives the ring's diameter (--r) with the core's breath; the size
+ * transition smooths it and eases it back on leaving. Size, not `scale`: `scale` also multiplies the `translate3d`
+ * that places the ring, and threw it away from the pointer. No blending: `difference` darkened it on the orange.
+ */
+.cursor.is-core {
+  width: var(--r);
+  height: var(--r);
+  margin: calc(var(--r) / -2) 0 0 calc(var(--r) / -2);
+  mix-blend-mode: normal;
+}
+
 @media (pointer: fine) and (forced-colors: none) {
   body.has-custom-cursor,
   body.has-custom-cursor a,
@@ -1791,10 +1803,11 @@ main {
 }
 
 /*
- * Short desktop and wide landscape-phone windows: six 44px rows do not fit between the HUD tools and the
+ * Short desktop and wide landscape-phone windows: seven 44px rows do not fit between the HUD tools and the
  * motion control, so the rail becomes a two-column numeric grid instead of a list that scrolls chapters away.
+ * Landscape phones take the same grid since the Method chapter (#47): a column of seven ran past 375px.
  */
-@media (min-width: 761px) and (max-height: 560px) {
+@media (min-width: 761px) and (max-height: 560px), (orientation: landscape) and (max-height: 500px) {
   .chapter-nav {
     padding: 0.3rem;
   }
@@ -2134,9 +2147,18 @@ main {
   }
 }
 
+/* Seven 44px chapters (#47) need 308px: on the narrowest phones the dock runs almost edge to edge. */
+@media (max-width: 340px) {
+  .chapter-nav {
+    right: 0.125rem;
+    left: 0.125rem;
+    padding-inline: 0.125rem;
+  }
+}
+
 @media (max-width: 760px) and (orientation: landscape) and (max-height: 500px) {
   :root {
-    --nav-lane: 4.5rem;
+    --nav-lane: 6.25rem;
     --nav-clearance: max(1rem, env(safe-area-inset-bottom));
   }
 
@@ -2148,8 +2170,6 @@ main {
     left: auto;
     padding: 0.125rem;
   }
-
-  .chapter-nav ol { flex-direction: column; }
 
   .scene-staged:not([data-scene-layout]) main {
     padding-right: calc(var(--nav-lane) + env(safe-area-inset-right));
@@ -2179,15 +2199,16 @@ main {
     min-height: 4rem;
   }
 
+  /* Clear of the two-column rail (6.25rem lane since #47). */
   .identity-section {
     min-height: max(150svh, 32rem);
-    padding-right: max(5rem, calc(env(safe-area-inset-right) + 4rem));
+    padding-right: max(7rem, calc(env(safe-area-inset-right) + 6rem));
     padding-top: 4.5rem;
   }
 
   .visual-status {
-    right: max(5.5rem, calc(env(safe-area-inset-right) + 5rem));
-    max-width: min(22rem, calc(100vw - 7rem));
+    right: max(7.5rem, calc(env(safe-area-inset-right) + 7rem));
+    max-width: min(22rem, calc(100vw - 9rem));
   }
 
   .identity-section .story-section__content--wide {

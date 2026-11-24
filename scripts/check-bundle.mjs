@@ -4,13 +4,15 @@ import { extname, join, relative } from "node:path";
 
 const dist = new URL("../dist", import.meta.url);
 // Runtime dependency JS baseline explicitly confirmed by Thomas on 2026-11-14 (#77):
-// entry 98,000 / visual 255,000 / total 350,000 gzip; performance gates are unchanged.
+// entry 98,000 / visual 255,000 / total 350,000 gzip; performance gates are unchanged. The entry ceiling was raised to
+// 99,500 for the Method chapter (#47, AST-01, variant A) on 2026-11-23: its bilingual text lives in the entry, its flow
+// in a separate chunk; the same day Thomas raised the total to 351,000 to leave room after #47 (docs/PERFORMANCE.md).
 // CSS retains #76's separate 42,000-byte allowance for the boot loader and entry gate, raised to 42,500 for the
 // Work rows and the portrait-phone first screens (#81, PR #87): Thomas confirmed it on 2026-11-18; raised to 42,800 for
-// the model readout (#20) on 2026-11-23, after a coverage audit found nothing to recover. Only the CSS ceiling moves;
-// see docs/PERFORMANCE.md (Budgets).
+// the model readout (#20) on 2026-11-23, after a coverage audit found nothing to recover, then to 43,200 with #47 the
+// same day (Thomas: room after the Method chapter). See docs/PERFORMANCE.md (Budgets).
 // Measurements and the explicit trade-offs: docs/DEPENDENCY_BUDGETS.md and docs/PERFORMANCE.md.
-const limits = { entryJs: 98_000, visualJs: 255_000, css: 42_800, totalJs: 350_000 };
+const limits = { entryJs: 99_500, visualJs: 255_000, css: 43_200, totalJs: 351_000 };
 
 async function filesIn(directory) {
   const entries = await readdir(directory, { withFileTypes: true });

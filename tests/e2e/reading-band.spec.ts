@@ -94,8 +94,14 @@ test("reading chapters leave at least 60% of the screen to the text at 375x667 a
 
 test("the reading band narrows the stage without moving the text or resizing the canvas", async ({ page }) => {
   await open(page, { width: 390, height: 844 });
-  const textTops = () => page.evaluate(() => Array.from(document.querySelectorAll("main p, main h2, main h3, main li"))
-    .map((element) => Math.round(element.getBoundingClientRect().top + window.scrollY)));
+  // Unrounded, against the document's own box. Rounding flipped Firefox's tops that sit on exactly .5px (the Method
+  // flow, #47) by 1px between two scroll positions, from float noise alone: the text has to stay within half a pixel.
+  const textTops = () => page.evaluate(() => {
+    const origin = document.documentElement.getBoundingClientRect().top;
+    return Array.from(document.querySelectorAll("main p, main h2, main h3, main li"))
+      .map((element) => element.getBoundingClientRect().top - origin);
+  });
+  const sameTops = (now: number[], before: number[]) => now.length === before.length && now.every((top, index) => Math.abs(top - before[index]) < 0.5);
 
   await scrollToSection(page, "about");
   await settleBand(page);
@@ -107,7 +113,7 @@ test("the reading band narrows the stage without moving the text or resizing the
   await settleBand(page);
   const full = await bandGeometry(page);
   expect(full.cut).toBe(0);
-  expect(await textTops()).toEqual(closedText);
+  expect(sameTops(await textTops(), closedText)).toBe(true);
   expect(full.stageHeight).toBe(closed.stageHeight);
 });
 

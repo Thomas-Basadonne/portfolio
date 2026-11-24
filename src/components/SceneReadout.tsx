@@ -18,6 +18,9 @@ export function SceneReadout({ labels }: { labels: PortfolioContent["ui"]["reado
   }, []);
   useEffect(() => {
     experienceStore.onReadout = refresh;
+    // The frame loop may have written the readout before this subscription (a deep link with reduced motion renders
+    // one frame): without this render the box kept «01 Standby 000%» until a rounded value changed (#47).
+    refresh();
     // Place the box at once, without waiting for the next scroll.
     experienceStore.requestRender?.();
     return () => { experienceStore.onReadout = null; };
@@ -26,11 +29,14 @@ export function SceneReadout({ labels }: { labels: PortfolioContent["ui"]["reado
   useEffect(() => { experienceStore.requestRender?.(); }, [labels]);
 
   const { state, metric, value, part } = experienceStore.readout;
+  const note = experienceStore.readoutNote;
   return (
     <div ref={box} className="scene-readout mono-label" aria-hidden="true" data-readout-part={part ?? ""}>
-      <span>{labels.states[state]}</span>
-      <span>{metric === "cycle" ? labels.cycle : labels.explode} {String(value).padStart(3, "0")}%</span>
-      <span>{part ? labels.parts[part] : "—"}</span>
+      {note ? <span>{labels.note}</span> : <>
+        <span>{labels.states[state]}</span>
+        <span>{metric === "cycle" ? labels.cycle : labels.explode} {String(value).padStart(3, "0")}%</span>
+        <span>{part ? labels.parts[part] : labels.rest}</span>
+      </>}
     </div>
   );
 }

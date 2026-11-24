@@ -90,13 +90,32 @@ function writeFit(rx: number, ry: number, rz: number, aspect: number) {
  * to the back and returns, Experience comes round to the front and Contact turns a half orbit.
  * Work does not orbit the exploded stack (a long stack swinging end-on would make an exact fit pump the camera
  * by more than half); the stack turns once about its own axis instead, which leaves its envelope unchanged.
+ * Method (#47) carries the half orbit to the front, where the core is in view (≥ 0.9 of it, measured: at 196° the shell
+ * hides 60% of it); Contact then turns its last 12° to 378°.
  */
-const YAW = [-32, -150, 16, 58, 150, 378];
-const PITCH = [12, 18, 12, 22, -4, 12];
+const YAW = [-32, -150, 16, 58, 150, 366, 378];
+const PITCH = [12, 18, 12, 22, -4, 8, 12];
 /** The hero settles into its first hold, so even the opening screen answers the scroll. */
 const YAW_START = -50;
 const PITCH_START = 6;
 const DEGREE = Math.PI / 180;
+/**
+ * Method (#47, chapter 5): the camera closes in on the core to 0.88 of the fitted distance. Thomas approved 0.82 from
+ * the spike (0.60 left the column); measured on the real geometry, 0.82 puts the model at 0.965 of the narrowest
+ * column (1100×700) against the 0.95 the presentation tests allow, and 0.88 is the closest that stays inside.
+ */
+export const METHOD_ZOOM = 0.88;
+const METHOD = 5;
+/**
+ * The close-in happens once Method's turn has brought the core to the front (the hold, p 0.8 → 1): during the turn
+ * the silhouette nearly fills its fit and a closer camera would leave the stage. Contact eases back out while its
+ * short turn starts, so the chapter boundary has no jump.
+ */
+function methodZoom(chapter: number, p: number) {
+  if (chapter === METHOD) return 1 - (1 - METHOD_ZOOM) * smoothRange(p, 0.8, 1);
+  if (chapter === METHOD + 1) return 1 - (1 - METHOD_ZOOM) * (1 - smoothRange(p, 0, 0.3));
+  return 1;
+}
 /**
  * Work rows (#21, option C): hover or keyboard focus turns the model about its own hatch axis, the same for every case.
  * A turn about that axis leaves the envelope unchanged, so the framing does not move and the readout (cycle, explode)
@@ -155,7 +174,7 @@ function fitState(state: ChapterState, aspect: number) {
 
 /** Direct, reversible poses. Document depth never selects a chapter or mechanical state. */
 export function writePresentation(target: ReturnType<typeof createPresentation>, input: PresentationInput) {
-  const chapter = Math.min(5, Math.max(0, Math.trunc(input.chapter ?? 0)));
+  const chapter = Math.min(6, Math.max(0, Math.trunc(input.chapter ?? 0)));
   const p = input.reducedMotion ? 1 : clamp01(input.stageProgress ?? 0);
   const aspect = Math.max(0.1, input.aspect ?? 1);
   const motion = input.reducedMotion || input.userPaused ? 0 : 1;
@@ -163,7 +182,8 @@ export function writePresentation(target: ReturnType<typeof createPresentation>,
   // The exact fit follows the parts as they leave and return, so the machine keeps its size on screen; a
   // scripted dolly ran ahead of the outside-in teardown and shrank the still-compact stack to under half.
   writeChapterState(current, chapter, p, aspect);
-  const distance = fitState(current, aspect);
+  const zoom = methodZoom(chapter, p);
+  const distance = fitState(current, aspect) * zoom;
   target.cycle = current.cycle;
   target.explode = current.explode;
   target.rotationZ = current.rz;

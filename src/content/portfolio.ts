@@ -67,7 +67,7 @@ export type ListItem = {
   link?: ExternalLink;
 };
 
-export type ChapterId = "identity" | "about" | "capabilities" | "work" | "experience" | "contact";
+export type ChapterId = "identity" | "about" | "capabilities" | "work" | "experience" | "method" | "contact";
 
 export type Chapter = {
   id: ChapterId;
@@ -115,6 +115,10 @@ export type PortfolioContent = {
       cycle: string;
       explode: string;
       parts: Record<"outer" | "inner" | "joints" | "rings" | "core", string>;
+      /** In standby nothing moves with the scroll: the third line names what the hero shows, the closed shell (Thomas, 24/11/2026). */
+      rest: string;
+      /** The core tap's note (#47): a fixed line on the method, shown for a few seconds (Thomas, 23/11/2026). */
+      note: string;
     };
     instrument: string;
     heroWork: string;
@@ -163,6 +167,20 @@ export type PortfolioContent = {
   };
   experience: ListItem[];
   education: ListItem[];
+  /**
+   * Method (#47): how Thomas works with agents, in his voice; Asterion never speaks as a character. Copy approved word
+   * for word on 2026-11-23 (AST-01). The typical flow of a task lives in method-flow.json, outside the entry bundle.
+   */
+  method: {
+    kicker: string;
+    title: { lead: string; emphasis: string };
+    intro: string;
+    boundary: string;
+    profilesTitle: string;
+    profiles: { name: string; role: string }[];
+    memory: string;
+    flowTitle: string;
+  };
   contact: {
     kicker: string;
     title: { lead: string; emphasis: string };
@@ -230,6 +248,8 @@ const en: PortfolioContent = {
       cycle: "Cycle",
       explode: "Exploded",
       parts: { outer: "Outer shell", inner: "Inner shell", joints: "Joint system", rings: "Stabilisation rings", core: "Computational core" },
+      rest: "Shell closed",
+      note: "Asterion · prepares, checks, waits for my go-ahead",
     },
     instrument: "Instrument TB–001",
     heroWork: "See selected work",
@@ -257,7 +277,8 @@ const en: PortfolioContent = {
     { id: "capabilities", code: "02", label: "Capabilities" },
     { id: "work", code: "03", label: "Work" },
     { id: "experience", code: "04", label: "Experience" },
-    { id: "contact", code: "05", label: "Contact" },
+    { id: "method", code: "05", label: "Method" },
+    { id: "contact", code: "06", label: "Contact" },
   ],
   about: {
     kicker: "01 / About",
@@ -713,8 +734,28 @@ const en: PortfolioContent = {
       note: "High-school diploma, 2015–2020.",
     },
   ],
+  method: {
+    kicker: "05 / Method",
+    title: { lead: "I work with agents.", emphasis: " The decisions stay mine." },
+    intro:
+      "Asterion is my configuration of Hermes Agent. It plans the work, hands parts of it to six specialist profiles and checks the evidence before it shows me anything. It does not merge, publish or decide for me.",
+    boundary:
+      "Hermes Agent is an open-source project by Nous Research; Asterion is my configuration on top of it. The Compiler's core is a metaphor: it runs nothing.",
+    profilesTitle: "Six specialists",
+    profiles: [
+      { name: "researcher", role: "Documentation and web research, from primary sources." },
+      { name: "builder", role: "Implements one assigned task, in a worktree prepared for it." },
+      { name: "reviewer", role: "Independent review: concrete defects in the evidence." },
+      { name: "qa", role: "Acceptance and exploratory testing in the browser." },
+      { name: "operator", role: "Operations: the real state first, then the smallest change with a rollback." },
+      { name: "knowledge-keeper", role: "Keeps a knowledge vault, with the source of every note." },
+    ],
+    memory:
+      "Memory runs on Hindsight, an open-source memory engine I host myself. Scheduled maintenance keeps the knowledge in order.",
+    flowTitle: "How a task runs",
+  },
   contact: {
-    kicker: "05 / Contact",
+    kicker: "06 / Contact",
     title: { lead: "Let's build something", emphasis: " that holds." },
     body:
       "I'm open to AI product work, websites for businesses that care about the details, and open-source projects that sound slightly unreasonable.",
@@ -763,6 +804,8 @@ const it: PortfolioContent = {
       cycle: "Ciclo",
       explode: "Esploso",
       parts: { outer: "Involucro esterno", inner: "Involucro interno", joints: "Sistema di giunti", rings: "Anelli di stabilizzazione", core: "Core computazionale" },
+      rest: "Involucro chiuso",
+      note: "Asterion · prepara, verifica, aspetta il mio ok",
     },
     instrument: "Strumento TB–001",
     heroWork: "Guarda i progetti",
@@ -790,7 +833,8 @@ const it: PortfolioContent = {
     { id: "capabilities", code: "02", label: "Competenze" },
     { id: "work", code: "03", label: "Progetti" },
     { id: "experience", code: "04", label: "Esperienza" },
-    { id: "contact", code: "05", label: "Contatti" },
+    { id: "method", code: "05", label: "Metodo" },
+    { id: "contact", code: "06", label: "Contatti" },
   ],
   about: {
     kicker: "01 / Chi sono",
@@ -1245,8 +1289,28 @@ const it: PortfolioContent = {
       note: "Diploma, 2015–2020.",
     },
   ],
+  method: {
+    kicker: "05 / Metodo",
+    title: { lead: "Lavoro con gli agenti.", emphasis: " Le decisioni restano mie." },
+    intro:
+      "Asterion è la mia configurazione di Hermes Agent. Pianifica il lavoro, ne affida parti a sei profili specialisti e verifica le prove prima di mostrarmi qualcosa. Non mergia, non pubblica e non decide al posto mio.",
+    boundary:
+      "Hermes Agent è un progetto open source di Nous Research; Asterion è la mia configurazione sopra di esso. Il nucleo del Compiler è una metafora: non esegue nulla.",
+    profilesTitle: "Sei specialisti",
+    profiles: [
+      { name: "researcher", role: "Ricerca su documentazione e web, da fonti primarie." },
+      { name: "builder", role: "Implementa un solo task assegnato, in una worktree preparata per quello." },
+      { name: "reviewer", role: "Revisione indipendente: difetti concreti nelle prove." },
+      { name: "qa", role: "Test di accettazione ed esplorativi nel browser." },
+      { name: "operator", role: "Operazioni: prima lo stato reale, poi la modifica minima con un rollback." },
+      { name: "knowledge-keeper", role: "Cura un archivio di conoscenza, con la fonte di ogni nota." },
+    ],
+    memory:
+      "La memoria gira su Hindsight, un motore di memoria open source che ospito io. Una manutenzione programmata tiene in ordine la conoscenza.",
+    flowTitle: "Come si svolge un task",
+  },
   contact: {
-    kicker: "05 / Contatti",
+    kicker: "06 / Contatti",
     title: { lead: "Costruiamo qualcosa", emphasis: " che regga." },
     body:
       "Sono disponibile per progetti AI, siti per aziende che tengono ai dettagli e progetti open source un po' irragionevoli.",
