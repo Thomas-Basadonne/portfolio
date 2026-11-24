@@ -18,6 +18,9 @@ export function SceneReadout({ labels }: { labels: PortfolioContent["ui"]["reado
   }, []);
   useEffect(() => {
     experienceStore.onReadout = refresh;
+    // The frame loop may have written the readout before this subscription (a deep link with reduced motion renders
+    // one frame): without this render the box kept «01 Standby 000%» until a rounded value changed (#47).
+    refresh();
     // Place the box at once, without waiting for the next scroll.
     experienceStore.requestRender?.();
     return () => { experienceStore.onReadout = null; };

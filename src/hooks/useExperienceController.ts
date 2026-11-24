@@ -25,8 +25,11 @@ export const SIDE_BY_SIDE_QUERY = "(min-width: 1081px), (orientation: landscape)
 export const SHORT_LANDSCAPE_QUERY = "(max-width: 760px) and (orientation: landscape) and (max-height: 500px)";
 /** Portrait layout with the stage band over the reading flow: the only one where the band narrows. */
 export const PORTRAIT_BAND_QUERY = "(max-width: 1080px) and (orientation: portrait)";
-/** Column the model takes in each chapter (0 = left, 1 = right); the text takes the other one. */
-export const MODEL_SIDE = [1, 0, 1, 0, 1, 0] as const;
+/**
+ * Column the model takes in each chapter (0 = left, 1 = right); the text takes the other one. Method (#47) keeps
+ * Experience's side, so Contact keeps its own (text right, model left) and nothing crosses between Experience and Method.
+ */
+export const MODEL_SIDE = [1, 0, 1, 0, 1, 1, 0] as const;
 /**
  * A side change is centred on the empty band between two chapters' texts (half a viewport tall in the
  * side-by-side layout) crossing the middle of the viewport, and spans CROSSING_TRAVEL of the viewport.

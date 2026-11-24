@@ -1,13 +1,15 @@
 import type { Ref } from "react";
-import type { CaseStudy, ListItem, PortfolioContent } from "../content/portfolio";
+import type { CaseStudy, ListItem, Locale, PortfolioContent } from "../content/portfolio";
 import { SceneStage } from "./SceneStage";
 import { Arrow } from "./Arrow";
 import { experienceStore } from "../lib/experienceStore";
+import { MethodFlow } from "./MethodFlow";
 
 type PortfolioStoryProps = {
   content: PortfolioContent;
   onSelectCase: (caseStudy: CaseStudy, trigger: HTMLElement) => void;
   stageRef?: Ref<HTMLDivElement>;
+  locale: Locale;
 };
 
 function ItemLink({ item, newTabLabel }: { item: ListItem; newTabLabel: string }) {
@@ -59,10 +61,10 @@ function Timeline({ items }: { items: ListItem[] }) {
   );
 }
 
-export function PortfolioStory({ content, onSelectCase, stageRef }: PortfolioStoryProps) {
+export function PortfolioStory({ content, onSelectCase, stageRef, locale }: PortfolioStoryProps) {
   const { profile, ui, about, capabilitiesSection, capabilities, work, caseStudies, openSource, lab } =
     content;
-  const { experienceSection, experience, education, contact } = content;
+  const { experienceSection, experience, education, contact, method } = content;
 
   return (
     <main id="main-content" tabIndex={-1}>
@@ -211,7 +213,34 @@ export function PortfolioStory({ content, onSelectCase, stageRef }: PortfolioSto
         </div>
       </section>
 
-      <section className="story-section contact-section" id="contact" data-chapter="05">
+      {/* Method (#47): Thomas's voice; the profiles and the flow reuse the timeline's rhythm. */}
+      <section className="story-section trace-section" id="method" data-chapter="05" data-align="start">
+        <div className="story-section__content reading-panel">
+          <span className="chapter-kicker mono-label">{method.kicker}</span>
+          <h2>
+            {method.title.lead}
+            <em>{method.title.emphasis}</em>
+          </h2>
+          <p>{method.intro}</p>
+          <p>{method.boundary}</p>
+          <h3 className="timeline-heading mono-label">{method.profilesTitle}</h3>
+          <ol className="trace-list">
+            {method.profiles.map((profile, index) => (
+              <li key={profile.name}>
+                <span className="mono-label">{String(index + 1).padStart(2, "0")}</span>
+                <div>
+                  <h3>{profile.name}</h3>
+                  <p>{profile.role}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+          <p>{method.memory}</p>
+          <MethodFlow locale={locale} title={method.flowTitle} />
+        </div>
+      </section>
+
+      <section className="story-section contact-section" id="contact" data-chapter="06">
         <div className="story-section__content story-section__content--contact">
           <span className="chapter-kicker mono-label">{contact.kicker}</span>
           <h2>

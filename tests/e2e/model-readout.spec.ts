@@ -54,6 +54,7 @@ for (const locale of ["en", "it"] as const) {
     capabilities: [labels.states[2], `${labels.cycle} 068%`, labels.parts.rings],
     work: [labels.states[3], `${labels.explode} 100%`, labels.parts.core],
     experience: [labels.states[3], `${labels.cycle} 100%`, labels.parts.core],
+    method: [labels.states[3], `${labels.cycle} 100%`, labels.parts.core],
     contact: [labels.states[3], `${labels.cycle} 100%`, labels.parts.core],
   };
 

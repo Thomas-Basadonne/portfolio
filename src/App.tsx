@@ -328,7 +328,7 @@ export default function App() {
         />
         {!motionInHud && motionControl && stageNode && createPortal(motionControl, stageNode)}
         {entered && phase === "ready" && stageNode && createPortal(<SceneReadout labels={ui.readout} />, stageNode)}
-        <PortfolioStory content={content} onSelectCase={selectCase} stageRef={setStageNode} />
+        <PortfolioStory content={content} onSelectCase={selectCase} stageRef={setStageNode} locale={locale} />
       </div>
 
       {entered && phase === "loading" && (

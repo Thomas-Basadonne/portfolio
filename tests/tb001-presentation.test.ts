@@ -7,8 +7,8 @@ import { boundsOnScreen, coreVisibility } from "./helpers/tb001-probes";
 import { hideUnframedOrbits } from "./helpers/tb001-framing";
 
 const input = { progress: 0, chapter: 0, stageProgress: 0, isMobile: false, reducedMotion: false, pointerX: 0, pointerY: 0 };
-/** The arc is monotonic: Experience recomposes into the operational state and Contact holds it (no reopening). */
-const anchors = [[0, 0, 0], [1, 0.35, 0], [2, 0.68, 0], [3, 1, 1], [4, 1, 0], [5, 1, 0]] as const;
+/** The arc is monotonic: Experience recomposes into the operational state; Method and Contact hold it (no reopening). */
+const anchors = [[0, 0, 0], [1, 0.35, 0], [2, 0.68, 0], [3, 1, 1], [4, 1, 0], [5, 1, 0], [6, 1, 0]] as const;
 /**
  * Aspect of the region the model is framed in, measured in the browser (scene-stages.css): one column of the
  * side-by-side layout at 1100×700 … 1920×1080 and on landscape phones, or the sticky band on portrait screens.
@@ -123,12 +123,23 @@ describe("TB-001 semantic chapter choreography", () => {
 
   it("keeps the approved core-visibility gates in the chapter camera", () => {
     for (const aspect of aspects) {
-      for (const [chapter, gate] of [[2, 0.9], [3, 0.95], [5, 0.9]] as const) {
+      // Method (5, #47) closes in on the core: it must stay at least as visible as in Contact.
+      for (const [chapter, gate] of [[2, 0.9], [3, 0.95], [5, 0.9], [6, 0.9]] as const) {
         const { camera } = frame(chapter, 1, aspect);
         expect(coreVisibility(machine.root, camera).vis, `chapter ${chapter} aspect ${aspect}`).toBeGreaterThanOrEqual(gate);
       }
     }
   }, 60000);
+
+  it("joins Method and Contact without a jump: same turn and camera across the boundary (#47)", () => {
+    for (const aspect of aspects) {
+      const end = writePresentation(createPresentation(), { ...input, chapter: 5, stageProgress: 1, aspect });
+      const start = writePresentation(createPresentation(), { ...input, chapter: 6, stageProgress: 0, aspect });
+      for (const key of ["rotationX", "rotationY", "rotationZ", "cameraZ", "x", "y"] as const) {
+        expect(start[key], `${key} aspect ${aspect}`).toBeCloseTo(end[key], 6);
+      }
+    }
+  });
 
   it("turns the model about its own axis for a Work row and changes nothing else (#21)", () => {
     // Option C: the same small turn for every case. Not a state of the mechanism: cycle and explode (the readout), the
