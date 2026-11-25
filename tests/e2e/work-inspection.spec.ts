@@ -167,6 +167,36 @@ test("an open case pauses the scene, a resize behind it draws no loop, closing r
   await expect.poll(draws, { timeout: SCENE_TIMEOUT }).toBeGreaterThan(closed);
 });
 
+// The drawer covers the row the pointer is on, and the browser moves the hover off it later, on its own schedule
+// (WebKit on Linux: 50-120 ms after the drawer shows; the scene then drew one frame up to ~400 ms later, the flake
+// of the test above in CI). The row's hover ending behind the open drawer, and its focus leaving, must draw nothing.
+test("a row's hover or focus ending behind the open case draws nothing", async ({ page }) => {
+  const draws = await countDraws(page);
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await enterWork(page);
+  await sceneReady(page);
+  await toWork(page);
+  const row = page.getByRole("button", { name: /project twin/i });
+  await row.hover();
+  await expect(stage(page)).toHaveAttribute("data-inspecting", "", { timeout: SCENE_TIMEOUT });
+  // Held from before the drawer: behind it the page is inert, out of the accessibility tree that getByRole reads.
+  const behind = await row.elementHandle();
+  await row.click();
+  const dialog = page.getByRole("dialog", { name: "Project Twin" });
+  await expect(dialog).toBeVisible();
+  await page.waitForTimeout(400);
+  const paused = await draws();
+  // What the browser does when it moves the hover: pointerout on the row towards the overlay (React's pointerleave).
+  await behind!.evaluate((element) => {
+    const overlay = document.querySelector(".case-overlay");
+    element.dispatchEvent(new PointerEvent("pointerout", { bubbles: true, pointerType: "mouse", relatedTarget: overlay }));
+    overlay?.dispatchEvent(new PointerEvent("pointerover", { bubbles: true, pointerType: "mouse", relatedTarget: element }));
+    element.dispatchEvent(new FocusEvent("focusout", { bubbles: true, relatedTarget: overlay }));
+  });
+  await page.waitForTimeout(700);
+  expect(await draws(), "no draw for a row behind the open case").toBe(paused);
+});
+
 test("closing a case returns to the chapter's pose as it is now, after a resize too", async ({ page }) => {
   // Reduced motion: every pose is exact (no ambient time, no pointer, no turn), so two frames of the same state match.
   await page.emulateMedia({ reducedMotion: "reduce" });
