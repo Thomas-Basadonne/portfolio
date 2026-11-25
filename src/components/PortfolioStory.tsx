@@ -32,7 +32,9 @@ const inspecting = { hover: false, focus: false };
 function inspect(source: keyof typeof inspecting, on: boolean) {
   inspecting[source] = on;
   experienceStore.inspectTarget = inspecting.hover || inspecting.focus ? 1 : 0;
-  experienceStore.requestRender?.();
+  // Behind an open case the scene draws nothing: the browser moves the hover off the covered row on its own schedule
+  // (WebKit: after the drawer shows), and the frame on resume picks the target up.
+  if (!experienceStore.paused) experienceStore.requestRender?.();
 }
 
 /**
