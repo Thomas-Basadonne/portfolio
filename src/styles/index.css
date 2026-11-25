@@ -2307,7 +2307,10 @@ main {
     scroll-behavior: auto !important;
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
-    transition-duration: 0.001ms !important;
+    /* 0s, not a tiny duration: `transition-property` defaults to `all`, so any nonzero duration made every property of
+       every element transition and a layout change kept its old geometry until the next frame (#95). A declared delay
+       (the gate's visibility) still holds its value until it ends. */
+    transition-duration: 0s !important;
   }
 
   .site-shell .identity-section .story-section__content,
