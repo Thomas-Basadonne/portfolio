@@ -37,17 +37,17 @@
     "three": "0.182.0"
   },
   "devDependencies": {
-    "@axe-core/playwright": "4.14.0",
+    "@axe-core/playwright": "4.14.1",
     "@lhci/cli": "0.16.1",
     "@playwright/test": "1.65.1",
-    "@types/react": "^19.3.0",
+    "@types/react": "^19.3.1",
     "@types/react-dom": "^19.3.0",
     "@types/three": "^0.185.1",
     "@vitejs/plugin-react": "^6.2.1",
-    "oxlint": "1.94.0",
+    "oxlint": "1.95.0",
     "typescript": "^7.0.2",
     "vite": "^8.3.8",
-    "vitest": "5.1.0",
-    "wrangler": "4.164.0"
+    "vitest": "5.1.1",
+    "wrangler": "4.168.0"
   }
 }
